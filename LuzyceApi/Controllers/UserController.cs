@@ -68,7 +68,7 @@ namespace LuzyceApi.Controllers
         [Authorize]
         public IActionResult Get()
         {
-            var users = _context.Users.ToList().Select(x => new { x.Id, x.Name, x.LastName, x.Login, x.CreatedAt });
+            var users = _context.Users.ToList().Select(x => new { x.Id, x.Name, x.LastName, x.Login });
             return Ok(users);
         }
 
@@ -81,7 +81,7 @@ namespace LuzyceApi.Controllers
             {
                 return NotFound();
             }
-            var result = new { user.Id, user.Name, user.LastName, user.Login, user.CreatedAt };
+            var result = new { user.Id, user.Name, user.LastName, user.Login };
             return Ok(result);
         }
 

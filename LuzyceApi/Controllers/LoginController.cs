@@ -43,13 +43,14 @@ namespace LuzyceApi.Controllers
         [HttpPost]
         public IActionResult Login([FromBody] LoginDto dto)
         {
-            var user = _context.Users.FirstOrDefault(x => x.Login == dto.Login && x.Password == dto.Password);
-            if (user == null)
+            var user = _context.Users.FirstOrDefault(x => x.Login == dto.Login);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
             {
                 return NotFound();
             }
             var tokenString = GenerateJSONWebToken(user.Id);
-            return Ok(new { token = tokenString });
+            var result = new { user.Id, user.Name, user.LastName, user.Login };
+            return Ok(new { token = tokenString, result });
         }
     }
 }

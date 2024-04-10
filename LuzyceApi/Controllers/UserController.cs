@@ -21,15 +21,6 @@ namespace LuzyceApi.Controllers
         {
             _context = context;
         }
-        private static string HashPassword(string password)
-        {
-            byte[] bytes = SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(password));
-
-            // Convert byte array to a string
-            string hashedPassword = BitConverter.ToString(bytes).Replace("-", "").ToLower();
-
-            return hashedPassword;
-        }
 
         [HttpGet]
         [Authorize]
@@ -53,12 +44,11 @@ namespace LuzyceApi.Controllers
         }
 
         [HttpPost]
-        [Authorize]
         public IActionResult Post([FromBody] CreateUserDto dto)
         {
             var user = dto.ToUserFromCreateDto();
             var hashedUser = dto.ToUserFromCreateDto();
-            hashedUser.Password = HashPassword(dto.Password);
+            hashedUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             _context.Users.Add(hashedUser);
             _context.SaveChanges();
             return CreatedAtAction(nameof(Get), new { id = user.Id }, user);

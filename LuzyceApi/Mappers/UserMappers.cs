@@ -11,6 +11,7 @@ public static class UserMappers
         {
             Name = dto.Name,
             LastName = dto.LastName,
+            Email = dto.Email,
             Login = dto.Login,
             Password = dto.Password,
             Hash = dto.Hash,

@@ -39,6 +39,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public IActionResult Post([FromBody] CreateUserDto dto)
     {
         var user = dto.ToUserFromCreateDto();

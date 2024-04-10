@@ -17,7 +17,8 @@ namespace LuzyceApi.Mappers
                 LastName = dto.LastName,
                 Login = dto.Login,
                 Password = dto.Password,
-                Hash = dto.Hash
+                Hash = dto.Hash,
+                Admin = false
             };
         }
     }

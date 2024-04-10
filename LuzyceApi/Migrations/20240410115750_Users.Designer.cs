@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240408165459_Users")]
+    [Migration("20240410115750_Users")]
     partial class Users
     {
         /// <inheritdoc />
@@ -28,8 +28,14 @@ namespace LuzyceApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    b.Property<bool>("Admin")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Hash")
                         .IsRequired()

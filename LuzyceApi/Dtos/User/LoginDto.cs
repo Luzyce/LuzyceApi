@@ -2,6 +2,7 @@ namespace LuzyceApi.Dtos.User;
 
 public class LoginDto
 {
-    public required string Login { get; set; }
-    public required string Password { get; set; }
+    public string Login { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Hash { get; set; } = string.Empty;
 }

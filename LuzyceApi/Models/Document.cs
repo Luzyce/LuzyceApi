@@ -8,6 +8,7 @@ public class Document
     public required int Year { get; set; }
     public required User OperatorID { get; set; }
     public required DateTime CreatedAt { get; set; }
+    public required DateTime UpdatedAt { get; set; }
     public required DateTime ClosedAt { get; set; }
     public required Status StatusID { get; set; }
     public required DocumentsDefinition DocumentDefinitionID { get; set; }

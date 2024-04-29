@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LuzyceApi.Models;
+namespace LuzyceApi.Db.AppDb.Data.Models;
 
 public class User
 {

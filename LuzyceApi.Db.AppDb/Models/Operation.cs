@@ -1,4 +1,4 @@
-namespace LuzyceApi.Models;
+namespace LuzyceApi.Db.AppDb.Data.Models;
 
 public class Operation
 {

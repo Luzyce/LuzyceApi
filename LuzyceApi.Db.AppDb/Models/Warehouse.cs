@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace LuzyceApi.Models;
+namespace LuzyceApi.Db.AppDb.Data.Models;
 
-public class DocumentsDefinition
+public class Warehouse
 {
     public int Id { get; set; }
     [Required]
@@ -10,4 +10,6 @@ public class DocumentsDefinition
     [MaxLength(1)]
     public required char Code { get; set; }
     public required string Name { get; set; }
+
+
 }

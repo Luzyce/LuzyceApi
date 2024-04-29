@@ -1,5 +1,4 @@
 using System.Text;
-using LuzyceApi;
 using LuzyceApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

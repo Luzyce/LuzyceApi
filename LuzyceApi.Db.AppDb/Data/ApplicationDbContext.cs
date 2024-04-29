@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using LuzyceApi.Models;
+using LuzyceApi.Db.AppDb.Data.Models;
 
-namespace LuzyceApi.Data;
+namespace LuzyceApi.Db.AppDb.Data;
 
 public class ApplicationDbContext : DbContext
 {

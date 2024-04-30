@@ -1,5 +1,7 @@
 using System.Text;
-using LuzyceApi.Data;
+using LuzyceApi.Db.AppDb.Data;
+
+// using LuzyceApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -55,7 +57,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("AppDbConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseMySql(
         connectionString,

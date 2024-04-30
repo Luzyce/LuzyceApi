@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace LuzyceApi.Migrations
+namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
     public partial class Users : Migration

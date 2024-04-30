@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LuzyceApi.Db.Subiekt\LuzyceApi.Db.Subiekt.csproj" />
+    <ProjectReference Include="..\LuzyceApi.Db.AppDb\LuzyceApi.Db.AppDb.csproj" />
+    <ProjectReference Include="..\LuzyceApi.Repositories\LuzyceApi.Repositories.csproj" />
   </ItemGroup>
 
 </Project>

@@ -57,13 +57,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var connectionString = builder.Configuration.GetConnectionString("AppDbConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString)
-    )
-);
+builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
 

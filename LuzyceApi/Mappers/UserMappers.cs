@@ -1,5 +1,5 @@
 using LuzyceApi.Dtos.User;
-using LuzyceApi.Models;
+using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Mappers;
 

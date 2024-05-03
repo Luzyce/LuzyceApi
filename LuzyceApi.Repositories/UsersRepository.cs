@@ -59,4 +59,67 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
             Admin = user.Admin
         };
     }
+
+    public IEnumerable<Domain.Models.User> GetUsers()
+    {
+        logger.LogInformation("Getting all users");
+        return applicationDbContext
+            .Users
+            .Select(
+                x => new Domain.Models.User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    Login = x.Login,
+                    Hash = x.Hash,
+                    CreatedAt = x.CreatedAt,
+                    Admin = x.Admin
+                }
+            )
+            .ToList();
+    }
+
+    public Domain.Models.User? GetUserById(int id)
+    {
+        logger.LogInformation($"Getting user by id: {id}");
+        return applicationDbContext
+            .Users
+            .Select(
+                x => new Domain.Models.User
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    Login = x.Login,
+                    Hash = x.Hash,
+                    CreatedAt = x.CreatedAt,
+                    Admin = x.Admin
+                }
+            )
+            .FirstOrDefault(x => x.Id == id);
+    }
+
+    public void AddUser(Domain.Models.User user)
+    {
+        logger.LogInformation($"Adding user: {user.Login}");
+
+        applicationDbContext.Users.Add(
+            new Db.AppDb.Data.Models.User
+            {
+                Name = user.Name,
+                LastName = user.LastName,
+                Email = user.Email,
+                Login = user.Login,
+                Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                Hash = user.Hash,
+                CreatedAt = user.CreatedAt,
+                Admin = user.Admin
+            }
+        );
+
+        applicationDbContext.SaveChanges();
+    }
 }

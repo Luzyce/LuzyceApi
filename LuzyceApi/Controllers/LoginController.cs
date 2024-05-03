@@ -56,22 +56,12 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         bool isHashLogin = !string.IsNullOrEmpty(dto.Hash);
         User? user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
-        if (isHashLogin)
+
+        if (user == null)
         {
-            user = context.Users.FirstOrDefault(x => x.Hash == dto.Hash);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            return NotFound();
         }
-        else
-        {
-            user = context.Users.FirstOrDefault(x => x.Login == dto.Login);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
-            {
-                return NotFound();
-            }
-        }
+
         var tokenString = generateJSONWebToken(user, isHashLogin);
         var result = new { user.Id, user.Name, user.LastName, user.Login };
         return Ok(new { token = tokenString, result });

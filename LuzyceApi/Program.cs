@@ -57,6 +57,8 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddScoped<LuzyceApi.Repositories.UsersRepository>();
+
 builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();

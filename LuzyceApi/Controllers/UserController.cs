@@ -1,6 +1,6 @@
-using LuzyceApi.Data;
 using LuzyceApi.Dtos.User;
 using LuzyceApi.Mappers;
+using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,20 +8,16 @@ namespace LuzyceApi.Controllers;
 
 [Route("api/user")]
 [ApiController]
-public class UserController : ControllerBase
+public class UserController(UsersRepository usersRepository) : ControllerBase
 {
-    private readonly ApplicationDbContext context;
 
-    public UserController(ApplicationDbContext context)
-    {
-        this.context = context;
-    }
+    private readonly UsersRepository usersRepository = usersRepository;
 
     [HttpGet]
     [Authorize]
     public IActionResult Get()
     {
-        var users = context.Users.ToList().Select(x => new { x.Id, x.Name, x.LastName, x.Login });
+        var users = usersRepository.GetUsers().Select(x => new { x.Id, x.Name, x.LastName, x.Login });
         return Ok(users);
     }
 
@@ -29,7 +25,7 @@ public class UserController : ControllerBase
     [Authorize]
     public IActionResult Get(int id)
     {
-        var user = context.Users.SingleOrDefault(x => x.Id == id);
+        var user = usersRepository.GetUserById(id);
         if (user == null)
         {
             return NotFound();
@@ -42,11 +38,8 @@ public class UserController : ControllerBase
     [Authorize]
     public IActionResult Post([FromBody] CreateUserDto dto)
     {
-        var user = dto.ToUserFromCreateDto();
-        var hashedUser = dto.ToUserFromCreateDto();
-        hashedUser.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        context.Users.Add(hashedUser);
-        context.SaveChanges();
+        var user = UserMappers.ToUserFromCreateDto(dto);
+        usersRepository.AddUser(user);
         return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
     }
 

@@ -13,15 +13,8 @@ namespace LuzyceApi.Controllers;
 [ApiController]
 public class LoginController(IConfiguration config, UsersRepository usersRepository) : Controller
 {
-    // private readonly ApplicationDbContext context;
     private readonly IConfiguration config = config;
     private readonly UsersRepository usersRepository = usersRepository;
-
-    // public LoginController(ApplicationDbContext context, IConfiguration config)
-    // {
-    //     this.context = context;
-    //     this.config = config;
-    // }
 
     private string generateJSONWebToken(User user, bool isHashLogin)
     {

@@ -19,4 +19,23 @@ public class ApplicationDbContext : DbContext
     {
         optionsBuilder.UseMySql(config.GetConnectionString("AppDbConnection"), ServerVersion.AutoDetect(config.GetConnectionString("AppDbConnection")));
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        var adminUser = new User
+        {
+            Id = 1,
+            Name = "Admin",
+            LastName = "Admin",
+            Email = "admin@gmail.com",
+            Login = "admin",
+            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+            Hash = "",
+            Admin = true
+        };
+
+        modelBuilder.Entity<User>().HasData(adminUser);
+    }
 }

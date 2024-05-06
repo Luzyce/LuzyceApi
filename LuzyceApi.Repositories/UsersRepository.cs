@@ -122,4 +122,40 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
 
         applicationDbContext.SaveChanges();
     }
+
+    public void UpdateUser(Domain.Models.User user)
+    {
+        logger.LogInformation($"Updating user: {user.Login}");
+
+        var userToUpdate = applicationDbContext.Users.FirstOrDefault(x => x.Id == user.Id);
+
+        if (userToUpdate == null)
+        {
+            return;
+        }
+
+        userToUpdate.Name = user.Name;
+        userToUpdate.LastName = user.LastName;
+        userToUpdate.Email = user.Email;
+        userToUpdate.Login = user.Login;
+        userToUpdate.Hash = user.Hash;
+        userToUpdate.Admin = user.Admin;
+
+        applicationDbContext.SaveChanges();
+    }
+
+    public void DeleteUser(Domain.Models.User user)
+    {
+        logger.LogInformation($"Deleting user: {user.Login}");
+
+        var userToDelete = applicationDbContext.Users.FirstOrDefault(x => x.Id == user.Id);
+
+        if (userToDelete == null)
+        {
+            return;
+        }
+
+        applicationDbContext.Users.Remove(userToDelete);
+        applicationDbContext.SaveChanges();
+    }
 }

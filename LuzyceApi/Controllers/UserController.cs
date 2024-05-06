@@ -43,4 +43,32 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
     }
 
+    [HttpPut("{id}")]
+    [Authorize]
+    public IActionResult Put(int id, [FromBody] UpdateUserDto dto)
+    {
+        var user = usersRepository.GetUserById(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        usersRepository.UpdateUser(UserMappers.UpdateUserFromDto(dto, user));
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public IActionResult Delete(int id)
+    {
+        var user = usersRepository.GetUserById(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        usersRepository.DeleteUser(user);
+        return NoContent();
+    }
+
 }

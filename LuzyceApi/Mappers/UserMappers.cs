@@ -18,4 +18,15 @@ public static class UserMappers
             Admin = false
         };
     }
+
+    public static User UpdateUserFromDto(this UpdateUserDto dto, User user)
+    {
+        user.Name = dto.Name;
+        user.LastName = dto.LastName;
+        user.Email = dto.Email;
+        user.Login = dto.Login;
+        user.Hash = dto.Hash;
+        user.Admin = dto.Admin;
+        return user;
+    }
 }

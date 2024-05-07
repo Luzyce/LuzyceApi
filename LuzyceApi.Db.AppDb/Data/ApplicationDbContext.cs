@@ -14,6 +14,16 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<Document> Documents { get; set; }
+    public DbSet<DocumentItemRelationships> DocumentItemRelationships { get; set; }
+    public DbSet<DocumentPositions> DocumentPositions { get; set; }
+    public DbSet<DocumentRelations> DocumentRelations { get; set; }
+    public DbSet<DocumentsDefinition> DocumentsDefinitions { get; set; }
+    public DbSet<Error> Errors { get; set; }
+    public DbSet<Lampshade> Lampshades { get; set; }
+    public DbSet<Operation> Operations { get; set; }
+    public DbSet<Status> Statuses { get; set; }
+    public DbSet<Warehouse> Warehouses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -26,16 +36,47 @@ public class ApplicationDbContext : DbContext
 
         var adminUser = new User
         {
-            Id = 1,
             Name = "Admin",
             LastName = "Admin",
             Email = "admin@gmail.com",
             Login = "admin",
             Password = BCrypt.Net.BCrypt.HashPassword("admin"),
-            Hash = "",
+            Hash = "admin",
             Admin = true
         };
 
+        var DocumentDefinitionID = new DocumentsDefinition
+        {
+            Code = "D",
+            Name = "Dokument"
+        };
+
+        var open = new Status
+        {
+            Name = "Otwarty",
+            Priority = 1
+        };
+
+        var kwit = new Warehouse
+        {
+            Code = "KW",
+            Name = "Kwit"
+        };
+
+        var exampleDocument = new Document
+        {
+            Number = "0001/KW/2023",
+            Year = 2023,
+            WarehouseID = kwit,
+            OperatorID = adminUser,
+            CreatedAt = DateTime.Now,
+            StatusID = open,
+            DocumentDefinitionID = DocumentDefinitionID
+        };
+
         modelBuilder.Entity<User>().HasData(adminUser);
+        modelBuilder.Entity<Warehouse>().HasData(kwit);
+        modelBuilder.Entity<Status>().HasData(open);
+        modelBuilder.Entity<Document>().HasData(exampleDocument);
     }
 }

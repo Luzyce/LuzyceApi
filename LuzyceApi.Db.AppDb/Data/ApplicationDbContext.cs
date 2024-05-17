@@ -34,50 +34,46 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        var adminUser = new User
+        var documentsDefinition = new DocumentsDefinition()
         {
-            Name = "Admin",
-            LastName = "Admin",
-            Email = "admin@gmail.com",
-            Login = "admin",
-            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
-            Hash = "admin",
-            Admin = true
-        };
-
-        var documentDefinitionID = new DocumentsDefinition
-        {
-            Code = "D",
-            Name = "Dokument"
-        };
-
-        var open = new Status
-        {
-            Name = "Otwarty",
-            Priority = 1
-        };
-
-        var kwit = new Warehouse
-        {
+            Id = 1,
             Code = "KW",
-            Name = "Kwit"
+            Name = "Kwit",
         };
+        modelBuilder.Entity<DocumentsDefinition>().HasData(documentsDefinition);
 
         var exampleDocument = new Document
         {
+            Id = 1,
             Number = "0001/KW/2023",
             Year = 2023,
-            WarehouseID = kwit,
-            OperatorID = adminUser,
+            Warehouse = new()
+            {
+                Id = 1,
+                Code = "Prod",
+                Name = "Produkcja z wanny"
+            },
+            Operator = new()
+            {
+                Id = 1,
+                Name = "Admin",
+                LastName = "Admin",
+                Email = "admin@gmail.com",
+                Login = "admin",
+                Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Hash = "admin",
+                Admin = true
+            },
             CreatedAt = DateTime.Now,
-            StatusID = open,
-            DocumentDefinitionID = documentDefinitionID
+            Status = new()
+            {
+                Id = 1,
+                Name = "Otwarty",
+                Priority = 1
+            },
+            DocumentsDefinition = documentsDefinition
         };
 
-        modelBuilder.Entity<DocumentsDefinition>().HasData(documentDefinitionID);
-        modelBuilder.Entity<User>().HasData(adminUser);
-        modelBuilder.Entity<Warehouse>().HasData(kwit);
-        modelBuilder.Entity<Status>().HasData(open);
         modelBuilder.Entity<Document>().HasData(exampleDocument);
     }
 }

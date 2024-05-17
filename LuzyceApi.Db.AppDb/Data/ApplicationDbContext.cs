@@ -45,7 +45,7 @@ public class ApplicationDbContext : DbContext
             Admin = true
         };
 
-        var DocumentDefinitionID = new DocumentsDefinition
+        var documentDefinitionID = new DocumentsDefinition
         {
             Code = "D",
             Name = "Dokument"
@@ -71,9 +71,10 @@ public class ApplicationDbContext : DbContext
             OperatorID = adminUser,
             CreatedAt = DateTime.Now,
             StatusID = open,
-            DocumentDefinitionID = DocumentDefinitionID
+            DocumentDefinitionID = documentDefinitionID
         };
 
+        modelBuilder.Entity<DocumentsDefinition>().HasData(documentDefinitionID);
         modelBuilder.Entity<User>().HasData(adminUser);
         modelBuilder.Entity<Warehouse>().HasData(kwit);
         modelBuilder.Entity<Status>().HasData(open);

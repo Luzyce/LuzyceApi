@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240519100219_Documents")]
+    [Migration("20240519151621_Documents")]
     partial class Documents
     {
         /// <inheritdoc />
@@ -28,7 +28,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ClosedAt")
+                    b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -47,7 +47,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("WarehouseId")
@@ -72,13 +72,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            ClosedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            CreatedAt = new DateTime(2024, 5, 19, 12, 2, 19, 110, DateTimeKind.Local).AddTicks(9970),
+                            CreatedAt = new DateTime(2024, 5, 19, 17, 16, 20, 889, DateTimeKind.Local).AddTicks(1239),
                             DocumentsDefinitionId = 1,
                             Number = "0001/KW/2023",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -359,13 +357,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 19, 12, 2, 19, 2, DateTimeKind.Local).AddTicks(4370),
+                            CreatedAt = new DateTime(2024, 5, 19, 17, 16, 20, 782, DateTimeKind.Local).AddTicks(669),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$cW8CDS.wFfSxWutFSKerL.7Fnatmn6Hf.WgFfybXZAIjIO60OWXXW"
+                            Password = "$2a$11$PZsACXs8FN0WCmdv0EkGH.FWRdEfvJSIucF5NNH7x5lU0rVq.Bk.K"
                         });
                 });
 

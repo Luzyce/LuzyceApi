@@ -1,4 +1,5 @@
 using LuzyceApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LuzyceApi.Controllers;
@@ -9,6 +10,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     private readonly DocumentRepository documentRepository = documentRepository;
 
     [HttpGet]
+    [Authorize]
     public IActionResult Get()
     {
         var documents = documentRepository.GetDocuments().Select(x => new
@@ -17,7 +19,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             x.Number,
             x.Warehouse,
             x.Year,
-            Operator = new { x.Operator.Id, x.Operator.Name, x.Operator.LastName, x.Operator.Email, x.Operator.Login },
+            Operator = new { x.Operator.Id, x.Operator.Name, x.Operator.LastName },
             x.CreatedAt,
             x.UpdatedAt,
             x.ClosedAt,
@@ -26,5 +28,29 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         }
         );
         return Ok(documents);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize]
+    public IActionResult Get(int id)
+    {
+        var document = documentRepository.GetDocument(id);
+        if (document == null)
+        {
+            return NotFound();
+        }
+        return Ok(new
+        {
+            document.Id,
+            document.Number,
+            document.Warehouse,
+            document.Year,
+            Operator = new { document.Operator.Id, document.Operator.Name, document.Operator.LastName },
+            document.CreatedAt,
+            document.UpdatedAt,
+            document.ClosedAt,
+            document.Status,
+            document.DocumentsDefinition
+        });
     }
 }

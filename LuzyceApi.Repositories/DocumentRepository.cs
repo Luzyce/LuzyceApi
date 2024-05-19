@@ -1,5 +1,6 @@
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace LuzyceApi.Repositories;
@@ -29,6 +30,35 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             }
         )
         .ToList();
+    }
+
+    public Domain.Models.Document? GetDocument(int id)
+    {
+        logger.LogInformation("Getting document by id");
+        var document = applicationDbContext.Documents
+                        .Include(d => d.Warehouse)
+                        .Include(d => d.Operator)
+                        .Include(d => d.Status)
+                        .Include(d => d.DocumentsDefinition)
+                        .FirstOrDefault(x => x.Id == id);
+
+        if (document == null)
+        {
+            return null;
+        }
+        return new Domain.Models.Document
+        {
+            Id = document.Id,
+            Number = document.Number,
+            Warehouse = WarehouseDomainFromDb(document.Warehouse),
+            Year = document.Year,
+            Operator = UserDomainFromDb(document.Operator),
+            CreatedAt = document.CreatedAt,
+            UpdatedAt = document.UpdatedAt,
+            ClosedAt = document.ClosedAt,
+            Status = StatusDomainFromDb(document.Status),
+            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition)
+        };
     }
 
     public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse wherehouse)

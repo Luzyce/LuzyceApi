@@ -137,8 +137,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     Year = table.Column<int>(type: "int", nullable: false),
                     OperatorId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     DocumentsDefinitionId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -333,7 +333,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 19, 12, 2, 19, 2, DateTimeKind.Local).AddTicks(4370), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$cW8CDS.wFfSxWutFSKerL.7Fnatmn6Hf.WgFfybXZAIjIO60OWXXW" });
+                values: new object[] { 1, true, new DateTime(2024, 5, 19, 17, 16, 20, 782, DateTimeKind.Local).AddTicks(669), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$PZsACXs8FN0WCmdv0EkGH.FWRdEfvJSIucF5NNH7x5lU0rVq.Bk.K" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -343,7 +343,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
-                values: new object[] { 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2024, 5, 19, 12, 2, 19, 110, DateTimeKind.Local).AddTicks(9970), 1, "0001/KW/2023", 1, 1, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 2023 });
+                values: new object[] { 1, null, new DateTime(2024, 5, 19, 17, 16, 20, 889, DateTimeKind.Local).AddTicks(1239), 1, "0001/KW/2023", 1, 1, null, 1, 2023 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",

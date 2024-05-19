@@ -58,6 +58,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 builder.Services.AddScoped<LuzyceApi.Repositories.UsersRepository>();
+builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
 

@@ -34,44 +34,61 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        var documentsDefinition = new DocumentsDefinition()
+        var adminUser = new User
+        {
+            Id = 1,
+            Name = "Admin",
+            LastName = "Admin",
+            Email = "admin@gmail.com",
+            Login = "admin",
+            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+            Hash = "admin",
+            Admin = true
+        };
+
+        modelBuilder.Entity<User>().HasData(adminUser);
+
+        var kwit = new DocumentsDefinition
         {
             Id = 1,
             Code = "KW",
-            Name = "Kwit",
+            Name = "Kwit"
         };
-        modelBuilder.Entity<DocumentsDefinition>().HasData(documentsDefinition);
+
+        modelBuilder.Entity<DocumentsDefinition>().HasData(kwit);
+
+        var open = new Status
+        {
+            Id = 1,
+            Name = "Otwarty",
+            Priority = 1
+        };
+
+        modelBuilder.Entity<Status>().HasData(open);
+
+        var magazyn = new Warehouse
+        {
+            Id = 1,
+            Code = "MG",
+            Name = "Magazyn"
+        };
+
+        modelBuilder.Entity<Warehouse>().HasData(magazyn);
 
         var exampleDocument = new Document
         {
             Id = 1,
             Number = "0001/KW/2023",
             Year = 2023,
-            Warehouse = new()
-            {
-                Id = 1,
-                Code = "Prod",
-                Name = "Produkcja z wanny"
-            },
-            Operator = new()
-            {
-                Id = 1,
-                Name = "Admin",
-                LastName = "Admin",
-                Email = "admin@gmail.com",
-                Login = "admin",
-                Password = BCrypt.Net.BCrypt.HashPassword("admin"),
-                Hash = "admin",
-                Admin = true
-            },
+            Warehouse = null!,
+            WarehouseId = magazyn.Id,
+            Operator = null!,
+            OperatorId = adminUser.Id,
             CreatedAt = DateTime.Now,
-            Status = new()
-            {
-                Id = 1,
-                Name = "Otwarty",
-                Priority = 1
-            },
-            DocumentsDefinition = documentsDefinition
+            Status = null!,
+            StatusId = open.Id,
+            DocumentsDefinition = null!,
+            DocumentsDefinitionId = kwit.Id
         };
 
         modelBuilder.Entity<Document>().HasData(exampleDocument);

@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-// using LuzyceApi.Data;
 using LuzyceApi.Dtos.User;
 using LuzyceApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;

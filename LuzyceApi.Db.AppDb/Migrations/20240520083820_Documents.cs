@@ -131,16 +131,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Number = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DocNumber = table.Column<int>(type: "int", nullable: false),
                     WarehouseId = table.Column<int>(type: "int", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DocumentsDefinitionId = table.Column<int>(type: "int", nullable: false),
                     OperatorId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    DocumentsDefinitionId = table.Column<int>(type: "int", nullable: false)
+                    StatusId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -333,7 +334,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 19, 17, 16, 20, 782, DateTimeKind.Local).AddTicks(669), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$PZsACXs8FN0WCmdv0EkGH.FWRdEfvJSIucF5NNH7x5lU0rVq.Bk.K" });
+                values: new object[] { 1, true, new DateTime(2024, 5, 20, 10, 38, 20, 342, DateTimeKind.Local).AddTicks(7176), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$Tn5Fjr2WIMVvxYpZNHLHqug5V4M2xguke6t2HKx15Mr8MmHa0vFWi" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -342,8 +343,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.InsertData(
                 table: "Documents",
-                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
-                values: new object[] { 1, null, new DateTime(2024, 5, 19, 17, 16, 20, 889, DateTimeKind.Local).AddTicks(1239), 1, "0001/KW/2023", 1, 1, null, 1, 2023 });
+                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
+                values: new object[] { 1, null, new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8856), 1, 1, "0001/KW/2023", 1, 1, new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8910), 1, 2023 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",

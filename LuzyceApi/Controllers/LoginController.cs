@@ -19,7 +19,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
     {
         var claims = new[]
         {
-                new Claim(ClaimTypes.NameIdentifier, user.Login),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, string.IsNullOrEmpty(user.Email) ? "" : user.Email),
                 new Claim(ClaimTypes.Role, user.Admin ? Roles.ADMIN : Roles.USER),
                 new Claim(ClaimTypes.GivenName, user.Name),

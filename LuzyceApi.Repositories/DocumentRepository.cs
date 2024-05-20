@@ -18,20 +18,20 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             x => new Domain.Models.Document
             {
                 Id = x.Id,
-                Number = x.Number,
-                Warehouse = WarehouseDomainFromDb(x.Warehouse),
+                DocNumber = x.DocNumber,
+                Warehouse = WarehouseDomainFromDb(x.Warehouse!),
                 Year = x.Year,
-                Operator = UserDomainFromDb(x.Operator),
+                Number = x.Number,
+                DocumentsDefinition = DocumentsDefinitionDomainFromDb(x.DocumentsDefinition!),
+                Operator = UserDomainFromDb(x.Operator!),
                 CreatedAt = x.CreatedAt,
                 UpdatedAt = x.UpdatedAt,
                 ClosedAt = x.ClosedAt,
-                Status = StatusDomainFromDb(x.Status),
-                DocumentsDefinition = DocumentsDefinitionDomainFromDb(x.DocumentsDefinition)
+                Status = StatusDomainFromDb(x.Status!)
             }
         )
         .ToList();
     }
-
     public Domain.Models.Document? GetDocument(int id)
     {
         logger.LogInformation("Getting document by id");
@@ -49,18 +49,52 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         return new Domain.Models.Document
         {
             Id = document.Id,
-            Number = document.Number,
-            Warehouse = WarehouseDomainFromDb(document.Warehouse),
+            DocNumber = document.DocNumber,
+            Warehouse = WarehouseDomainFromDb(document.Warehouse!),
             Year = document.Year,
-            Operator = UserDomainFromDb(document.Operator),
+            Number = document.Number,
+            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition!),
+            Operator = UserDomainFromDb(document.Operator!),
             CreatedAt = document.CreatedAt,
             UpdatedAt = document.UpdatedAt,
             ClosedAt = document.ClosedAt,
-            Status = StatusDomainFromDb(document.Status),
-            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition)
+            Status = StatusDomainFromDb(document.Status!)
         };
     }
+    public Domain.Models.Document AddDocument(Domain.Models.Document document)
+    {
+        logger.LogInformation("Adding document");
+        int currentYear = DateTime.Now.Year;
+        int nextDocNumber = applicationDbContext.Documents
+        .Where(d => d.WarehouseId == document.WarehouseId
+                    && d.Year == currentYear
+                    && d.DocumentsDefinitionId == document.DocumentsDefinitionId)
+        .Select(d => d.DocNumber)
+        .ToList()
+        .DefaultIfEmpty(0)
+        .Max() + 1;
 
+        var dbDocument = new Document
+        {
+            DocNumber = nextDocNumber,
+            WarehouseId = document.WarehouseId,
+            Year = currentYear,
+            Number = $"{nextDocNumber:D4}/{applicationDbContext.Warehouses
+                .Where(w => w.Id == document.WarehouseId)
+                .Select(w => w.Code)
+                .FirstOrDefault()}/{currentYear}",
+            DocumentsDefinitionId = document.DocumentsDefinitionId,
+            OperatorId = document.OperatorId,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+            ClosedAt = null,
+            StatusId = 1
+        };
+        applicationDbContext.Documents.Add(dbDocument);
+        applicationDbContext.SaveChanges();
+        document.Id = dbDocument.Id;
+        return document;
+    }
     public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse wherehouse)
     {
         return new()

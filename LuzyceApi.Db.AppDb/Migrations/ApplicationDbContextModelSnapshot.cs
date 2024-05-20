@@ -31,6 +31,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("DocNumber")
+                        .HasColumnType("int");
+
                     b.Property<int>("DocumentsDefinitionId")
                         .HasColumnType("int");
 
@@ -44,7 +47,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("StatusId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("WarehouseId")
@@ -69,11 +72,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 19, 17, 16, 20, 889, DateTimeKind.Local).AddTicks(1239),
+                            CreatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8856),
+                            DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/KW/2023",
                             OperatorId = 1,
                             StatusId = 1,
+                            UpdatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8910),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -354,13 +359,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 19, 17, 16, 20, 782, DateTimeKind.Local).AddTicks(669),
+                            CreatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 342, DateTimeKind.Local).AddTicks(7176),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$PZsACXs8FN0WCmdv0EkGH.FWRdEfvJSIucF5NNH7x5lU0rVq.Bk.K"
+                            Password = "$2a$11$Tn5Fjr2WIMVvxYpZNHLHqug5V4M2xguke6t2HKx15Mr8MmHa0vFWi"
                         });
                 });
 

@@ -69,7 +69,7 @@ public class ApplicationDbContext : DbContext
         var magazyn = new Warehouse
         {
             Id = 1,
-            Code = "MG",
+            Code = "M",
             Name = "Magazyn"
         };
 
@@ -78,17 +78,19 @@ public class ApplicationDbContext : DbContext
         var exampleDocument = new Document
         {
             Id = 1,
-            Number = "0001/KW/2023",
-            Year = 2023,
+            DocNumber = 1,
             Warehouse = null!,
             WarehouseId = magazyn.Id,
+            Year = 2023,
+            Number = "0001/M/2024",
+            DocumentsDefinition = null!,
+            DocumentsDefinitionId = kwit.Id,
             Operator = null!,
             OperatorId = adminUser.Id,
             CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
             Status = null!,
-            StatusId = open.Id,
-            DocumentsDefinition = null!,
-            DocumentsDefinitionId = kwit.Id
+            StatusId = open.Id
         };
 
         modelBuilder.Entity<Document>().HasData(exampleDocument);

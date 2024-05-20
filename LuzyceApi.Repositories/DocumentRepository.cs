@@ -95,6 +95,19 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         document.Id = dbDocument.Id;
         return document;
     }
+    public Domain.Models.Document? UpdateDocument(Domain.Models.Document document)
+    {
+        logger.LogInformation("Updating document");
+        var dbDocument = applicationDbContext.Documents.Find(document.Id);
+        if (dbDocument == null)
+        {
+            return null;
+        }
+        dbDocument.StatusId = document.StatusId;
+        dbDocument.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+        return document;
+    }
     public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse wherehouse)
     {
         return new()

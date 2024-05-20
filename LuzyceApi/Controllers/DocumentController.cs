@@ -19,15 +19,16 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         var documents = documentRepository.GetDocuments().Select(x => new
         {
             x.Id,
-            x.Number,
+            x.DocNumber,
             x.Warehouse,
             x.Year,
+            x.Number,
+            x.DocumentsDefinition,
             Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
             x.CreatedAt,
             x.UpdatedAt,
             x.ClosedAt,
-            x.Status,
-            x.DocumentsDefinition
+            x.Status
         }
         );
         return Ok(documents);
@@ -45,15 +46,16 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         return Ok(new
         {
             document.Id,
-            document.Number,
+            document.DocNumber,
             document.Warehouse,
             document.Year,
+            document.Number,
+            document.DocumentsDefinition,
             Operator = document.Operator != null ? new { document.Operator.Id, document.Operator.Name, document.Operator.LastName } : null,
             document.CreatedAt,
             document.UpdatedAt,
             document.ClosedAt,
-            document.Status,
-            document.DocumentsDefinition
+            document.Status
         });
     }
 
@@ -65,5 +67,19 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         newDocument.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         newDocument = documentRepository.AddDocument(newDocument);
         return CreatedAtAction(nameof(Get), new { id = newDocument.Id }, documentRepository.GetDocument(newDocument.Id));
+    }
+
+    [HttpPut("changeStatus/{id}")]
+    [Authorize]
+    public IActionResult ChangeStatus(int id, [FromBody] ChangeDocumentStatusDto dto)
+    {
+        var document = documentRepository.GetDocument(id);
+        if (document == null)
+        {
+            return NotFound();
+        }
+        document.StatusId = dto.StatusId;
+        documentRepository.UpdateDocument(document);
+        return Ok(documentRepository.GetDocument(id));
     }
 }

@@ -4,6 +4,7 @@ using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Controllers;
 [Route("api/document")]
@@ -66,7 +67,27 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         var newDocument = DocumentMappers.ToDocumentFromCreateDto(dto);
         newDocument.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         newDocument = documentRepository.AddDocument(newDocument);
-        return CreatedAtAction(nameof(Get), new { id = newDocument.Id }, documentRepository.GetDocument(newDocument.Id));
+        if (documentRepository.GetDocumentsDefinition(newDocument.DocumentsDefinitionId)?.Code == "KW" && newDocument != null)
+        {
+            var documentPosition = new DocumentPositions
+            {
+                DocumentId = newDocument.Id,
+                OperatorId = newDocument.OperatorId,
+                StartTime = DateTime.Now,
+                StatusId = 1,
+                LampshadeId = dto.LampshadeId
+            };
+            documentRepository.AddDocumentPosition(documentPosition);
+        }
+
+        if (newDocument != null)
+        {
+            return CreatedAtAction(nameof(Get), new { id = newDocument.Id }, documentRepository.GetDocument(newDocument.Id));
+        }
+        else
+        {
+            return BadRequest("Failed to create document.");
+        }
     }
 
     [HttpPut("changeStatus/{id}")]

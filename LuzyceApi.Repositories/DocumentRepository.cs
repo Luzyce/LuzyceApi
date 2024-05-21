@@ -1,3 +1,4 @@
+using System.Buffers;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -108,6 +109,38 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return document;
     }
+    public Domain.Models.DocumentPositions AddDocumentPosition(Domain.Models.DocumentPositions documentPosition)
+    {
+        logger.LogInformation("Adding document position" + documentPosition.DocumentId);
+        var dbDocumentPosition = new DocumentPositions
+        {
+            DocumentId = documentPosition.DocumentId,
+            OperatorId = documentPosition.OperatorId,
+            StartTime = documentPosition.StartTime,
+            StatusId = documentPosition.StatusId,
+            LampshadeId = documentPosition.LampshadeId
+        };
+        applicationDbContext.DocumentPositions.Add(dbDocumentPosition);
+        applicationDbContext.SaveChanges();
+        return documentPosition;
+    }
+    public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
+    {
+        logger.LogInformation("Getting document definition by id");
+        var documentsDefinition = applicationDbContext.DocumentsDefinitions
+                        .FirstOrDefault(x => x.Id == id);
+
+        if (documentsDefinition == null)
+        {
+            return null;
+        }
+        return new Domain.Models.DocumentsDefinition
+        {
+            Id = documentsDefinition.Id,
+            Code = documentsDefinition.Code,
+            Name = documentsDefinition.Name
+        };
+    }
     public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse wherehouse)
     {
         return new()
@@ -117,7 +150,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = wherehouse.Name
         };
     }
-
     public static Domain.Models.User UserDomainFromDb(User user)
     {
         return new()
@@ -133,7 +165,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Admin = user.Admin
         };
     }
-
     public static Domain.Models.Status StatusDomainFromDb(Status status)
     {
         return new()
@@ -143,7 +174,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Priority = status.Priority
         };
     }
-
     public static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
     {
         return new()

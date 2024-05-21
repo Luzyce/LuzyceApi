@@ -94,5 +94,34 @@ public class ApplicationDbContext : DbContext
         };
 
         modelBuilder.Entity<Document>().HasData(exampleDocument);
+
+        var exampleLampshade = new Lampshade
+        {
+            Id = 1,
+            Code = "KL4124",
+        };
+
+        modelBuilder.Entity<Lampshade>().HasData(exampleLampshade);
+
+        var exampleDocumentPosition = new DocumentPositions
+        {
+            Id = 1,
+            DocumentId = exampleDocument.Id,
+            Document = null!,
+            NetQuantity = 0,
+            QuantityLoss = 0,
+            QuantityToImprove = 0,
+            GrossQuantity = 0,
+            OperatorId = adminUser.Id,
+            Operator = null!,
+            StartTime = DateTime.Now,
+            EndTime = null,
+            StatusId = open.Id,
+            Status = null!,
+            LampshadeId = 1,
+            Lampshade = null!
+        };
+
+        modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPosition);
     }
 }

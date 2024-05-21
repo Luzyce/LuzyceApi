@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240520083820_Documents")]
+    [Migration("20240521132932_Documents")]
     partial class Documents
     {
         /// <inheritdoc />
@@ -75,13 +75,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8856),
+                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7526),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
-                            Number = "0001/KW/2023",
+                            Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 450, DateTimeKind.Local).AddTicks(8910),
+                            UpdatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7587),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -133,7 +133,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("GrossQuantity")
@@ -171,6 +171,21 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.HasIndex("StatusId");
 
                     b.ToTable("DocumentPositions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DocumentId = 1,
+                            GrossQuantity = 0,
+                            LampshadeId = 1,
+                            NetQuantity = 0,
+                            OperatorId = 1,
+                            QuantityLoss = 0,
+                            QuantityToImprove = 0,
+                            StartTime = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7641),
+                            StatusId = 1
+                        });
                 });
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentRelations", b =>
@@ -257,6 +272,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Lampshades");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "KL4124"
+                        });
                 });
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Operation", b =>
@@ -362,13 +384,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 20, 10, 38, 20, 342, DateTimeKind.Local).AddTicks(7176),
+                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 407, DateTimeKind.Local).AddTicks(468),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$Tn5Fjr2WIMVvxYpZNHLHqug5V4M2xguke6t2HKx15Mr8MmHa0vFWi"
+                            Password = "$2a$11$jwqZqBrVkttVmcPC6lf3HOUfivvgpOB6JybPxmtVCY/MG12eEJdJG"
                         });
                 });
 
@@ -395,7 +417,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "MG",
+                            Code = "M",
                             Name = "Magazyn"
                         });
                 });

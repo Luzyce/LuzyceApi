@@ -153,7 +153,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return documentPosition;
     }
-    public Domain.Models.DocumentPositions? GetDocumentPositions(int id)
+    public Domain.Models.DocumentPositions? GetDocumentPosition(int id)
     {
         logger.LogInformation("Getting document positions");
         var documentPositions = applicationDbContext.DocumentPositions
@@ -169,7 +169,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             return null;
         }
 
-
         return new Domain.Models.DocumentPositions
         {
             Id = documentPositions.Id,
@@ -184,6 +183,33 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             LampshadeId = documentPositions.LampshadeId,
             Lampshade = LampshadeDomainFromDb(documentPositions.Lampshade!)
         };
+    }
+    public IEnumerable<Domain.Models.DocumentPositions> GetDocumentPositions(int documentId)
+    {
+        logger.LogInformation("Getting document positions");
+        return applicationDbContext.DocumentPositions
+            .Include(d => d.Document)
+            .Include(d => d.Operator)
+            .Include(d => d.Status)
+            .Include(d => d.Lampshade)
+            .Where(d => d.DocumentId == documentId)
+            .Select(
+                x => new Domain.Models.DocumentPositions
+                {
+                    Id = x.Id,
+                    Document = DocumentDomainFromDb(x.Document!),
+                    NetQuantity = x.NetQuantity,
+                    QuantityLoss = x.QuantityLoss,
+                    QuantityToImprove = x.QuantityToImprove,
+                    GrossQuantity = x.GrossQuantity,
+                    Operator = UserDomainFromDb(x.Operator!),
+                    StartTime = x.StartTime,
+                    Status = StatusDomainFromDb(x.Status!),
+                    LampshadeId = x.LampshadeId,
+                    Lampshade = LampshadeDomainFromDb(x.Lampshade!)
+                }
+            )
+            .ToList();
     }
     public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
     {

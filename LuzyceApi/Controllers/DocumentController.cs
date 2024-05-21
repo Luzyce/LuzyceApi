@@ -112,7 +112,18 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             document.UpdatedAt,
             document.ClosedAt,
             document.Status,
-            documentPositions = documentRepository.GetDocumentPositions(document.Id) ?? null
+            documentPositions = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+            {
+                x.Id,
+                x.NetQuantity,
+                x.QuantityLoss,
+                x.QuantityToImprove,
+                x.GrossQuantity,
+                Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
+                x.StartTime,
+                x.EndTime,
+                Lampshade = x.Lampshade != null ? new { x.Lampshade.Id, x.Lampshade.Code } : null
+            })
         });
     }
 

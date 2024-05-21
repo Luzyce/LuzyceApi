@@ -62,6 +62,35 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Status = StatusDomainFromDb(document.Status!)
         };
     }
+    public Domain.Models.Document? GetDocumentByNumber(string number)
+    {
+        logger.LogInformation("Getting document by number");
+        var document = applicationDbContext.Documents
+                        .Include(d => d.Warehouse)
+                        .Include(d => d.Operator)
+                        .Include(d => d.Status)
+                        .Include(d => d.DocumentsDefinition)
+                        .FirstOrDefault(x => x.Number == number);
+
+        if (document == null)
+        {
+            return null;
+        }
+        return new Domain.Models.Document
+        {
+            Id = document.Id,
+            DocNumber = document.DocNumber,
+            Warehouse = WarehouseDomainFromDb(document.Warehouse!),
+            Year = document.Year,
+            Number = document.Number,
+            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition!),
+            Operator = UserDomainFromDb(document.Operator!),
+            CreatedAt = document.CreatedAt,
+            UpdatedAt = document.UpdatedAt,
+            ClosedAt = document.ClosedAt,
+            Status = StatusDomainFromDb(document.Status!)
+        };
+    }
     public Domain.Models.Document AddDocument(Domain.Models.Document document)
     {
         logger.LogInformation("Adding document");
@@ -124,6 +153,38 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return documentPosition;
     }
+    public Domain.Models.DocumentPositions? GetDocumentPositions(int id)
+    {
+        logger.LogInformation("Getting document positions");
+        var documentPositions = applicationDbContext.DocumentPositions
+                        .Include(d => d.Document)
+                        .Include(d => d.Operator)
+                        .Include(d => d.Status)
+                        .Include(d => d.Lampshade)
+                        .FirstOrDefault(x => x.DocumentId == id);
+
+
+        if (documentPositions == null)
+        {
+            return null;
+        }
+
+
+        return new Domain.Models.DocumentPositions
+        {
+            Id = documentPositions.Id,
+            Document = DocumentDomainFromDb(documentPositions.Document!),
+            NetQuantity = documentPositions.NetQuantity,
+            QuantityLoss = documentPositions.QuantityLoss,
+            QuantityToImprove = documentPositions.QuantityToImprove,
+            GrossQuantity = documentPositions.GrossQuantity,
+            Operator = UserDomainFromDb(documentPositions.Operator!),
+            StartTime = documentPositions.StartTime,
+            Status = StatusDomainFromDb(documentPositions.Status!),
+            LampshadeId = documentPositions.LampshadeId,
+            Lampshade = LampshadeDomainFromDb(documentPositions.Lampshade!)
+        };
+    }
     public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
     {
         logger.LogInformation("Getting document definition by id");
@@ -181,6 +242,31 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Id = documentsDefinition.Id,
             Code = documentsDefinition.Code,
             Name = documentsDefinition.Name
+        };
+    }
+    public static Domain.Models.Lampshade LampshadeDomainFromDb(Lampshade lampshade)
+    {
+        return new()
+        {
+            Id = lampshade.Id,
+            Code = lampshade.Code,
+        };
+    }
+    public static Domain.Models.Document DocumentDomainFromDb(Document document)
+    {
+        return new()
+        {
+            Id = document.Id,
+            DocNumber = document.DocNumber,
+            Warehouse = WarehouseDomainFromDb(document.Warehouse!),
+            Year = document.Year,
+            Number = document.Number,
+            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition!),
+            Operator = UserDomainFromDb(document.Operator!),
+            CreatedAt = document.CreatedAt,
+            UpdatedAt = document.UpdatedAt,
+            ClosedAt = document.ClosedAt,
+            Status = StatusDomainFromDb(document.Status!)
         };
     }
 }

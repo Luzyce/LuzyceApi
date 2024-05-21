@@ -90,6 +90,32 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         }
     }
 
+    [HttpPost("getByNumber")]
+    [Authorize]
+    public IActionResult GetByNumber([FromBody] GetDocumentByNumberDto dto)
+    {
+        var document = documentRepository.GetDocumentByNumber(dto.number);
+        if (document == null)
+        {
+            return NotFound();
+        }
+        return Ok(new
+        {
+            document.Id,
+            document.DocNumber,
+            document.Warehouse,
+            document.Year,
+            document.Number,
+            document.DocumentsDefinition,
+            Operator = document.Operator != null ? new { document.Operator.Id, document.Operator.Name, document.Operator.LastName } : null,
+            document.CreatedAt,
+            document.UpdatedAt,
+            document.ClosedAt,
+            document.Status,
+            documentPositions = documentRepository.GetDocumentPositions(document.Id) ?? null
+        });
+    }
+
     [HttpPut("changeStatus/{id}")]
     [Authorize]
     public IActionResult ChangeStatus(int id, [FromBody] ChangeDocumentStatusDto dto)

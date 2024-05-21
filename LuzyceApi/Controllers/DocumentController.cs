@@ -67,18 +67,18 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         var newDocument = DocumentMappers.ToDocumentFromCreateDto(dto);
         newDocument.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         newDocument = documentRepository.AddDocument(newDocument);
-        if (documentRepository.GetDocumentsDefinition(newDocument.DocumentsDefinitionId)?.Code == "KW" && newDocument != null)
-        {
-            var documentPosition = new DocumentPositions
-            {
-                DocumentId = newDocument.Id,
-                OperatorId = newDocument.OperatorId,
-                StartTime = DateTime.Now,
-                StatusId = 1,
-                LampshadeId = dto.LampshadeId
-            };
-            documentRepository.AddDocumentPosition(documentPosition);
-        }
+        // if (documentRepository.GetDocumentsDefinition(newDocument.DocumentsDefinitionId)?.Code == "KW" && newDocument != null)
+        // {
+        //     var documentPosition = new DocumentPositions
+        //     {
+        //         DocumentId = newDocument.Id,
+        //         OperatorId = newDocument.OperatorId,
+        //         StartTime = DateTime.Now,
+        //         StatusId = 1,
+        //         LampshadeId = dto.LampshadeId
+        //     };
+        //     documentRepository.AddDocumentPosition(documentPosition);
+        // }
 
         if (newDocument != null)
         {
@@ -139,5 +139,28 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         document.StatusId = dto.StatusId;
         documentRepository.UpdateDocument(document);
         return Ok(documentRepository.GetDocument(id));
+    }
+
+    [HttpPost("addDocumentPosition/{id}")]
+    [Authorize]
+    public IActionResult AddDocumentPosition(int id, [FromBody] CreateDocumentPositionDto dto)
+    {
+        var document = documentRepository.GetDocument(id);
+        if (document == null)
+        {
+            return NotFound();
+        }
+        var documentPosition = DocumentMappers.ToDocumentPositionFromCreateDto(dto);
+        documentPosition.DocumentId = id;
+        documentPosition.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        documentPosition = documentRepository.AddDocumentPosition(documentPosition);
+        if (documentPosition != null)
+        {
+            return CreatedAtAction(nameof(Get), new { id = documentPosition.Id }, documentRepository.GetDocumentPosition(documentPosition.Id));
+        }
+        else
+        {
+            return BadRequest("Failed to create document position.");
+        }
     }
 }

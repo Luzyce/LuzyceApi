@@ -14,4 +14,17 @@ public static class DocumentMappers
             DocumentsDefinitionId = dto.DocumentsDefinitionId
         };
     }
+
+    public static DocumentPositions ToDocumentPositionFromCreateDto(this CreateDocumentPositionDto dto)
+    {
+        return new DocumentPositions
+        {
+            NetQuantity = dto.NetQuantity,
+            QuantityLoss = dto.QuantityLoss,
+            QuantityToImprove = dto.QuantityToImprove,
+            GrossQuantity = dto.GrossQuantity,
+            StartTime = DateTime.Now,
+            LampshadeId = dto.LampshadeId
+        };
+    }
 }

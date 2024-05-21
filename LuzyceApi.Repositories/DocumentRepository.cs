@@ -143,10 +143,14 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         logger.LogInformation("Adding document position" + documentPosition.DocumentId);
         var dbDocumentPosition = new DocumentPositions
         {
+            NetQuantity = documentPosition.NetQuantity,
+            QuantityLoss = documentPosition.QuantityLoss,
+            QuantityToImprove = documentPosition.QuantityToImprove,
+            GrossQuantity = documentPosition.GrossQuantity,
             DocumentId = documentPosition.DocumentId,
             OperatorId = documentPosition.OperatorId,
             StartTime = documentPosition.StartTime,
-            StatusId = documentPosition.StatusId,
+            StatusId = 1,
             LampshadeId = documentPosition.LampshadeId
         };
         applicationDbContext.DocumentPositions.Add(dbDocumentPosition);

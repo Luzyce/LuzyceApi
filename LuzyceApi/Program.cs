@@ -1,12 +1,13 @@
 using System.Text;
-using LuzyceApi;
-using LuzyceApi.Data;
+using LuzyceApi.Db.AppDb.Data;
+// using LuzyceApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddLogging(l => l.AddConsole());
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -56,8 +57,10 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+builder.Services.AddScoped<LuzyceApi.Repositories.UsersRepository>();
+builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
+
+builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
 

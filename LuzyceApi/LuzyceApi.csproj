@@ -19,4 +19,9 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LuzyceApi.Repositories\LuzyceApi.Repositories.csproj" />
+    <ProjectReference Include="..\LuzyceApi.Domain\LuzyceApi.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

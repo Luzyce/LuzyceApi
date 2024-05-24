@@ -4,7 +4,6 @@ using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Controllers;
 [Route("api/document")]

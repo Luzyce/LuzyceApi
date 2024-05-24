@@ -56,7 +56,19 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             document.CreatedAt,
             document.UpdatedAt,
             document.ClosedAt,
-            document.Status
+            document.Status,
+            documentPositions = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+            {
+                x.Id,
+                x.NetQuantity,
+                x.QuantityLoss,
+                x.QuantityToImprove,
+                x.GrossQuantity,
+                Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
+                x.StartTime,
+                x.EndTime,
+                Lampshade = x.Lampshade != null ? new { x.Lampshade.Id, x.Lampshade.Code } : null
+            })
         });
     }
 
@@ -67,18 +79,6 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         var newDocument = DocumentMappers.ToDocumentFromCreateDto(dto);
         newDocument.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         newDocument = documentRepository.AddDocument(newDocument);
-        // if (documentRepository.GetDocumentsDefinition(newDocument.DocumentsDefinitionId)?.Code == "KW" && newDocument != null)
-        // {
-        //     var documentPosition = new DocumentPositions
-        //     {
-        //         DocumentId = newDocument.Id,
-        //         OperatorId = newDocument.OperatorId,
-        //         StartTime = DateTime.Now,
-        //         StatusId = 1,
-        //         LampshadeId = dto.LampshadeId
-        //     };
-        //     documentRepository.AddDocumentPosition(documentPosition);
-        // }
 
         if (newDocument != null)
         {
@@ -162,5 +162,47 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return BadRequest("Failed to create document position.");
         }
+    }
+
+    [HttpPut("updateDocumentPosition/{id}")]
+    [Authorize]
+    public IActionResult UpdateDocumentPosition(int id, [FromBody] UpdateDocumentPositionDto dto)
+    {
+        var documentPosition = documentRepository.GetDocumentPosition(id);
+        if (documentPosition == null)
+        {
+            return NotFound();
+        }
+        documentPosition.NetQuantity = dto.NetQuantity;
+        documentPosition.QuantityLoss = dto.QuantityLoss;
+        documentPosition.QuantityToImprove = dto.QuantityToImprove;
+        documentPosition.GrossQuantity = dto.GrossQuantity;
+        documentRepository.UpdateDocumentPosition(documentPosition);
+        return Ok(documentRepository.GetDocumentPosition(id));
+    }
+
+    [HttpPut("updateDocumentPositionOnKwit/{id}")]
+    [Authorize]
+    public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionDto dto)
+    {
+        var document = documentRepository.GetDocument(id);
+        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW")
+        {
+            return NotFound(document);
+        }
+
+        var documentPosition = documentRepository.GetDocumentPositions(id).FirstOrDefault();
+
+        if (documentPosition != null)
+        {
+            documentPosition.NetQuantity = dto.NetQuantity;
+            documentPosition.QuantityLoss = dto.QuantityLoss;
+            documentPosition.QuantityToImprove = dto.QuantityToImprove;
+            documentPosition.GrossQuantity = dto.GrossQuantity;
+            documentPosition.EndTime = DateTime.Now;
+            documentRepository.UpdateDocumentPosition(documentPosition);
+        }
+
+        return Ok(documentRepository.GetDocumentPosition(id));
     }
 }

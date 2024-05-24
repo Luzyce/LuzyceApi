@@ -215,6 +215,19 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             )
             .ToList();
     }
+    public Domain.Models.DocumentPositions? UpdateDocumentPosition(Domain.Models.DocumentPositions documentPosition)
+    {
+        logger.LogInformation("Updating document position");
+        var dbDocumentPosition = applicationDbContext.DocumentPositions.Find(documentPosition.Id);
+        if (dbDocumentPosition == null)
+        {
+            return null;
+        }
+        dbDocumentPosition.StatusId = documentPosition.StatusId;
+        dbDocumentPosition.EndTime = documentPosition.EndTime;
+        applicationDbContext.SaveChanges();
+        return documentPosition;
+    }
     public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
     {
         logger.LogInformation("Getting document definition by id");

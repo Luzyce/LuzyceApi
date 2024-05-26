@@ -223,8 +223,10 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         {
             return null;
         }
-        dbDocumentPosition.StatusId = documentPosition.StatusId;
         dbDocumentPosition.EndTime = documentPosition.EndTime;
+        dbDocumentPosition.NetQuantity = documentPosition.NetQuantity;
+        dbDocumentPosition.QuantityLoss = documentPosition.QuantityLoss;
+        dbDocumentPosition.QuantityToImprove = documentPosition.QuantityToImprove;
         applicationDbContext.SaveChanges();
         return documentPosition;
     }

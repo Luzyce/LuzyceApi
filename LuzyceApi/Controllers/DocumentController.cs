@@ -56,7 +56,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             document.UpdatedAt,
             document.ClosedAt,
             document.Status,
-            documentPositions = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+            documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
             {
                 x.Id,
                 x.NetQuantity,
@@ -111,7 +111,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             document.UpdatedAt,
             document.ClosedAt,
             document.Status,
-            documentPositions = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+            documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
             {
                 x.Id,
                 x.NetQuantity,
@@ -182,26 +182,52 @@ public class DocumentController(DocumentRepository documentRepository) : Control
 
     [HttpPut("updateDocumentPositionOnKwit/{id}")]
     [Authorize]
-    public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionDto dto)
+    public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwit dto)
     {
         var document = documentRepository.GetDocument(id);
-        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW")
+        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW" || (dto.type.Equals("+") && dto.type.Equals("-")))
         {
-            return NotFound(document);
+            return BadRequest("Invalid request");
         }
 
         var documentPosition = documentRepository.GetDocumentPositions(id).FirstOrDefault();
 
-        if (documentPosition != null)
+        if (documentPosition == null)
         {
-            documentPosition.NetQuantity = dto.NetQuantity;
-            documentPosition.QuantityLoss = dto.QuantityLoss;
-            documentPosition.QuantityToImprove = dto.QuantityToImprove;
-            documentPosition.GrossQuantity = dto.GrossQuantity;
-            documentPosition.EndTime = DateTime.Now;
-            documentRepository.UpdateDocumentPosition(documentPosition);
+            return NotFound();
         }
 
-        return Ok(documentRepository.GetDocumentPosition(id));
+        if (dto.field == "Dobrych")
+        {
+            if (documentPosition.NetQuantity == 0 && dto.type == '-')
+            {
+                return BadRequest("NetQuantity is 0");
+            }
+            documentPosition.NetQuantity = dto.type == '+' ? documentPosition.NetQuantity + 1 : documentPosition.NetQuantity - 1;
+        }
+        else if (dto.field == "DoPoprawy")
+        {
+            if (documentPosition.QuantityToImprove == 0 && dto.type == '-')
+            {
+                return BadRequest("QuantityToImprove is 0");
+            }
+            documentPosition.QuantityToImprove = dto.type.Equals("+") ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
+        }
+        else if (dto.field == "Zlych" || dto.errorCode != null)
+        {
+            if (documentPosition.QuantityLoss == 0 && dto.type == '-')
+            {
+                return BadRequest("QuantityLoss is 0");
+            }
+            documentPosition.QuantityLoss = dto.type.Equals("+") ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
+        }
+        else
+        {
+            return BadRequest("Invalid field");
+        }
+
+        documentRepository.UpdateDocumentPosition(documentPosition);
+
+        return Ok(documentPosition);
     }
 }

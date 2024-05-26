@@ -1,6 +1,6 @@
 namespace LuzyceApi.Dtos.Document;
 
-public class UpdateDocumentPositionOnKwit
+public class UpdateDocumentPositionOnKwitDto
 {
     public char type { get; set; }
     public required string field { get; set; }

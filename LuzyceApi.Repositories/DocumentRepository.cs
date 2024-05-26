@@ -230,6 +230,23 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return documentPosition;
     }
+    public Domain.Models.Operation AddOperation(Domain.Models.Operation operation)
+    {
+        logger.LogInformation("Adding operation");
+        var dbOperation = new Operation
+        {
+            Time = DateTime.Now,
+            DocumentId = operation.DocumentId,
+            OperatorId = operation.OperatorId,
+            QuantityNetDelta = operation.QuantityNetDelta,
+            QuantityLossDelta = operation.QuantityLossDelta,
+            QuantityToImproveDelta = operation.QuantityToImproveDelta,
+        };
+        applicationDbContext.Operations.Add(dbOperation);
+        applicationDbContext.SaveChanges();
+        operation.Id = dbOperation.Id;
+        return operation;
+    }
     public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
     {
         logger.LogInformation("Getting document definition by id");

@@ -182,7 +182,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
 
     [HttpPut("updateDocumentPositionOnKwit/{id}")]
     [Authorize]
-    public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwit dto)
+    public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwitDto dto)
     {
         var document = documentRepository.GetDocument(id);
         if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW" || (dto.type.Equals("+") && dto.type.Equals("-")))
@@ -191,6 +191,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         }
 
         var documentPosition = documentRepository.GetDocumentPositions(id).FirstOrDefault();
+        var documentPositionBefore = documentRepository.GetDocumentPositions(id).FirstOrDefault();
 
         if (documentPosition == null)
         {
@@ -226,6 +227,17 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             return BadRequest("Invalid field");
         }
 
+        var newOperation = new Domain.Models.Operation
+        {
+            DocumentId = id,
+            Operator = document.Operator,
+            OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
+            QuantityNetDelta = documentPosition.NetQuantity - (documentPositionBefore?.NetQuantity ?? 0),
+            QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
+            QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
+        };
+
+        documentRepository.AddOperation(newOperation);
         documentRepository.UpdateDocumentPosition(documentPosition);
 
         return Ok(documentPosition);

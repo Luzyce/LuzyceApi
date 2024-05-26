@@ -141,7 +141,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false)
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    lockedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
@@ -256,7 +258,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     Time = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
                     OperatorId = table.Column<int>(type: "int", nullable: false),
-                    NetDeltaQuantity = table.Column<int>(type: "int", nullable: false),
+                    QuantityNetDelta = table.Column<int>(type: "int", nullable: false),
                     QuantityLossDelta = table.Column<int>(type: "int", nullable: false),
                     QuantityToImproveDelta = table.Column<int>(type: "int", nullable: false)
                 },
@@ -339,7 +341,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 21, 15, 29, 32, 407, DateTimeKind.Local).AddTicks(468), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$jwqZqBrVkttVmcPC6lf3HOUfivvgpOB6JybPxmtVCY/MG12eEJdJG" });
+                values: new object[] { 1, true, new DateTime(2024, 5, 26, 20, 41, 44, 706, DateTimeKind.Local).AddTicks(6728), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$20u.TkMtx6H.8o1yk8ZQRe1pSCgEvBAk.NWeud4kcoGv7Irj4j/ei" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -348,13 +350,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.InsertData(
                 table: "Documents",
-                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
-                values: new object[] { 1, null, new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7526), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7587), 1, 2023 });
+                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year", "lockedBy" },
+                values: new object[] { 1, null, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3711), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3775), 1, 2023, null });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "GrossQuantity", "LampshadeId", "NetQuantity", "OperatorId", "QuantityLoss", "QuantityToImprove", "StartTime", "StatusId" },
-                values: new object[] { 1, 1, null, 0, 1, 0, 1, 0, 0, new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7641), 1 });
+                values: new object[] { 1, 1, null, 0, 1, 0, 1, 0, 0, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3834), 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",

@@ -56,6 +56,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
+                    b.Property<string>("lockedBy")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentsDefinitionId");
@@ -72,13 +75,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7526),
+                            CreatedAt = new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3711),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7587),
+                            UpdatedAt = new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3775),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -180,7 +183,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             OperatorId = 1,
                             QuantityLoss = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7641),
+                            StartTime = new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3834),
                             StatusId = 1
                         });
                 });
@@ -287,13 +290,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NetDeltaQuantity")
-                        .HasColumnType("int");
-
                     b.Property<int>("OperatorId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityLossDelta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityNetDelta")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityToImproveDelta")
@@ -381,13 +384,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 407, DateTimeKind.Local).AddTicks(468),
+                            CreatedAt = new DateTime(2024, 5, 26, 20, 41, 44, 706, DateTimeKind.Local).AddTicks(6728),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$jwqZqBrVkttVmcPC6lf3HOUfivvgpOB6JybPxmtVCY/MG12eEJdJG"
+                            Password = "$2a$11$20u.TkMtx6H.8o1yk8ZQRe1pSCgEvBAk.NWeud4kcoGv7Irj4j/ei"
                         });
                 });
 

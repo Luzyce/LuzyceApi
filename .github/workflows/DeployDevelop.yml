@@ -12,6 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
       - name: Stop & clean old containers
         run: |
           if [ $(docker container ls -q -f name=luzyceapi) ]; then
@@ -22,9 +25,6 @@ jobs:
             docker image rm luzyceapi:latest
           fi
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      
       - name: Build and Push Docker image
         uses: docker/build-push-action@v2
         with:
@@ -38,12 +38,11 @@ jobs:
         run: |
           docker run \
             -d \
-            -p 8080:8080 \
-            -p 8081:8081 \
+            -p 35132:35132 \
             -e ConnectionStrings__AppDbConnection='${{ vars.CONNECTION_STRING_APP_DB }}' \
             -e ConnectionStrings__SubiektConnection='${{ vars.CONNECTION_STRING_SUBIEKT }}' \
             -e Jwt__SigningKey='${{ vars.JWT_SIGNING_KEY }}' \
-            --name luzyceapi
+            --name luzyceapi \
             luzyceapi:latest
 
       - name: Check container logs

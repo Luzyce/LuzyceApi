@@ -24,8 +24,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
+          file: ./LuzyceApi/Dockerfile
           push: false
+          load: true
           tags: luzyceapi:latest
 
       - name: Load Docker image

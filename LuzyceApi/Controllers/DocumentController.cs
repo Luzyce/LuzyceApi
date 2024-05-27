@@ -59,10 +59,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
             {
                 x.Id,
-                x.NetQuantity,
+                x.QuantityNetto,
                 x.QuantityLoss,
                 x.QuantityToImprove,
-                x.GrossQuantity,
+                x.QuantityGross,
                 Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
                 x.StartTime,
                 x.EndTime,
@@ -114,10 +114,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
             {
                 x.Id,
-                x.NetQuantity,
+                x.QuantityNetto,
                 x.QuantityLoss,
                 x.QuantityToImprove,
-                x.GrossQuantity,
+                x.QuantityGross,
                 Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
                 x.StartTime,
                 x.EndTime,
@@ -172,10 +172,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return NotFound();
         }
-        documentPosition.NetQuantity = dto.NetQuantity;
+        documentPosition.QuantityNetto = dto.QuantityNetto;
         documentPosition.QuantityLoss = dto.QuantityLoss;
         documentPosition.QuantityToImprove = dto.QuantityToImprove;
-        documentPosition.GrossQuantity = dto.GrossQuantity;
+        documentPosition.QuantityGross = dto.QuantityGross;
         documentRepository.UpdateDocumentPosition(documentPosition);
         return Ok(documentRepository.GetDocumentPosition(id));
     }
@@ -200,11 +200,11 @@ public class DocumentController(DocumentRepository documentRepository) : Control
 
         if (dto.field == "Dobrych")
         {
-            if (documentPosition.NetQuantity == 0 && dto.type == '-')
+            if (documentPosition.QuantityNetto == 0 && dto.type == '-')
             {
                 return BadRequest("NetQuantity is 0");
             }
-            documentPosition.NetQuantity = dto.type == '+' ? documentPosition.NetQuantity + 1 : documentPosition.NetQuantity - 1;
+            documentPosition.QuantityNetto = dto.type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
         }
         else if (dto.field == "DoPoprawy")
         {
@@ -212,27 +212,29 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             {
                 return BadRequest("QuantityToImprove is 0");
             }
-            documentPosition.QuantityToImprove = dto.type.Equals("+") ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
+            documentPosition.QuantityToImprove = dto.type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
         }
-        else if (dto.field == "Zlych" || dto.errorCode != null)
+        else if (dto.field == "Zlych" && dto.errorCode != null)
         {
             if (documentPosition.QuantityLoss == 0 && dto.type == '-')
             {
                 return BadRequest("QuantityLoss is 0");
             }
-            documentPosition.QuantityLoss = dto.type.Equals("+") ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
+            documentPosition.QuantityLoss = dto.type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
         }
         else
         {
             return BadRequest("Invalid field");
         }
 
+        documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss + documentPosition.QuantityToImprove;
+
         var newOperation = new Domain.Models.Operation
         {
             DocumentId = id,
             Operator = document.Operator,
             OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
-            QuantityNetDelta = documentPosition.NetQuantity - (documentPositionBefore?.NetQuantity ?? 0),
+            QuantityNetDelta = documentPosition.QuantityNetto - (documentPositionBefore?.QuantityNetto ?? 0),
             QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
             QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
         };
@@ -240,6 +242,13 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentRepository.AddOperation(newOperation);
         documentRepository.UpdateDocumentPosition(documentPosition);
 
-        return Ok(documentPosition);
+        return Ok(new
+        {
+            documentPosition.Id,
+            documentPosition.QuantityNetto,
+            documentPosition.QuantityLoss,
+            documentPosition.QuantityToImprove,
+            documentPosition.QuantityGross
+        });
     }
 }

@@ -5,10 +5,10 @@ public class DocumentPositions
     public int Id { get; set; }
     public int DocumentId { get; set; }
     public Document? Document { get; set; }
-    public int NetQuantity { get; set; }
+    public int QuantityNetto { get; set; }
     public int QuantityLoss { get; set; }
     public int QuantityToImprove { get; set; }
-    public int GrossQuantity { get; set; }
+    public int QuantityGross { get; set; }
     public int OperatorId { get; set; }
     public User? Operator { get; set; }
     public required DateTime StartTime { get; set; }

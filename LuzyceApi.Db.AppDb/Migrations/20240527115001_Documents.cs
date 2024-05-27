@@ -182,10 +182,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
-                    NetQuantity = table.Column<int>(type: "int", nullable: false),
+                    QuantityNetto = table.Column<int>(type: "int", nullable: false),
                     QuantityLoss = table.Column<int>(type: "int", nullable: false),
                     QuantityToImprove = table.Column<int>(type: "int", nullable: false),
-                    GrossQuantity = table.Column<int>(type: "int", nullable: false),
+                    QuantityGross = table.Column<int>(type: "int", nullable: false),
                     OperatorId = table.Column<int>(type: "int", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     EndTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -341,7 +341,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 26, 20, 41, 44, 706, DateTimeKind.Local).AddTicks(6728), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$20u.TkMtx6H.8o1yk8ZQRe1pSCgEvBAk.NWeud4kcoGv7Irj4j/ei" });
+                values: new object[] { 1, true, new DateTime(2024, 5, 27, 13, 50, 0, 676, DateTimeKind.Local).AddTicks(4948), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$eDGszTHunEhHCcAEV5Bfduo5f3IeZm0QteCJKJwULTkaYRk/FVT.e" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -351,12 +351,12 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year", "lockedBy" },
-                values: new object[] { 1, null, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3711), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3775), 1, 2023, null });
+                values: new object[] { 1, null, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7634), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7705), 1, 2023, null });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "DocumentId", "EndTime", "GrossQuantity", "LampshadeId", "NetQuantity", "OperatorId", "QuantityLoss", "QuantityToImprove", "StartTime", "StatusId" },
-                values: new object[] { 1, 1, null, 0, 1, 0, 1, 0, 0, new DateTime(2024, 5, 26, 20, 41, 44, 815, DateTimeKind.Local).AddTicks(3834), 1 });
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeId", "OperatorId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
+                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7758), 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",

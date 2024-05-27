@@ -1,4 +1,3 @@
-using System.Buffers;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -143,10 +142,10 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         logger.LogInformation("Adding document position" + documentPosition.DocumentId);
         var dbDocumentPosition = new DocumentPositions
         {
-            NetQuantity = documentPosition.NetQuantity,
+            QuantityNetto = documentPosition.QuantityNetto,
             QuantityLoss = documentPosition.QuantityLoss,
             QuantityToImprove = documentPosition.QuantityToImprove,
-            GrossQuantity = documentPosition.GrossQuantity,
+            QuantityGross = documentPosition.QuantityGross,
             DocumentId = documentPosition.DocumentId,
             OperatorId = documentPosition.OperatorId,
             StartTime = documentPosition.StartTime,
@@ -177,10 +176,10 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         {
             Id = documentPositions.Id,
             Document = DocumentDomainFromDb(documentPositions.Document!),
-            NetQuantity = documentPositions.NetQuantity,
+            QuantityNetto = documentPositions.QuantityNetto,
             QuantityLoss = documentPositions.QuantityLoss,
             QuantityToImprove = documentPositions.QuantityToImprove,
-            GrossQuantity = documentPositions.GrossQuantity,
+            QuantityGross = documentPositions.QuantityGross,
             Operator = UserDomainFromDb(documentPositions.Operator!),
             StartTime = documentPositions.StartTime,
             Status = StatusDomainFromDb(documentPositions.Status!),
@@ -202,10 +201,10 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
                 {
                     Id = x.Id,
                     Document = DocumentDomainFromDb(x.Document!),
-                    NetQuantity = x.NetQuantity,
+                    QuantityNetto = x.QuantityNetto,
                     QuantityLoss = x.QuantityLoss,
                     QuantityToImprove = x.QuantityToImprove,
-                    GrossQuantity = x.GrossQuantity,
+                    QuantityGross = x.QuantityGross,
                     Operator = UserDomainFromDb(x.Operator!),
                     StartTime = x.StartTime,
                     Status = StatusDomainFromDb(x.Status!),
@@ -224,7 +223,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             return null;
         }
         dbDocumentPosition.EndTime = documentPosition.EndTime;
-        dbDocumentPosition.NetQuantity = documentPosition.NetQuantity;
+        dbDocumentPosition.QuantityNetto = documentPosition.QuantityNetto;
         dbDocumentPosition.QuantityLoss = documentPosition.QuantityLoss;
         dbDocumentPosition.QuantityToImprove = documentPosition.QuantityToImprove;
         applicationDbContext.SaveChanges();

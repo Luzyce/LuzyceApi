@@ -226,6 +226,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         dbDocumentPosition.QuantityNetto = documentPosition.QuantityNetto;
         dbDocumentPosition.QuantityLoss = documentPosition.QuantityLoss;
         dbDocumentPosition.QuantityToImprove = documentPosition.QuantityToImprove;
+        dbDocumentPosition.QuantityGross = documentPosition.QuantityGross;
         applicationDbContext.SaveChanges();
         return documentPosition;
     }

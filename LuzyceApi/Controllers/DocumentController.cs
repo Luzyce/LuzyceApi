@@ -101,27 +101,13 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         return Ok(new
         {
             document.Id,
-            document.DocNumber,
-            document.Warehouse,
-            document.Year,
             document.Number,
-            document.DocumentsDefinition,
-            Operator = document.Operator != null ? new { document.Operator.Id, document.Operator.Name, document.Operator.LastName } : null,
-            document.CreatedAt,
-            document.UpdatedAt,
-            document.ClosedAt,
-            document.Status,
             documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
             {
                 x.Id,
                 x.QuantityNetto,
                 x.QuantityLoss,
-                x.QuantityToImprove,
-                x.QuantityGross,
-                Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
-                x.StartTime,
-                x.EndTime,
-                Lampshade = x.Lampshade != null ? new { x.Lampshade.Id, x.Lampshade.Code } : null
+                x.QuantityToImprove
             })
         });
     }

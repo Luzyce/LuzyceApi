@@ -182,6 +182,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return BadRequest("Invalid request");
         }
+        if (documentRepository.IsDocumentLocked(id) != HttpContext.Connection.RemoteIpAddress?.ToString())
+        {
+            return BadRequest("Document is locked by another user");
+        }
 
         var documentPosition = documentRepository.GetDocumentPositions(id).FirstOrDefault();
         var documentPositionBefore = documentRepository.GetDocumentPositions(id).FirstOrDefault();

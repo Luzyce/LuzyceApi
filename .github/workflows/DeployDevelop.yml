@@ -24,6 +24,12 @@ jobs:
           load: true
           tags: luzyceapi:latest
 
+      - name: Stop & clean old containers
+        run: |
+          docker container stop luzyceapi
+          docker container rm luzyceapi
+          docker image rm luzyceapi:latest
+
       - name: Run Docker container
         run: |
           docker run \
@@ -33,6 +39,7 @@ jobs:
             -e ConnectionStrings__AppDbConnection='${{ vars.CONNECTION_STRING_APP_DB }}' \
             -e ConnectionStrings__SubiektConnection='${{ vars.CONNECTION_STRING_SUBIEKT }}' \
             -e Jwt__SigningKey='${{ vars.JWT_SIGNING_KEY }}' \
+            --name luzyceapi
             luzyceapi:latest
 
       - name: Check container logs

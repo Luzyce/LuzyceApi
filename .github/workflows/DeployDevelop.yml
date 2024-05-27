@@ -12,6 +12,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Stop & clean old containers
+        run: |
+          if [ $(docker container ls -q -f name=luzyceapi) ]; then
+            docker container stop luzyceapi
+            docker container rm luzyceapi
+          fi
+          if [ $(docker image ls -q luzyceapi:latest) ]; then
+            docker image rm luzyceapi:latest
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       
@@ -23,12 +33,6 @@ jobs:
           push: false
           load: true
           tags: luzyceapi:latest
-
-      - name: Stop & clean old containers
-        run: |
-          docker container stop luzyceapi
-          docker container rm luzyceapi
-          docker image rm luzyceapi:latest
 
       - name: Run Docker container
         run: |

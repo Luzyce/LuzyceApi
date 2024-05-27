@@ -98,6 +98,13 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return NotFound();
         }
+        if (documentRepository.IsDocumentLocked(document.Id) != null)
+        {
+            return Conflict();
+        }
+
+        documentRepository.LockDocument(document.Id, HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0");
+
         return Ok(new
         {
             document.Id,
@@ -242,5 +249,22 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             documentPosition.QuantityToImprove,
             documentPosition.QuantityGross
         });
+    }
+
+    [HttpPost("closeDocument/{id}")]
+    [Authorize]
+    public IActionResult CloseDocument(int id)
+    {
+        if (documentRepository.IsDocumentLocked(id) == null)
+        {
+            return BadRequest("Document is not locked");
+        }
+        if (documentRepository.IsDocumentLocked(id) != HttpContext.Connection.RemoteIpAddress?.ToString())
+        {
+            return BadRequest("Document is locked by another user");
+        }
+
+        documentRepository.UnlockDocument(id);
+        return Ok();
     }
 }

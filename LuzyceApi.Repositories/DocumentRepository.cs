@@ -137,6 +137,42 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return document;
     }
+    public bool LockDocument(int id, string ip)
+    {
+        logger.LogInformation("Updating document");
+        var dbDocument = applicationDbContext.Documents.Find(id);
+        if (dbDocument == null)
+        {
+            return false;
+        }
+        dbDocument.lockedBy = ip;
+        dbDocument.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+        return true;
+    }
+    public bool UnlockDocument(int id)
+    {
+        logger.LogInformation("Updating document");
+        var dbDocument = applicationDbContext.Documents.Find(id);
+        if (dbDocument == null)
+        {
+            return false;
+        }
+        dbDocument.lockedBy = null;
+        dbDocument.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+        return true;
+    }
+    public string IsDocumentLocked(int id)
+    {
+        logger.LogInformation("Checking if document is locked");
+        var dbDocument = applicationDbContext.Documents.Find(id);
+        if (dbDocument == null || dbDocument.lockedBy == null)
+        {
+            return "";
+        }
+        return dbDocument.lockedBy;
+    }
     public Domain.Models.DocumentPositions AddDocumentPosition(Domain.Models.DocumentPositions documentPosition)
     {
         logger.LogInformation("Adding document position" + documentPosition.DocumentId);

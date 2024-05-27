@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using LuzyceApi.Db.AppDb.Data;
-// using LuzyceApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;

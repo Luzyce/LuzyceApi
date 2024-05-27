@@ -42,6 +42,7 @@ jobs:
             -e ConnectionStrings__AppDbConnection='${{ vars.CONNECTION_STRING_APP_DB }}' \
             -e ConnectionStrings__SubiektConnection='${{ vars.CONNECTION_STRING_SUBIEKT }}' \
             -e Jwt__SigningKey='${{ vars.JWT_SIGNING_KEY }}' \
+            -e ASPNETCORE_HTTP_PORTS=35132 \
             --name luzyceapi \
             luzyceapi:latest
 

@@ -38,7 +38,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Code = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ShortName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
@@ -260,7 +261,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     OperatorId = table.Column<int>(type: "int", nullable: false),
                     QuantityNetDelta = table.Column<int>(type: "int", nullable: false),
                     QuantityLossDelta = table.Column<int>(type: "int", nullable: false),
-                    QuantityToImproveDelta = table.Column<int>(type: "int", nullable: false)
+                    QuantityToImproveDelta = table.Column<int>(type: "int", nullable: false),
+                    ErrorCodeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -271,6 +273,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalTable: "Documents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Operations_Errors_ErrorCodeId",
+                        column: x => x.ErrorCodeId,
+                        principalTable: "Errors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Operations_Users_OperatorId",
                         column: x => x.OperatorId,
@@ -341,7 +348,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 27, 13, 50, 0, 676, DateTimeKind.Local).AddTicks(4948), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$eDGszTHunEhHCcAEV5Bfduo5f3IeZm0QteCJKJwULTkaYRk/FVT.e" });
+                values: new object[] { 1, true, new DateTime(2024, 5, 27, 14, 54, 51, 311, DateTimeKind.Local).AddTicks(4784), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$U9KkcjwKkDPpdnZc5SLq/.ioKeo5ep9zp1SN.3CMlB94zVgAKx6bK" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -351,12 +358,12 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year", "lockedBy" },
-                values: new object[] { 1, null, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7634), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7705), 1, 2023, null });
+                values: new object[] { 1, null, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1375), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1441), 1, 2023, null });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeId", "OperatorId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
-                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7758), 1 });
+                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1500), 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",
@@ -434,6 +441,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 column: "DocumentId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Operations_ErrorCodeId",
+                table: "Operations",
+                column: "ErrorCodeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Operations_OperatorId",
                 table: "Operations",
                 column: "OperatorId");
@@ -449,13 +461,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "DocumentRelations");
 
             migrationBuilder.DropTable(
-                name: "Errors");
-
-            migrationBuilder.DropTable(
                 name: "Operations");
 
             migrationBuilder.DropTable(
                 name: "DocumentPositions");
+
+            migrationBuilder.DropTable(
+                name: "Errors");
 
             migrationBuilder.DropTable(
                 name: "Documents");

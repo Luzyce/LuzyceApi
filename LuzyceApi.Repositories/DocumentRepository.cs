@@ -246,6 +246,24 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         operation.Id = dbOperation.Id;
         return operation;
     }
+    public Domain.Models.Error? GetError(string code)
+    {
+        logger.LogInformation("Getting error by id");
+        var error = applicationDbContext.Errors
+                        .FirstOrDefault(x => x.Code == code);
+
+        if (error == null)
+        {
+            return null;
+        }
+        return new Domain.Models.Error
+        {
+            Id = error.Id,
+            Code = error.Code,
+            ShortName = error.ShortName,
+            Name = error.Name
+        };
+    }
     public Domain.Models.DocumentsDefinition? GetDocumentsDefinition(int id)
     {
         logger.LogInformation("Getting document definition by id");

@@ -214,12 +214,17 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             }
             documentPosition.QuantityToImprove = dto.type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
         }
-        else if (dto.field == "Zlych" && dto.errorCode != null)
+        else if (dto.field == "Zlych")
         {
             if (documentPosition.QuantityLoss == 0 && dto.type == '-')
             {
                 return BadRequest("QuantityLoss is 0");
             }
+            if (dto.errorCode == null || documentRepository.GetError(dto.errorCode ?? "0") == null)
+            {
+                return BadRequest(dto.errorCode);
+            }
+
             documentPosition.QuantityLoss = dto.type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
         }
         else
@@ -237,6 +242,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             QuantityNetDelta = documentPosition.QuantityNetto - (documentPositionBefore?.QuantityNetto ?? 0),
             QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
             QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
+            ErrorCodeId = documentRepository.GetError(dto.errorCode ?? "0")?.Id
         };
 
         documentRepository.AddOperation(newOperation);

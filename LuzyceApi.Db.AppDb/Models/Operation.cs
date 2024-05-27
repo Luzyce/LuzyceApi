@@ -11,4 +11,6 @@ public class Operation
     public int QuantityNetDelta { get; set; }
     public int QuantityLossDelta { get; set; }
     public int QuantityToImproveDelta { get; set; }
+    public int? ErrorCodeId { get; set; }
+    public Error? ErrorCode { get; set; }
 }

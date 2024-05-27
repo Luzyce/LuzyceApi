@@ -75,13 +75,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7634),
+                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1375),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7705),
+                            UpdatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1441),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -183,7 +183,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 5, 27, 13, 50, 0, 781, DateTimeKind.Local).AddTicks(7758),
+                            StartTime = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1500),
                             StatusId = 1
                         });
                 });
@@ -243,8 +243,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -290,6 +291,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ErrorCodeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("OperatorId")
                         .HasColumnType("int");
 
@@ -308,6 +312,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentId");
+
+                    b.HasIndex("ErrorCodeId");
 
                     b.HasIndex("OperatorId");
 
@@ -384,13 +390,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 27, 13, 50, 0, 676, DateTimeKind.Local).AddTicks(4948),
+                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 311, DateTimeKind.Local).AddTicks(4784),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$eDGszTHunEhHCcAEV5Bfduo5f3IeZm0QteCJKJwULTkaYRk/FVT.e"
+                            Password = "$2a$11$U9KkcjwKkDPpdnZc5SLq/.ioKeo5ep9zp1SN.3CMlB94zVgAKx6bK"
                         });
                 });
 
@@ -554,6 +560,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Error", "ErrorCode")
+                        .WithMany()
+                        .HasForeignKey("ErrorCodeId");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Data.Models.User", "Operator")
                         .WithMany()
                         .HasForeignKey("OperatorId")
@@ -561,6 +571,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .IsRequired();
 
                     b.Navigation("Document");
+
+                    b.Navigation("ErrorCode");
 
                     b.Navigation("Operator");
                 });

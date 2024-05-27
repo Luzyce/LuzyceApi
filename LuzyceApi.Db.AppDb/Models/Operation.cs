@@ -8,7 +8,9 @@ public class Operation
     public Document? Document { get; set; }
     public int OperatorId { get; set; }
     public User? Operator { get; set; }
-    public int NetDeltaQuantity { get; set; }
+    public int QuantityNetDelta { get; set; }
     public int QuantityLossDelta { get; set; }
     public int QuantityToImproveDelta { get; set; }
+    public int? ErrorCodeId { get; set; }
+    public Error? ErrorCode { get; set; }
 }

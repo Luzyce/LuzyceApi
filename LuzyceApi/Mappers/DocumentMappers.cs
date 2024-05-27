@@ -19,10 +19,10 @@ public static class DocumentMappers
     {
         return new DocumentPositions
         {
-            NetQuantity = dto.NetQuantity,
+            QuantityNetto = dto.QuantityNetto,
             QuantityLoss = dto.QuantityLoss,
             QuantityToImprove = dto.QuantityToImprove,
-            GrossQuantity = dto.GrossQuantity,
+            QuantityGross = dto.QuantityGross,
             StartTime = DateTime.Now,
             LampshadeId = dto.LampshadeId
         };

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240521132932_Documents")]
+    [Migration("20240527125451_Documents")]
     partial class Documents
     {
         /// <inheritdoc />
@@ -59,6 +59,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
+                    b.Property<string>("lockedBy")
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentsDefinitionId");
@@ -75,13 +78,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7526),
+                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1375),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7587),
+                            UpdatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1441),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -136,19 +139,19 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("GrossQuantity")
-                        .HasColumnType("int");
-
                     b.Property<int>("LampshadeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NetQuantity")
                         .HasColumnType("int");
 
                     b.Property<int>("OperatorId")
                         .HasColumnType("int");
 
+                    b.Property<int>("QuantityGross")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuantityLoss")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityNetto")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityToImprove")
@@ -177,13 +180,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             DocumentId = 1,
-                            GrossQuantity = 0,
                             LampshadeId = 1,
-                            NetQuantity = 0,
                             OperatorId = 1,
+                            QuantityGross = 0,
                             QuantityLoss = 0,
+                            QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 5, 21, 15, 29, 32, 515, DateTimeKind.Local).AddTicks(7641),
+                            StartTime = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1500),
                             StatusId = 1
                         });
                 });
@@ -243,8 +246,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Code")
-                        .HasColumnType("int");
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -290,13 +294,16 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NetDeltaQuantity")
+                    b.Property<int?>("ErrorCodeId")
                         .HasColumnType("int");
 
                     b.Property<int>("OperatorId")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityLossDelta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityNetDelta")
                         .HasColumnType("int");
 
                     b.Property<int>("QuantityToImproveDelta")
@@ -308,6 +315,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentId");
+
+                    b.HasIndex("ErrorCodeId");
 
                     b.HasIndex("OperatorId");
 
@@ -384,13 +393,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 21, 15, 29, 32, 407, DateTimeKind.Local).AddTicks(468),
+                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 311, DateTimeKind.Local).AddTicks(4784),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$jwqZqBrVkttVmcPC6lf3HOUfivvgpOB6JybPxmtVCY/MG12eEJdJG"
+                            Password = "$2a$11$U9KkcjwKkDPpdnZc5SLq/.ioKeo5ep9zp1SN.3CMlB94zVgAKx6bK"
                         });
                 });
 
@@ -554,6 +563,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Error", "ErrorCode")
+                        .WithMany()
+                        .HasForeignKey("ErrorCodeId");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Data.Models.User", "Operator")
                         .WithMany()
                         .HasForeignKey("OperatorId")
@@ -561,6 +574,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .IsRequired();
 
                     b.Navigation("Document");
+
+                    b.Navigation("ErrorCode");
 
                     b.Navigation("Operator");
                 });

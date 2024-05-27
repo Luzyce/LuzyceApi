@@ -10,6 +10,15 @@ var jwtkey = builder.Configuration["Jwt:SigningKey"] ?? throw new KeyNotFoundExc
 
 builder.Services.AddLogging(l => l.AddConsole());
 
+var logger = LoggerFactory.Create(config =>
+{
+    config.AddConsole();
+    config.AddConfiguration(builder.Configuration.GetSection("Logging"));
+}).CreateLogger("Program");
+
+logger.LogInformation("Starting application");
+logger.LogInformation("Signing key: {jwtkey}", jwtkey);
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

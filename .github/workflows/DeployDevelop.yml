@@ -26,7 +26,14 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run -d -p 8080:8080 -p 8081:8081 luzyceapi:latest
+          docker run \
+            -d \
+            -p 8080:8080 \
+            -p 8081:8081 \
+            -e ConnectionStrings__AppDbConnection='${{ vars.CONNECTION_STRING_APP_DB }}' \
+            -e ConnectionStrings__SubiektConnection='${{ vars.CONNECTION_STRING_SUBIEKT }}' \
+            -e Jwt__SigningKey='${{ vars.JWT_SIGNING_KEY }}' \
+            luzyceapi:latest
 
       - name: Check container logs
         run: |

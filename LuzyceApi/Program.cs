@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using LuzyceApi.Db.AppDb.Data;
 // using LuzyceApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -64,7 +64,6 @@ builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

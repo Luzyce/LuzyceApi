@@ -44,6 +44,7 @@ jobs:
             -e SQLCONNSTR_SubiektConnection='${{ secrets.CONNECTION_STRING_SUBIEKT }}' \
             -e Jwt__SigningKey='${{ secrets.JWT_SIGNING_KEY }}' \
             -e ASPNETCORE_HTTP_PORTS=35132 \
+            -e ASPNETCORE_ENVIRONMENT=Development \
             --name luzyceapi \
             luzyceapi:latest
 

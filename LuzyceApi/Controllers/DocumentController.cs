@@ -255,7 +255,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         });
     }
 
-    [HttpPost("closeDocument/{id}")]
+    [HttpGet("closeDocument/{id}")]
     [Authorize]
     public IActionResult CloseDocument(int id)
     {

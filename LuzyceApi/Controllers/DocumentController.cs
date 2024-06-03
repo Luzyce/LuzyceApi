@@ -98,7 +98,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return NotFound();
         }
-        if (documentRepository.IsDocumentLocked(document.Id) != null)
+        if (documentRepository.IsDocumentLocked(document.Id) == null)
         {
             return Conflict();
         }

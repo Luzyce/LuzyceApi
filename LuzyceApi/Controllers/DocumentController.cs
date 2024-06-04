@@ -274,4 +274,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentRepository.UnlockDocument(id);
         return Ok();
     }
+
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+        return Ok(HttpContext.Request.Headers);
+    }
 }

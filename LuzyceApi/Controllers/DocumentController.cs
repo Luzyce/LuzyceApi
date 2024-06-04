@@ -220,7 +220,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             {
                 return BadRequest("QuantityLoss is 0");
             }
-            if (dto.errorCode == null || documentRepository.GetError(dto.errorCode ?? "0") == null)
+            if ((dto.errorCode == null || documentRepository.GetError(dto.errorCode ?? "0") == null) && dto.type == '+')
             {
                 return BadRequest(dto.errorCode);
             }

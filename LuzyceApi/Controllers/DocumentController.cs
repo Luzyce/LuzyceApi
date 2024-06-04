@@ -170,7 +170,10 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentPosition.QuantityToImprove = dto.QuantityToImprove;
         documentPosition.QuantityGross = dto.QuantityGross;
         documentRepository.UpdateDocumentPosition(documentPosition);
-        return Ok(documentRepository.GetDocumentPosition(id));
+        return Ok(new
+        {
+            documentPosition = documentRepository.GetDocumentPosition(id)
+        });
     }
 
     [HttpPut("updateDocumentPositionOnKwit/{id}")]

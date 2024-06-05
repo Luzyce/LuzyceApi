@@ -6,6 +6,7 @@ using LuzyceApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
+using System.Net;
 
 namespace LuzyceApi.Controllers;
 [Route("api/login")]
@@ -15,7 +16,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
     private readonly IConfiguration config = config;
     private readonly UsersRepository usersRepository = usersRepository;
 
-    private string generateJSONWebToken(User user, bool isHashLogin)
+    private string generateJSONWebToken(User user, string ipaddress, bool isHashLogin)
     {
         var claims = new[]
         {
@@ -24,6 +25,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
                 new Claim(ClaimTypes.Role, user.Admin ? Roles.ADMIN : Roles.USER),
                 new Claim(ClaimTypes.GivenName, user.Name),
                 new Claim(ClaimTypes.Surname, user.LastName),
+                new Claim(ClaimTypes.Sid, ipaddress),
                 new Claim(ClaimTypes.SerialNumber, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash)
         };
 
@@ -54,7 +56,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
             return NotFound();
         }
 
-        var tokenString = generateJSONWebToken(user, isHashLogin);
+        var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);
         var result = new { user.Id, user.Name, user.LastName, user.Login };
         return Ok(new { token = tokenString, result });
     }

@@ -98,12 +98,12 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return NotFound();
         }
-        if (documentRepository.IsDocumentLocked(document.Id) == null)
+        if (documentRepository.IsDocumentLocked(document.Id) != "")
         {
             return Conflict();
         }
 
-        documentRepository.LockDocument(document.Id, HttpContext.Connection.RemoteIpAddress?.ToString() ?? "0");
+        documentRepository.LockDocument(document.Id, User.FindFirstValue(ClaimTypes.Sid) ?? "0");
 
         return Ok(new
         {
@@ -185,9 +185,9 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return BadRequest("Invalid request");
         }
-        if (documentRepository.IsDocumentLocked(id) != HttpContext.Connection.RemoteIpAddress?.ToString())
+        if (documentRepository.IsDocumentLocked(id) != User.FindFirstValue(ClaimTypes.Sid))
         {
-            return BadRequest("Document is locked by another user");
+            return BadRequest("Document is locked by another user or not locked");
         }
 
         var documentPosition = documentRepository.GetDocumentPositions(id).FirstOrDefault();
@@ -266,18 +266,12 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         {
             return BadRequest("Document is not locked");
         }
-        if (documentRepository.IsDocumentLocked(id) != HttpContext.Connection.RemoteIpAddress?.ToString())
+        if (documentRepository.IsDocumentLocked(id) != User.FindFirstValue(ClaimTypes.Sid))
         {
             return BadRequest("Document is locked by another user");
         }
 
         documentRepository.UnlockDocument(id);
         return Ok();
-    }
-
-    [HttpGet("test")]
-    public IActionResult Test()
-    {
-        return Ok(HttpContext.Request.Headers);
     }
 }

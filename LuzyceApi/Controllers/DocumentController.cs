@@ -271,7 +271,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             return BadRequest("Document is locked by another user");
         }
 
-        documentRepository.UnlockDocument(id);
-        return Ok();
+        // documentRepository.UnlockDocument(id);
+        return Ok("Document unlocked");
     }
 }

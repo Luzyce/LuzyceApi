@@ -53,7 +53,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
 
         if (user == null)
         {
-            return NotFound();
+            return Unauthorized();
         }
 
         var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);

@@ -34,8 +34,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
@@ -73,6 +71,11 @@ builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
 builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
+app.UseCors(builder => builder
+.AllowAnyHeader()
+.AllowAnyMethod()
+.SetIsOriginAllowed((host) => true)
+.AllowCredentials());
 
 if (app.Environment.IsDevelopment())
 {
@@ -82,6 +85,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.UseHttpsRedirection();
 

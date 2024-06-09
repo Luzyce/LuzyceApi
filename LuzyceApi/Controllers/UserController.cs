@@ -1,4 +1,4 @@
-using LuzyceApi.Dtos.User;
+using Luzyce.Core.Models.User;
 using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;

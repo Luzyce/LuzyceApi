@@ -1,6 +1,6 @@
 
 using LuzyceApi.Domain.Models;
-using LuzyceApi.Dtos.Document;
+using Luzyce.Core.Models.Document;
 
 namespace LuzyceApi.Mappers;
 

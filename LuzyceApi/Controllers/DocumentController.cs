@@ -1,4 +1,4 @@
-using LuzyceApi.Dtos.Document;
+using Luzyce.Core.Models.Document;
 using LuzyceApi.Repositories;
 using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
@@ -93,7 +93,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     [Authorize]
     public IActionResult GetByNumber([FromBody] GetDocumentByNumberDto dto)
     {
-        var document = documentRepository.GetDocumentByNumber(dto.number);
+        var document = documentRepository.GetDocumentByNumber(dto.Number);
         if (document == null)
         {
             return NotFound();
@@ -181,7 +181,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwitDto dto)
     {
         var document = documentRepository.GetDocument(id);
-        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW" || (dto.type.Equals("+") && dto.type.Equals("-")))
+        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW" || (dto.Type.Equals("+") && dto.Type.Equals("-")))
         {
             return BadRequest("Invalid request");
         }
@@ -198,34 +198,34 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             return NotFound();
         }
 
-        if (dto.field == "Dobrych")
+        if (dto.Field == "Dobrych")
         {
-            if (documentPosition.QuantityNetto == 0 && dto.type == '-')
+            if (documentPosition.QuantityNetto == 0 && dto.Type == '-')
             {
                 return BadRequest("NetQuantity is 0");
             }
-            documentPosition.QuantityNetto = dto.type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
+            documentPosition.QuantityNetto = dto.Type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
         }
-        else if (dto.field == "DoPoprawy")
+        else if (dto.Field == "DoPoprawy")
         {
-            if (documentPosition.QuantityToImprove == 0 && dto.type == '-')
+            if (documentPosition.QuantityToImprove == 0 && dto.Type == '-')
             {
                 return BadRequest("QuantityToImprove is 0");
             }
-            documentPosition.QuantityToImprove = dto.type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
+            documentPosition.QuantityToImprove = dto.Type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
         }
-        else if (dto.field == "Zlych")
+        else if (dto.Field == "Zlych")
         {
-            if (documentPosition.QuantityLoss == 0 && dto.type == '-')
+            if (documentPosition.QuantityLoss == 0 && dto.Type == '-')
             {
                 return BadRequest("QuantityLoss is 0");
             }
-            if ((dto.errorCode == null || documentRepository.GetError(dto.errorCode ?? "0") == null) && dto.type == '+')
+            if ((dto.ErrorCode == null || documentRepository.GetError(dto.ErrorCode ?? "0") == null) && dto.Type == '+')
             {
-                return BadRequest(dto.errorCode);
+                return BadRequest(dto.ErrorCode);
             }
 
-            documentPosition.QuantityLoss = dto.type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
+            documentPosition.QuantityLoss = dto.Type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
         }
         else
         {
@@ -242,7 +242,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             QuantityNetDelta = documentPosition.QuantityNetto - (documentPositionBefore?.QuantityNetto ?? 0),
             QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
             QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
-            ErrorCodeId = documentRepository.GetError(dto.errorCode ?? "0")?.Id
+            ErrorCodeId = documentRepository.GetError(dto.ErrorCode ?? "0")?.Id
         };
 
         documentRepository.AddOperation(newOperation);

@@ -4,6 +4,7 @@ using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Luzyce.Core.Models.User;
 
 namespace LuzyceApi.Controllers;
 [Route("api/document")]
@@ -16,22 +17,45 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     [Authorize]
     public IActionResult Get()
     {
-        var documents = documentRepository.GetDocuments().Select(x => new
-        {
-            x.Id,
-            x.DocNumber,
-            x.Warehouse,
-            x.Year,
-            x.Number,
-            x.DocumentsDefinition,
-            Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
-            x.CreatedAt,
-            x.UpdatedAt,
-            x.ClosedAt,
-            x.Status
-        }
-        );
-        return Ok(documents);
+        return Ok(
+            documentRepository
+                .GetDocuments()
+                .Select(x => new GetDocumentResponseDto
+                {
+                    Id = x.Id,
+                    DocNumber = x.DocNumber,
+                    Warehouse = x.Warehouse != null ? new GetWarehouseResponseDto
+                    {
+                        Id = x.Warehouse.Id,
+                        Code = x.Warehouse.Code,
+                        Name = x.Warehouse.Name
+                    } : null,
+                    Year = x.Year,
+                    Number = x.Number ?? "",
+                    DocumentsDefinition = x.DocumentsDefinition != null ? new GetDocumentsDefinitionResponseDto
+                    {
+                        Id = x.DocumentsDefinition.Id,
+                        Code = x.DocumentsDefinition.Code,
+                        Name = x.DocumentsDefinition.Name
+                    } : null,
+                    User = x.Operator != null ? new GetUserResponseDto
+                    {
+                        Id = x.Operator.Id,
+                        Name = x.Operator.Name,
+                        LastName = x.Operator.LastName,
+                        Login = x.Operator.Login
+                    } : null,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    ClosedAt = x.ClosedAt,
+                    Status = x.Status != null ? new GetStatusResponseDto
+                    {
+                        Id = x.Status.Id,
+                        Name = x.Status.Name,
+                        Priority = x.Status.Priority
+                    } : null
+                })
+                .ToList());
     }
 
     [HttpGet("{id}")]
@@ -39,36 +63,48 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     public IActionResult Get(int id)
     {
         var document = documentRepository.GetDocument(id);
+
         if (document == null)
         {
             return NotFound();
         }
-        return Ok(new
-        {
-            document.Id,
-            document.DocNumber,
-            document.Warehouse,
-            document.Year,
-            document.Number,
-            document.DocumentsDefinition,
-            Operator = document.Operator != null ? new { document.Operator.Id, document.Operator.Name, document.Operator.LastName } : null,
-            document.CreatedAt,
-            document.UpdatedAt,
-            document.ClosedAt,
-            document.Status,
-            documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+
+        return Ok(
+            new GetDocumentResponseDto
             {
-                x.Id,
-                x.QuantityNetto,
-                x.QuantityLoss,
-                x.QuantityToImprove,
-                x.QuantityGross,
-                Operator = x.Operator != null ? new { x.Operator.Id, x.Operator.Name, x.Operator.LastName } : null,
-                x.StartTime,
-                x.EndTime,
-                Lampshade = x.Lampshade != null ? new { x.Lampshade.Id, x.Lampshade.Code } : null
-            })
-        });
+                Id = document.Id,
+                DocNumber = document.DocNumber,
+                Warehouse = document.Warehouse != null ? new GetWarehouseResponseDto
+                {
+                    Id = document.Warehouse.Id,
+                    Code = document.Warehouse.Code,
+                    Name = document.Warehouse.Name
+                } : null,
+                Year = document.Year,
+                Number = document.Number ?? "",
+                DocumentsDefinition = document.DocumentsDefinition != null ? new GetDocumentsDefinitionResponseDto
+                {
+                    Id = document.DocumentsDefinition.Id,
+                    Code = document.DocumentsDefinition.Code,
+                    Name = document.DocumentsDefinition.Name
+                } : null,
+                User = document.Operator != null ? new GetUserResponseDto
+                {
+                    Id = document.Operator.Id,
+                    Name = document.Operator.Name,
+                    LastName = document.Operator.LastName,
+                    Login = document.Operator.Login
+                } : null,
+                CreatedAt = document.CreatedAt,
+                UpdatedAt = document.UpdatedAt,
+                ClosedAt = document.ClosedAt,
+                Status = document.Status != null ? new GetStatusResponseDto
+                {
+                    Id = document.Status.Id,
+                    Name = document.Status.Name,
+                    Priority = document.Status.Priority
+                } : null
+            });
     }
 
     [HttpPost]
@@ -79,14 +115,50 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         newDocument.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         newDocument = documentRepository.AddDocument(newDocument);
 
-        if (newDocument != null)
-        {
-            return CreatedAtAction(nameof(Get), new { id = newDocument.Id }, documentRepository.GetDocument(newDocument.Id));
-        }
-        else
+        var createdDocument = documentRepository.GetDocument(newDocument.Id);
+
+        if (newDocument == null || createdDocument == null)
         {
             return BadRequest("Failed to create document.");
         }
+
+        return CreatedAtAction(
+            nameof(Get),
+            new GetDocumentResponseDto
+            {
+                Id = createdDocument.Id,
+                DocNumber = createdDocument.DocNumber,
+                Warehouse = createdDocument.Warehouse != null ? new GetWarehouseResponseDto
+                {
+                    Id = createdDocument.Warehouse.Id,
+                    Code = createdDocument.Warehouse.Code,
+                    Name = createdDocument.Warehouse.Name
+                } : null,
+                Year = createdDocument.Year,
+                Number = createdDocument.Number ?? "",
+                DocumentsDefinition = createdDocument.DocumentsDefinition != null ? new GetDocumentsDefinitionResponseDto
+                {
+                    Id = createdDocument.DocumentsDefinition.Id,
+                    Code = createdDocument.DocumentsDefinition.Code,
+                    Name = createdDocument.DocumentsDefinition.Name
+                } : null,
+                User = createdDocument.Operator != null ? new GetUserResponseDto
+                {
+                    Id = createdDocument.Operator.Id,
+                    Name = createdDocument.Operator.Name,
+                    LastName = createdDocument.Operator.LastName,
+                    Login = createdDocument.Operator.Login
+                } : null,
+                CreatedAt = createdDocument.CreatedAt,
+                UpdatedAt = createdDocument.UpdatedAt,
+                ClosedAt = createdDocument.ClosedAt,
+                Status = createdDocument.Status != null ? new GetStatusResponseDto
+                {
+                    Id = createdDocument.Status.Id,
+                    Name = createdDocument.Status.Name,
+                    Priority = createdDocument.Status.Priority
+                } : null
+            });
     }
 
     [HttpPost("getByNumber")]
@@ -105,17 +177,17 @@ public class DocumentController(DocumentRepository documentRepository) : Control
 
         documentRepository.LockDocument(document.Id, User.FindFirstValue(ClaimTypes.Sid) ?? "0");
 
-        return Ok(new
+        return Ok(new GetDocumentByNumberResponseDto
         {
-            document.Id,
-            document.Number,
-            documentPosition = documentRepository.GetDocumentPositions(document.Id).Select(x => new
+            Id = document.Id,
+            Number = document.Number,
+            DocumentPositions = documentRepository.GetDocumentPositions(document.Id).Select(x => new GetDocumentPositionResponseDto
             {
-                x.Id,
-                x.QuantityNetto,
-                x.QuantityLoss,
-                x.QuantityToImprove
-            })
+                Id = x.Id,
+                QuantityNetto = x.QuantityNetto,
+                QuantityLoss = x.QuantityLoss,
+                QuantityToImprove = x.QuantityToImprove
+            }).ToList()
         });
     }
 
@@ -130,7 +202,42 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         }
         document.StatusId = dto.StatusId;
         documentRepository.UpdateDocument(document);
-        return Ok(documentRepository.GetDocument(id));
+        return Ok(
+            new GetDocumentResponseDto
+            {
+                Id = document.Id,
+                DocNumber = document.DocNumber,
+                Warehouse = document.Warehouse != null ? new GetWarehouseResponseDto
+                {
+                    Id = document.Warehouse.Id,
+                    Code = document.Warehouse.Code,
+                    Name = document.Warehouse.Name
+                } : null,
+                Year = document.Year,
+                Number = document.Number ?? "",
+                DocumentsDefinition = document.DocumentsDefinition != null ? new GetDocumentsDefinitionResponseDto
+                {
+                    Id = document.DocumentsDefinition.Id,
+                    Code = document.DocumentsDefinition.Code,
+                    Name = document.DocumentsDefinition.Name
+                } : null,
+                User = document.Operator != null ? new GetUserResponseDto
+                {
+                    Id = document.Operator.Id,
+                    Name = document.Operator.Name,
+                    LastName = document.Operator.LastName,
+                    Login = document.Operator.Login
+                } : null,
+                CreatedAt = document.CreatedAt,
+                UpdatedAt = document.UpdatedAt,
+                ClosedAt = document.ClosedAt,
+                Status = document.Status != null ? new GetStatusResponseDto
+                {
+                    Id = document.Status.Id,
+                    Name = document.Status.Name,
+                    Priority = document.Status.Priority
+                } : null
+            });
     }
 
     [HttpPost("addDocumentPosition/{id}")]
@@ -146,14 +253,50 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentPosition.DocumentId = id;
         documentPosition.OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         documentPosition = documentRepository.AddDocumentPosition(documentPosition);
-        if (documentPosition != null)
-        {
-            return CreatedAtAction(nameof(Get), new { id = documentPosition.Id }, documentRepository.GetDocumentPosition(documentPosition.Id));
-        }
-        else
+        document = documentRepository.GetDocument(id);
+
+        if (documentPosition == null || document == null)
         {
             return BadRequest("Failed to create document position.");
         }
+
+        return CreatedAtAction(
+            nameof(Get),
+            new GetDocumentResponseDto
+            {
+                Id = document.Id,
+                DocNumber = document.DocNumber,
+                Warehouse = document.Warehouse != null ? new GetWarehouseResponseDto
+                {
+                    Id = document.Warehouse.Id,
+                    Code = document.Warehouse.Code,
+                    Name = document.Warehouse.Name
+                } : null,
+                Year = document.Year,
+                Number = document.Number ?? "",
+                DocumentsDefinition = document.DocumentsDefinition != null ? new GetDocumentsDefinitionResponseDto
+                {
+                    Id = document.DocumentsDefinition.Id,
+                    Code = document.DocumentsDefinition.Code,
+                    Name = document.DocumentsDefinition.Name
+                } : null,
+                User = document.Operator != null ? new GetUserResponseDto
+                {
+                    Id = document.Operator.Id,
+                    Name = document.Operator.Name,
+                    LastName = document.Operator.LastName,
+                    Login = document.Operator.Login
+                } : null,
+                CreatedAt = document.CreatedAt,
+                UpdatedAt = document.UpdatedAt,
+                ClosedAt = document.ClosedAt,
+                Status = document.Status != null ? new GetStatusResponseDto
+                {
+                    Id = document.Status.Id,
+                    Name = document.Status.Name,
+                    Priority = document.Status.Priority
+                } : null
+            });
     }
 
     [HttpPut("updateDocumentPosition/{id}")]
@@ -170,9 +313,12 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentPosition.QuantityToImprove = dto.QuantityToImprove;
         documentPosition.QuantityGross = dto.QuantityGross;
         documentRepository.UpdateDocumentPosition(documentPosition);
-        return Ok(new
+        return Ok(new GetDocumentPositionResponseDto
         {
-            documentPosition = documentRepository.GetDocumentPosition(id)
+            Id = documentPosition.Id,
+            QuantityNetto = documentPosition.QuantityNetto,
+            QuantityLoss = documentPosition.QuantityLoss,
+            QuantityToImprove = documentPosition.QuantityToImprove
         });
     }
 
@@ -248,13 +394,12 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentRepository.AddOperation(newOperation);
         documentRepository.UpdateDocumentPosition(documentPosition);
 
-        return Ok(new
+        return Ok(new GetDocumentPositionResponseDto
         {
-            documentPosition.Id,
-            documentPosition.QuantityNetto,
-            documentPosition.QuantityLoss,
-            documentPosition.QuantityToImprove,
-            documentPosition.QuantityGross
+            Id = documentPosition.Id,
+            QuantityNetto = documentPosition.QuantityNetto,
+            QuantityLoss = documentPosition.QuantityLoss,
+            QuantityToImprove = documentPosition.QuantityToImprove
         });
     }
 

@@ -54,7 +54,7 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         }
 
         usersRepository.UpdateUser(UserMappers.UpdateUserFromDto(dto, user));
-        return NoContent();
+        return Ok();
     }
 
     [HttpDelete("{id}")]
@@ -68,7 +68,7 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         }
 
         usersRepository.DeleteUser(user);
-        return NoContent();
+        return Ok();
     }
 
 }

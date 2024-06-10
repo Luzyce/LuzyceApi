@@ -6,7 +6,6 @@ using LuzyceApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
-using System.Net;
 
 namespace LuzyceApi.Controllers;
 [Route("api/login")]

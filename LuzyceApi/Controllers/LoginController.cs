@@ -56,7 +56,11 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         }
 
         var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);
-        var result = new { user.Id, user.Name, user.LastName, user.Login };
-        return Ok(new { token = tokenString, result });
+        return Ok(
+            new LoginResponseDto
+            {
+                Token = tokenString,
+                Result = new GetUserResponseDto { Id = user.Id, Name = user.Name, LastName = user.LastName, Login = user.Login }
+            });
     }
 }

@@ -17,8 +17,16 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
     [Authorize]
     public IActionResult Get()
     {
-        var users = usersRepository.GetUsers().Select(x => new { x.Id, x.Name, x.LastName, x.Login });
-        return Ok(users);
+        return Ok(
+            usersRepository.GetUsers()
+                .Select(x => new GetUserResponseDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    LastName = x.LastName,
+                    Login = x.Login
+                })
+                .ToList());
     }
 
     [HttpGet("{id}")]
@@ -30,8 +38,15 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         {
             return NotFound();
         }
-        var result = new { user.Id, user.Name, user.LastName, user.Login };
-        return Ok(result);
+
+        return Ok(
+            new GetUserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                LastName = user.LastName,
+                Login = user.Login
+            });
     }
 
     [HttpPost]
@@ -40,7 +55,17 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
     {
         var user = UserMappers.ToUserFromCreateDto(dto);
         usersRepository.AddUser(user);
-        return CreatedAtAction(nameof(Get), new { id = user.Id }, user);
+
+        return CreatedAtAction(
+            nameof(Get),
+            new { id = user.Id },
+            new GetUserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                LastName = user.LastName,
+                Login = user.Login
+            });
     }
 
     [HttpPut("{id}")]
@@ -54,7 +79,13 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         }
 
         usersRepository.UpdateUser(UserMappers.UpdateUserFromDto(dto, user));
-        return Ok();
+        return Ok(new GetUserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            LastName = user.LastName,
+            Login = user.Login
+        });
     }
 
     [HttpDelete("{id}")]

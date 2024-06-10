@@ -1,12 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using LuzyceApi.Dtos.User;
+using Luzyce.Core.Models.User;
 using LuzyceApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
-using System.Net;
 
 namespace LuzyceApi.Controllers;
 [Route("api/login")]
@@ -57,7 +56,11 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         }
 
         var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);
-        var result = new { user.Id, user.Name, user.LastName, user.Login };
-        return Ok(new { token = tokenString, result });
+        return Ok(
+            new LoginResponseDto
+            {
+                Token = tokenString,
+                Result = new GetUserResponseDto { Id = user.Id, Name = user.Name, LastName = user.LastName, Login = user.Login }
+            });
     }
 }

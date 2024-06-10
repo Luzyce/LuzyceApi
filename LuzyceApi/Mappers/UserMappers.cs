@@ -1,4 +1,4 @@
-using LuzyceApi.Dtos.User;
+using Luzyce.Core.Models.User;
 using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Mappers;

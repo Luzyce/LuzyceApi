@@ -197,11 +197,15 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         logger.LogInformation("Getting document positions");
         var documentPositions = applicationDbContext.DocumentPositions
                         .Include(d => d.Document)
+                        .ThenInclude(d => d.Warehouse)
+                        .Include(d => d.Document)
+                        .ThenInclude(d => d.DocumentsDefinition)
+                        .Include(d => d.Document)
+                        .ThenInclude(d => d.Operator)
                         .Include(d => d.Operator)
                         .Include(d => d.Status)
                         .Include(d => d.Lampshade)
                         .FirstOrDefault(x => x.DocumentId == id);
-
 
         if (documentPositions == null)
         {
@@ -211,6 +215,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         return new Domain.Models.DocumentPositions
         {
             Id = documentPositions.Id,
+            DocumentId = documentPositions.DocumentId,
             Document = DocumentDomainFromDb(documentPositions.Document!),
             QuantityNetto = documentPositions.QuantityNetto,
             QuantityLoss = documentPositions.QuantityLoss,
@@ -318,17 +323,21 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = documentsDefinition.Name
         };
     }
-    public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse wherehouse)
+    public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
     {
+        ArgumentNullException.ThrowIfNull(warehouse);
+
         return new()
         {
-            Id = wherehouse.Id,
-            Code = wherehouse.Code,
-            Name = wherehouse.Name
+            Id = warehouse.Id,
+            Code = warehouse.Code,
+            Name = warehouse.Name
         };
     }
     public static Domain.Models.User UserDomainFromDb(User user)
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         return new()
         {
             Id = user.Id,
@@ -344,6 +353,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     }
     public static Domain.Models.Status StatusDomainFromDb(Status status)
     {
+        ArgumentNullException.ThrowIfNull(status);
+
         return new()
         {
             Id = status.Id,
@@ -353,6 +364,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     }
     public static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
     {
+        ArgumentNullException.ThrowIfNull(documentsDefinition);
+
         return new()
         {
             Id = documentsDefinition.Id,
@@ -362,6 +375,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     }
     public static Domain.Models.Lampshade LampshadeDomainFromDb(Lampshade lampshade)
     {
+        ArgumentNullException.ThrowIfNull(lampshade);
+
         return new()
         {
             Id = lampshade.Id,
@@ -370,6 +385,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     }
     public static Domain.Models.Document DocumentDomainFromDb(Document document)
     {
+        ArgumentNullException.ThrowIfNull(document);
+
         return new()
         {
             Id = document.Id,

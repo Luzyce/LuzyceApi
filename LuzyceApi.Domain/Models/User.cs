@@ -14,5 +14,6 @@ public class User
     public string Password { get; set; } = string.Empty;
     public string Hash { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public required bool Admin { get; set; } = false;
+    public int RoleId { get; set; }
+    public Role? Role { get; set; }
 }

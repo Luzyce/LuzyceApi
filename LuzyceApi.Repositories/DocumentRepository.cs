@@ -197,11 +197,11 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         logger.LogInformation("Getting document positions");
         var documentPositions = applicationDbContext.DocumentPositions
                         .Include(d => d.Document)
-                        .ThenInclude(d => d.Warehouse)
+                        .ThenInclude(d => d!.Warehouse)
                         .Include(d => d.Document)
-                        .ThenInclude(d => d.DocumentsDefinition)
+                        .ThenInclude(d => d!.DocumentsDefinition)
                         .Include(d => d.Document)
-                        .ThenInclude(d => d.Operator)
+                        .ThenInclude(d => d!.Operator)
                         .Include(d => d.Operator)
                         .Include(d => d.Status)
                         .Include(d => d.Lampshade)
@@ -348,7 +348,17 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Password = user.Password,
             Hash = user.Hash,
             CreatedAt = user.CreatedAt,
-            Admin = user.Admin
+            Role = RoleDomainFromDb(user.Role!)
+        };
+    }
+    public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+
+        return new()
+        {
+            Id = role.Id,
+            Name = role.Name
         };
     }
     public static Domain.Models.Status StatusDomainFromDb(Status status)

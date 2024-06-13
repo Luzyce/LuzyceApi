@@ -48,7 +48,11 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
                 Email = user.Email ?? "",
                 Login = user.Login,
                 Hash = user.Hash,
-                Admin = user.Admin
+                Role = new GetRoleDto
+                {
+                    Id = user.Role!.Id,
+                    Name = user.Role.Name
+                }
 
             });
     }

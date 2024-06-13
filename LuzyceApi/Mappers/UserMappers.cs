@@ -14,8 +14,7 @@ public static class UserMappers
             Email = dto.Email,
             Login = dto.Login,
             Password = dto.Password,
-            Hash = dto.Hash,
-            Admin = false
+            Hash = dto.Hash
         };
     }
 
@@ -26,7 +25,6 @@ public static class UserMappers
         user.Email = dto.Email;
         user.Login = dto.Login;
         user.Hash = dto.Hash;
-        user.Admin = dto.Admin;
         return user;
     }
 }

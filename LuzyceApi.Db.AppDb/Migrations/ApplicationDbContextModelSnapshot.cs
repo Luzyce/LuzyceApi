@@ -75,13 +75,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1375),
+                            CreatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9551),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1441),
+                            UpdatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9624),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -183,7 +183,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1500),
+                            StartTime = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9684),
                             StatusId = 1
                         });
                 });
@@ -352,9 +352,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("Admin")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
@@ -381,7 +378,12 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
 
@@ -389,14 +391,14 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Admin = true,
-                            CreatedAt = new DateTime(2024, 5, 27, 14, 54, 51, 311, DateTimeKind.Local).AddTicks(4784),
+                            CreatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 418, DateTimeKind.Local).AddTicks(1731),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$U9KkcjwKkDPpdnZc5SLq/.ioKeo5ep9zp1SN.3CMlB94zVgAKx6bK"
+                            Password = "$2a$11$BW4ocur5hWoPykCMr51hsuNHeZ2.InR0HAyxbLyajIbLC5ttHBAyK",
+                            RoleId = 1
                         });
                 });
 
@@ -425,6 +427,28 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             Id = 1,
                             Code = "M",
                             Name = "Magazyn"
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Admin"
                         });
                 });
 
@@ -575,6 +599,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("ErrorCode");
 
                     b.Navigation("Operator");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.User", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

@@ -21,7 +21,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, string.IsNullOrEmpty(user.Email) ? "" : user.Email),
-                new Claim(ClaimTypes.Role, user.Admin ? Roles.ADMIN : Roles.USER),
+                new Claim(ClaimTypes.Role, usersRepository.GetRole(user.RoleId)?.Name ?? ""),
                 new Claim(ClaimTypes.GivenName, user.Name),
                 new Claim(ClaimTypes.Surname, user.LastName),
                 new Claim(ClaimTypes.Sid, ipaddress),

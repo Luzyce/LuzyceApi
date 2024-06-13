@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using LuzyceApi.Db.AppDb.Data.Models;
 using Microsoft.Extensions.Configuration;
+using LuzyceApi.Db.AppDb.Models;
 
 namespace LuzyceApi.Db.AppDb.Data;
 
@@ -24,6 +25,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Operation> Operations { get; set; }
     public DbSet<Status> Statuses { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
+    public DbSet<Role> Roles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -34,6 +36,14 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        var adminRole = new Role
+        {
+            Id = 1,
+            Name = "Admin"
+        };
+
+        modelBuilder.Entity<Role>().HasData(adminRole);
+
         var adminUser = new User
         {
             Id = 1,
@@ -43,7 +53,7 @@ public class ApplicationDbContext : DbContext
             Login = "admin",
             Password = BCrypt.Net.BCrypt.HashPassword("admin"),
             Hash = "admin",
-            Admin = true
+            RoleId = 1
         };
 
         modelBuilder.Entity<User>().HasData(adminUser);

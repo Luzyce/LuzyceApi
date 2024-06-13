@@ -1,4 +1,5 @@
 using LuzyceApi.Db.AppDb.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace LuzyceApi.Repositories;
@@ -12,6 +13,7 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         logger.LogInformation($"Getting user by hash: {hash}");
         return applicationDbContext
             .Users
+            .Include(d => d.Role)
             .Select(
                 x => new Domain.Models.User
                 {
@@ -23,7 +25,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
                     Password = x.Password,
                     Hash = x.Hash,
                     CreatedAt = x.CreatedAt,
-                    Admin = x.Admin
+                    RoleId = x.RoleId,
+                    Role = RoleDomainFromDb(x.Role!)
                 }
             )
             .FirstOrDefault(x => x.Hash == hash);
@@ -33,7 +36,11 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
     {
         logger.LogInformation($"Getting user by login: {login}");
 
-        var user = applicationDbContext.Users.FirstOrDefault(x => x.Login == login);
+        var user = applicationDbContext.Users
+                .Include(d => d.Role)
+                .FirstOrDefault(x => x.Login == login);
+
+        logger.LogInformation($"Getting user by login: {user.RoleId}");
 
         if (user == null)
         {
@@ -56,7 +63,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
             Password = user.Password,
             Hash = user.Hash,
             CreatedAt = user.CreatedAt,
-            Admin = user.Admin
+            RoleId = user.RoleId,
+            Role = RoleDomainFromDb(user.Role!)
         };
     }
 
@@ -65,6 +73,7 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         logger.LogInformation("Getting all users");
         return applicationDbContext
             .Users
+            .Include(d => d.Role)
             .Select(
                 x => new Domain.Models.User
                 {
@@ -75,7 +84,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
                     Login = x.Login,
                     Hash = x.Hash,
                     CreatedAt = x.CreatedAt,
-                    Admin = x.Admin
+                    RoleId = x.RoleId,
+                    Role = RoleDomainFromDb(x.Role!)
                 }
             )
             .ToList();
@@ -86,6 +96,7 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         logger.LogInformation($"Getting user by id: {id}");
         return applicationDbContext
             .Users
+            .Include(d => d.Role)
             .Select(
                 x => new Domain.Models.User
                 {
@@ -96,7 +107,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
                     Login = x.Login,
                     Hash = x.Hash,
                     CreatedAt = x.CreatedAt,
-                    Admin = x.Admin
+                    RoleId = x.RoleId,
+                    Role = RoleDomainFromDb(x.Role!)
                 }
             )
             .FirstOrDefault(x => x.Id == id);
@@ -116,7 +128,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
                 Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
                 Hash = user.Hash,
                 CreatedAt = user.CreatedAt,
-                Admin = user.Admin
+                RoleId = user.RoleId,
+                Role = RoleDbFromDomain(user.Role!)
             }
         );
 
@@ -127,7 +140,9 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
     {
         logger.LogInformation($"Updating user: {user.Login}");
 
-        var userToUpdate = applicationDbContext.Users.FirstOrDefault(x => x.Id == user.Id);
+        var userToUpdate = applicationDbContext.Users
+                    .Include(d => d.Role)
+                    .FirstOrDefault(x => x.Id == user.Id);
 
         if (userToUpdate == null)
         {
@@ -139,7 +154,8 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         userToUpdate.Email = user.Email;
         userToUpdate.Login = user.Login;
         userToUpdate.Hash = user.Hash;
-        userToUpdate.Admin = user.Admin;
+        userToUpdate.RoleId = user.RoleId;
+        userToUpdate.Role = RoleDbFromDomain(user.Role!);
 
         applicationDbContext.SaveChanges();
     }
@@ -157,5 +173,32 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
 
         applicationDbContext.Users.Remove(userToDelete);
         applicationDbContext.SaveChanges();
+    }
+
+    public Domain.Models.Role? GetRole(int id)
+    {
+        logger.LogInformation($"Getting role by id: {id}");
+        var role = applicationDbContext.Roles.FirstOrDefault(x => x.Id == id);
+        if (role == null)
+        {
+            return null;
+        }
+        return RoleDomainFromDb(role);
+    }
+    public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
+    {
+        return new Domain.Models.Role
+        {
+            Id = role.Id,
+            Name = role.Name
+        };
+    }
+    public static Db.AppDb.Models.Role RoleDbFromDomain(Domain.Models.Role role)
+    {
+        return new Db.AppDb.Models.Role
+        {
+            Id = role.Id,
+            Name = role.Name
+        };
     }
 }

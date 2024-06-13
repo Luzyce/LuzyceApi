@@ -67,6 +67,21 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Statuses",
                 columns: table => new
                 {
@@ -79,6 +94,23 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Statuses", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Warehouses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Code = table.Column<string>(type: "varchar(2)", maxLength: 2, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Warehouses", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -101,28 +133,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     Hash = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Admin = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    RoleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Warehouses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Code = table.Column<string>(type: "varchar(2)", maxLength: 2, nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Warehouses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -341,14 +362,14 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 values: new object[] { 1, "KL4124" });
 
             migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { 1, "Admin" });
+
+            migrationBuilder.InsertData(
                 table: "Statuses",
                 columns: new[] { "Id", "Name", "Priority" },
                 values: new object[] { 1, "Otwarty", 1 });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "Admin", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password" },
-                values: new object[] { 1, true, new DateTime(2024, 5, 27, 14, 54, 51, 311, DateTimeKind.Local).AddTicks(4784), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$U9KkcjwKkDPpdnZc5SLq/.ioKeo5ep9zp1SN.3CMlB94zVgAKx6bK" });
 
             migrationBuilder.InsertData(
                 table: "Warehouses",
@@ -356,14 +377,19 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 values: new object[] { 1, "M", "Magazyn" });
 
             migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
+                values: new object[] { 1, new DateTime(2024, 6, 13, 15, 5, 14, 418, DateTimeKind.Local).AddTicks(1731), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$BW4ocur5hWoPykCMr51hsuNHeZ2.InR0HAyxbLyajIbLC5ttHBAyK", 1 });
+
+            migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year", "lockedBy" },
-                values: new object[] { 1, null, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1375), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1441), 1, 2023, null });
+                values: new object[] { 1, null, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9551), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9624), 1, 2023, null });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeId", "OperatorId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
-                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 5, 27, 14, 54, 51, 421, DateTimeKind.Local).AddTicks(1500), 1 });
+                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9684), 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",
@@ -449,6 +475,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "IX_Operations_OperatorId",
                 table: "Operations",
                 column: "OperatorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RoleId",
+                table: "Users",
+                column: "RoleId");
         }
 
         /// <inheritdoc />
@@ -486,6 +517,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "Warehouses");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
         }
     }
 }

@@ -40,12 +40,16 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         }
 
         return Ok(
-            new GetUserResponseDto
+            new GetUserForUpdateDto
             {
                 Id = user.Id,
                 Name = user.Name,
                 LastName = user.LastName,
-                Login = user.Login
+                Email = user.Email ?? "",
+                Login = user.Login,
+                Hash = user.Hash,
+                Admin = user.Admin
+
             });
     }
 

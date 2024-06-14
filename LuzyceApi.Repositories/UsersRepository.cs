@@ -175,6 +175,13 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         applicationDbContext.Users.Remove(userToDelete);
         applicationDbContext.SaveChanges();
     }
+    public IEnumerable<Domain.Models.Role> GetRoles()
+    {
+        logger.LogInformation("Getting all roles");
+        return applicationDbContext.Roles
+            .Select(x => RoleDomainFromDb(x))
+            .ToList();
+    }
 
     public Domain.Models.Role? GetRole(int id)
     {

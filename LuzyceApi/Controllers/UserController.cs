@@ -112,4 +112,17 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         return Ok();
     }
 
+    [HttpGet("roles")]
+    [Authorize]
+    public IActionResult GetRoles()
+    {
+        return Ok(
+            usersRepository.GetRoles()
+                .Select(x => new GetRoleDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .ToList());
+    }
 }

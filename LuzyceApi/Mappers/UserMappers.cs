@@ -25,6 +25,7 @@ public static class UserMappers
         user.Email = dto.Email;
         user.Login = dto.Login;
         user.Hash = dto.Hash;
+        user.RoleId = dto.RoleId;
         return user;
     }
 }

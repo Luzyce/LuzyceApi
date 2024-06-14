@@ -86,7 +86,9 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
             return NotFound();
         }
 
-        usersRepository.UpdateUser(UserMappers.UpdateUserFromDto(dto, user));
+        user = UserMappers.UpdateUserFromDto(dto, user);
+
+        usersRepository.UpdateUser(user);
         return Ok(new GetUserResponseDto
         {
             Id = user.Id,

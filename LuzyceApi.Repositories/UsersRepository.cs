@@ -157,7 +157,6 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         userToUpdate.Login = user.Login;
         userToUpdate.Hash = user.Hash;
         userToUpdate.RoleId = user.RoleId;
-        userToUpdate.Role = RoleDbFromDomain(user.Role!);
 
         applicationDbContext.SaveChanges();
     }
@@ -190,14 +189,6 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
     public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
     {
         return new Domain.Models.Role
-        {
-            Id = role.Id,
-            Name = role.Name
-        };
-    }
-    public static Db.AppDb.Models.Role RoleDbFromDomain(Domain.Models.Role role)
-    {
-        return new Db.AppDb.Models.Role
         {
             Id = role.Id,
             Name = role.Name

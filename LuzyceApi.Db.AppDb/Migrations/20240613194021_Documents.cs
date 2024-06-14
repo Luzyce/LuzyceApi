@@ -379,17 +379,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 6, 13, 15, 5, 14, 418, DateTimeKind.Local).AddTicks(1731), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$BW4ocur5hWoPykCMr51hsuNHeZ2.InR0HAyxbLyajIbLC5ttHBAyK", 1 });
+                values: new object[] { 1, new DateTime(2024, 6, 13, 21, 40, 21, 226, DateTimeKind.Local).AddTicks(3672), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$ahky/TU0pO6GIFGKH2bWjuAnXzrKIyKfOl4iP9Twss1RXXnxrJodW", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year", "lockedBy" },
-                values: new object[] { 1, null, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9551), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9624), 1, 2023, null });
+                values: new object[] { 1, null, new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9121), 1, 1, "0001/M/2024", 1, 1, new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9191), 1, 2023, null });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeId", "OperatorId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
-                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9684), 1 });
+                values: new object[] { 1, 1, null, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9249), 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",

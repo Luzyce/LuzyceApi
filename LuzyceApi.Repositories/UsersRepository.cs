@@ -118,22 +118,27 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
     {
         logger.LogInformation($"Adding user: {user.Login}");
 
-        applicationDbContext.Users.Add(
-            new Db.AppDb.Data.Models.User
-            {
-                Name = user.Name,
-                LastName = user.LastName,
-                Email = user.Email,
-                Login = user.Login,
-                Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
-                Hash = user.Hash,
-                CreatedAt = user.CreatedAt,
-                RoleId = user.RoleId,
-                Role = RoleDbFromDomain(user.Role!)
-            }
-        );
+        if (user.RoleId == 0)
+        {
+            user.RoleId = 2;
+        }
 
+        var dbUser = new Db.AppDb.Data.Models.User
+        {
+            Name = user.Name,
+            LastName = user.LastName,
+            Email = user.Email,
+            Login = user.Login,
+            Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
+            Hash = user.Hash,
+            CreatedAt = user.CreatedAt,
+            RoleId = user.RoleId
+        };
+
+        applicationDbContext.Users.Add(dbUser);
         applicationDbContext.SaveChanges();
+
+        user.Id = dbUser.Id;
     }
 
     public void UpdateUser(Domain.Models.User user)

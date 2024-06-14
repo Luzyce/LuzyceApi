@@ -75,13 +75,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9551),
+                            CreatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9121),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "0001/M/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9624),
+                            UpdatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9191),
                             WarehouseId = 1,
                             Year = 2023
                         });
@@ -183,7 +183,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 13, 15, 5, 14, 527, DateTimeKind.Local).AddTicks(9684),
+                            StartTime = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9249),
                             StatusId = 1
                         });
                 });
@@ -391,13 +391,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 13, 15, 5, 14, 418, DateTimeKind.Local).AddTicks(1731),
+                            CreatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 226, DateTimeKind.Local).AddTicks(3672),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$BW4ocur5hWoPykCMr51hsuNHeZ2.InR0HAyxbLyajIbLC5ttHBAyK",
+                            Password = "$2a$11$ahky/TU0pO6GIFGKH2bWjuAnXzrKIyKfOl4iP9Twss1RXXnxrJodW",
                             RoleId = 1
                         });
                 });

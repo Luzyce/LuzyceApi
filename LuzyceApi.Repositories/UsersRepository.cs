@@ -40,14 +40,11 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
                 .Include(d => d.Role)
                 .FirstOrDefault(x => x.Login == login);
 
-        logger.LogInformation($"Getting user by login: {user.RoleId}");
-
         if (user == null)
         {
             return null;
         }
 
-        // Verify the password
         if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
         {
             return null;

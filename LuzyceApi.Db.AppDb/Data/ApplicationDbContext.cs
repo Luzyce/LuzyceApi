@@ -42,15 +42,13 @@ public class ApplicationDbContext : DbContext
             Name = "Admin"
         };
 
-        modelBuilder.Entity<Role>().HasData(adminRole);
-
         var userRole = new Role
         {
-            Id = 1,
+            Id = 2,
             Name = "User"
         };
 
-        modelBuilder.Entity<Role>().HasData(userRole);
+        modelBuilder.Entity<Role>().HasData(adminRole, userRole);
 
         var adminUser = new User
         {

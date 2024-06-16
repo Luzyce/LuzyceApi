@@ -70,12 +70,21 @@ builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowAnyOrigin();
+    });
+});
+
 var app = builder.Build();
-app.UseCors(builder => builder
-.AllowAnyHeader()
-.AllowAnyMethod()
-.SetIsOriginAllowed((host) => true)
-.AllowCredentials());
+
+// Apply CORS middleware before other middlewares
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {
@@ -83,11 +92,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-
-app.UseHttpsRedirection();
 
 app.MapControllers();
 

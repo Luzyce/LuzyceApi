@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using LuzyceApi;
 using LuzyceApi.Db.AppDb.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -98,5 +99,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseMiddleware<CorsMiddleware>();
 
 app.Run();

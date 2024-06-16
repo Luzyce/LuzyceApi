@@ -28,4 +28,10 @@ public static class UserMappers
         user.RoleId = dto.RoleId;
         return user;
     }
+
+    public static User UpdateUserPasswordFromDto(this UpdatePasswordDto dto, User user)
+    {
+        user.Password = dto.NewPassword;
+        return user;
+    }
 }

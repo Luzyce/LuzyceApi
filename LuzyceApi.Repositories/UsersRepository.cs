@@ -161,6 +161,24 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         applicationDbContext.SaveChanges();
     }
 
+    public void UpdatePassword(Domain.Models.User user)
+    {
+        logger.LogInformation($"Updating password for user: {user.Login}");
+
+        var userToUpdate = applicationDbContext.Users
+                    .Include(d => d.Role)
+                    .FirstOrDefault(x => x.Id == user.Id);
+
+        if (userToUpdate == null)
+        {
+            return;
+        }
+
+        userToUpdate.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
+        applicationDbContext.SaveChanges();
+    }
+
     public void DeleteUser(Domain.Models.User user)
     {
         logger.LogInformation($"Deleting user: {user.Login}");

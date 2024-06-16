@@ -93,6 +93,28 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
         });
     }
 
+    [HttpPut("{id}/password")]
+    [Authorize]
+    public IActionResult PutPassword(int id, [FromBody] UpdatePasswordDto dto)
+    {
+        var user = usersRepository.GetUserById(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        user = UserMappers.UpdateUserPasswordFromDto(dto, user);
+
+        usersRepository.UpdatePassword(user);
+        return Ok(new GetUserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            LastName = user.LastName,
+            Login = user.Login
+        });
+    }
+
     [HttpDelete("{id}")]
     [Authorize]
     public IActionResult Delete(int id)

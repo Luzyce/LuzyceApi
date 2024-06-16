@@ -125,4 +125,21 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
                 })
                 .ToList());
     }
+
+    [HttpGet("roles/{id}")]
+    [Authorize]
+    public IActionResult GetRole(int id)
+    {
+        var role = usersRepository.GetRole(id);
+        if (role == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(new GetRoleDto
+        {
+            Id = role.Id,
+            Name = role.Name
+        });
+    }
 }

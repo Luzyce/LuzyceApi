@@ -348,7 +348,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Password = user.Password,
             Hash = user.Hash,
             CreatedAt = user.CreatedAt,
-            Role = RoleDomainFromDb(user.Role!)
+            RoleId = user.RoleId
         };
     }
     public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)

@@ -14,4 +14,16 @@ public class OrderController(OrderRepository orderRepository) : Controller
     {
         return Ok(orderRepository.GetOrders(offset: offset));
     }
+
+    [HttpGet("{offset}/{limit}")]
+    public IActionResult Get(int offset, int limit)
+    {
+        return Ok(orderRepository.GetOrders(offset: offset, limit: limit));
+    }
+
+    [HttpGet("items/{orderId}")]
+    public IActionResult GetItems(int orderId)
+    {
+        return Ok(orderRepository.GetOrderItems(orderId));
+    }
 }

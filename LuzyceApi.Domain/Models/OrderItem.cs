@@ -3,7 +3,7 @@ namespace LuzyceApi.Domain.Models;
 public class OrderItem
 {
     public int Id { get; set; }
-    public int OrderId { get; set; }
+    public int? OrderId { get; set; }
     public string OrderNumber { get; set; } = string.Empty;
     public string Symbol { get; set; } = string.Empty;
     public int? OrderItemId { get; set; }

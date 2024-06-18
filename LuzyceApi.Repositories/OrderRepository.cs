@@ -52,7 +52,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                              .Select(x => new OrderItem
                              {
                                  Id = x.pozycja!.ObId,
-                                 OrderId = x.pozycja.ObDokHanId ?? 0,
+                                 OrderId = x.pozycja.ObDokHanId,
                                  OrderNumber = x.d.DokNrPelny,
                                  Symbol = x.towar!.TwSymbol,
                                  OrderItemId = x.pozycja.ObTowId,
@@ -73,5 +73,39 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
             .ToList();
 
         return allOrders.Skip(offset).Take(limit).ToList();
+    }
+
+    public List<OrderItem> GetOrderItems(int dokId)
+    {
+        var orderItems = subiektDbContext.DokPozycjas
+            .Where(p => p.ObDokHanId == dokId)
+            .Join(subiektDbContext.TwTowars,
+                  p => p.ObTowId,
+                  t => t.TwId,
+                  (p, t) => new { p, t })
+            .Join(subiektDbContext.DokDokuments,
+                  temp => temp.p.ObDokHanId,
+                  d => d.DokId,
+                  (temp, d) => new { temp, d })
+            .Select(x => new OrderItem
+            {
+                Id = x.temp.p.ObId,
+                OrderId = x.temp.p.ObDokHanId,
+                OrderNumber = x.d.DokNrPelny,
+                Symbol = x.temp.t.TwSymbol,
+                OrderItemId = x.temp.p.ObTowId,
+                ProductId = x.temp.t.TwId,
+                Description = x.temp.p.ObOpis,
+                OrderItemLp = x.temp.p.ObDokHanLp,
+                Quantity = x.temp.p.ObIlosc,
+                QuantityInStock = x.temp.p.ObIloscMag,
+                Unit = x.temp.p.ObJm,
+                SerialNumber = x.temp.p.ObNumerSeryjny,
+                ProductSymbol = x.temp.t.TwSymbol,
+                ProductName = x.temp.t.TwNazwa,
+                ProductDescription = x.temp.t.TwOpis
+            })
+            .ToList();
+        return orderItems;
     }
 }

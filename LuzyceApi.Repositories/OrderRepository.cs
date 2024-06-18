@@ -7,9 +7,9 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 {
     private readonly SubiektDbContext subiektDbContext = subiektDbContext;
 
-    public List<Order> GetOrders(int limit = 20, int offset = 0)
+    public List<Order> GetOrders(int limit = 20, int offset = 0, OrdersFilters? ordersFilters = null)
     {
-        var allOrders = subiektDbContext.DokDokuments
+        var query = subiektDbContext.DokDokuments
             .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-1))
             .Join(subiektDbContext.AdrHistoria,
                   d => d.DokPlatnikAdreshId,
@@ -67,12 +67,33 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                                  ProductName = x.towar.TwNazwa,
                                  ProductDescription = x.towar.TwOpis
                              }).ToList()
-            })
+            });
+
+        if (ordersFilters != null)
+        {
+            if (ordersFilters.StartDate.HasValue)
+            {
+                query = query.Where(o => o.Date >= ordersFilters.StartDate.Value);
+            }
+
+            if (ordersFilters.EndDate.HasValue)
+            {
+                query = query.Where(o => o.Date <= ordersFilters.EndDate.Value);
+            }
+
+            if (!string.IsNullOrEmpty(ordersFilters.customerName))
+            {
+                // query = query.Where(o => o.CustomerName.StartsWith(ordersFilters.customerName));
+                query = query.Where(o => o.CustomerName.Contains(ordersFilters.customerName));
+            }
+        }
+
+        return query
             .OrderByDescending(x => x.Date)
             .ThenByDescending(x => x.Id)
+            .Skip(offset)
+            .Take(limit)
             .ToList();
-
-        return allOrders.Skip(offset).Take(limit).ToList();
     }
 
     public List<OrderItem> GetOrderItems(int dokId)

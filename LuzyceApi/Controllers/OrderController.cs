@@ -1,3 +1,5 @@
+using Luzyce.Core.Models.Order;
+using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +11,10 @@ public class OrderController(OrderRepository orderRepository) : Controller
 {
     private readonly OrderRepository orderRepository = orderRepository;
 
-    [HttpGet("{offset}")]
-    public IActionResult Get(int offset)
+    [HttpPost("{offset}")]
+    public IActionResult Get(int offset, GetOrdersDto getOrdersDto)
     {
-        return Ok(orderRepository.GetOrders(offset: offset));
+        return Ok(orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto()));
     }
 
     [HttpGet("{offset}/{limit}")]

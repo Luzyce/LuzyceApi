@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using LuzyceApi;
 using LuzyceApi.Db.AppDb.Data;
+using LuzyceApi.Db.Subiekt.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -68,8 +69,10 @@ builder.Services.AddSwaggerGen(option =>
 
 builder.Services.AddScoped<LuzyceApi.Repositories.UsersRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
+builder.Services.AddScoped<LuzyceApi.Repositories.OrderRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
+builder.Services.AddDbContext<SubiektDbContext>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>

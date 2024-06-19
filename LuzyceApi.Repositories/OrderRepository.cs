@@ -7,7 +7,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 {
     private readonly SubiektDbContext subiektDbContext = subiektDbContext;
 
-    public List<Order> GetOrders(int limit = 20, int offset = 0, OrdersFilters? ordersFilters = null)
+    public GetOrdersResponse GetOrders(int limit = 20, int offset = 0, OrdersFilters? ordersFilters = null)
     {
         var query = subiektDbContext.DokDokuments
             .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2))
@@ -83,17 +83,22 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
             if (!string.IsNullOrEmpty(ordersFilters.customerName))
             {
-                // query = query.Where(o => o.CustomerName.StartsWith(ordersFilters.customerName));
                 query = query.Where(o => o.CustomerName.Contains(ordersFilters.customerName));
             }
         }
 
-        return query
-            .OrderByDescending(x => x.Date)
-            .ThenByDescending(x => x.Id)
-            .Skip(offset)
-            .Take(limit)
-            .ToList();
+        return new GetOrdersResponse
+        {
+            CurrentPage = offset,
+            TotalPages = (int)Math.Ceiling(query.Count() / (double)limit),
+            TotalOrders = query.Count(),
+            Orders = query
+                .OrderByDescending(x => x.Date)
+                .ThenByDescending(x => x.Id)
+                .Skip(offset)
+                .Take(limit)
+                .ToList()
+        };
     }
 
     public List<OrderItem> GetOrderItems(int dokId)

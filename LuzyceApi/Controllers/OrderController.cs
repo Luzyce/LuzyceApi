@@ -14,7 +14,41 @@ public class OrderController(OrderRepository orderRepository) : Controller
     [HttpPost("{offset}")]
     public IActionResult Get(int offset, GetOrdersDto getOrdersDto)
     {
-        return Ok(orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto()));
+        var response = orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto();
+        return Ok(new GetOrdersResponseDto
+        {
+            CurrentPage = response.CurrentPage,
+            TotalPages = response.TotalPages,
+            TotalOrders = response.TotalOrders,
+            Orders = response.Orders.Select(x => new GetOrderResponseDto
+            {
+                Id = x.Id,
+                Date = x.Date,
+                Number = x.Number,
+                CustomerId = x.CustomerId,
+                CustomerSymbol = x.CustomerSymbol,
+                CustomerName = x.CustomerName,
+                Items = x.Items.Select(y => new GetOrderItemResponseDto
+                {
+                    Id = y.Id,
+                    OrderId = y.OrderId,
+                    OrderNumber = y.OrderNumber,
+                    Symbol = y.Symbol,
+                    OrderItemId = y.OrderItemId,
+                    ProductId = y.ProductId,
+                    Description = y.Description,
+                    OrderItemLp = y.OrderItemLp,
+                    Quantity = y.Quantity,
+                    QuantityInStock = y.QuantityInStock,
+                    Unit = y.Unit,
+                    SerialNumber = y.SerialNumber,
+                    ProductSymbol = y.ProductSymbol,
+                    ProductName = y.ProductName,
+                    ProductDescription = y.ProductDescription
+
+                }).ToList()
+            }).ToList()
+        });
     }
 
     [HttpGet("{offset}/{limit}")]

@@ -81,9 +81,9 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 query = query.Where(o => o.Date <= ordersFilters.EndDate.Value);
             }
 
-            if (!string.IsNullOrEmpty(ordersFilters.customerName))
+            if (!string.IsNullOrEmpty(ordersFilters.CustomerName))
             {
-                query = query.Where(o => o.CustomerName.Contains(ordersFilters.customerName));
+                query = query.Where(o => o.CustomerName.Contains(ordersFilters.CustomerName));
             }
         }
 

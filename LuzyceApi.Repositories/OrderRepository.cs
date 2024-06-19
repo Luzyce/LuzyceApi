@@ -10,7 +10,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
     public List<Order> GetOrders(int limit = 20, int offset = 0, OrdersFilters? ordersFilters = null)
     {
         var query = subiektDbContext.DokDokuments
-            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-1))
+            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2))
             .Join(subiektDbContext.AdrHistoria,
                   d => d.DokPlatnikAdreshId,
                   o => o.AdrhId,

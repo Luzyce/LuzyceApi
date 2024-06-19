@@ -14,7 +14,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
     [HttpPost("{offset}")]
     public IActionResult Get(int offset, GetOrdersDto getOrdersDto)
     {
-        var response = orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto();
+        var response = orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto());
         return Ok(new GetOrdersResponseDto
         {
             CurrentPage = response.CurrentPage,

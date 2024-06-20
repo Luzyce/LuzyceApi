@@ -7,7 +7,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 {
     private readonly SubiektDbContext subiektDbContext = subiektDbContext;
 
-    public GetOrdersResponse GetOrders(int limit = 20, int offset = 0, OrdersFilters? ordersFilters = null)
+    public GetOrdersResponse GetOrders(int limit = 10, int offset = 0, OrdersFilters? ordersFilters = null)
     {
         var query = subiektDbContext.DokDokuments
             .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2))

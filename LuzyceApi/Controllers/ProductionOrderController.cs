@@ -12,7 +12,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
 {
     private readonly ProductionOrderRepository productionOrderRepository = productionOrderRepository;
     
-    [HttpPost("/new")]
+    [HttpPost("new")]
     public IActionResult CreateProductionOrder(CreateProductionOrderDto createProductionOrderDto)
     {
         var operatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");

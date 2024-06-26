@@ -1,4 +1,5 @@
-﻿using LuzyceApi.Db.AppDb.Data;
+﻿using System.Text.RegularExpressions;
+using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Data.Models;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -33,33 +34,50 @@ namespace LuzyceApi.Repositories
                 };
                 applicationDbContext.OrdersForProduction.Add(orderForProduction);
 
-                foreach (var orderItemForProduction in order.Items.Select(item => new OrderItemForProduction
+                foreach (var item in order.Items)
                 {
-                    Id = order.Id,
-                    OrderId = order.Id,
-                    OrderNumber = order.Number,
-                    Symbol = item.Symbol,
-                    OrderItemId = item.Id,
-                    ProductId = item.ProductId,
-                    Description = item.Description,
-                    OrderItemLp = item.OrderItemLp,
-                    Quantity = item.Quantity,
-                    QuantityInStock = item.QuantityInStock,
-                    Unit = item.Unit,
-                    SerialNumber = item.SerialNumber,
-                    ProductSymbol = item.ProductSymbol,
-                    ProductName = item.ProductName,
-                    ProductDescription = item.ProductDescription
-                }))
-                {
+                    var lampshadeCode = Regex.Match(item.Symbol, @"^[A-Z]{2}\d{4}").Value;
+                    
+                    var lampshade = applicationDbContext.Lampshades
+                        .FirstOrDefault(l => l.Code == lampshadeCode);
+
+                    if (lampshade == null)
+                    {
+                        lampshade = new Lampshade
+                        {
+                            Code = lampshadeCode
+                        };
+                        applicationDbContext.Lampshades.Add(lampshade);
+                        applicationDbContext.SaveChanges();
+                    }
+                    
+                    var orderItemForProduction = new OrderItemForProduction
+                    {
+                        Id = item.Id,
+                        OrderId = order.Id,
+                        OrderNumber = order.Number,
+                        Symbol = item.Symbol,
+                        OrderItemId = item.Id,
+                        ProductId = lampshade.Id,
+                        Description = item.Description,
+                        OrderItemLp = item.OrderItemLp,
+                        Quantity = item.Quantity,
+                        QuantityInStock = item.QuantityInStock,
+                        Unit = item.Unit,
+                        SerialNumber = item.SerialNumber,
+                        ProductSymbol = item.ProductSymbol,
+                        ProductName = item.ProductName,
+                        ProductDescription = item.ProductDescription
+                    };
                     applicationDbContext.OrderItemsForProduction.Add(orderItemForProduction);
                 }
                 applicationDbContext.SaveChanges();
 
                 return CreateDocument(productionOrder, orderForProduction.Id, transaction);
             }
-            catch
+            catch (Exception exception)
             {
+                exception.ToString();
                 transaction.Rollback();
                 return 0;
             }
@@ -102,16 +120,6 @@ namespace LuzyceApi.Repositories
                 {
                     var lampshade = applicationDbContext.Lampshades
                         .FirstOrDefault(l => l.Code == position.Symbol);
-
-                    if (lampshade == null)
-                    {
-                        lampshade = new Lampshade
-                        {
-                            Code = position.Symbol
-                        };
-                        applicationDbContext.Lampshades.Add(lampshade);
-                        applicationDbContext.SaveChanges();
-                    }
 
                     var documentPosition = new DocumentPositions
                     {

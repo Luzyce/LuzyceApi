@@ -1,6 +1,7 @@
 using Luzyce.Core.Models.Order;
 using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LuzyceApi.Controllers;
@@ -12,6 +13,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
     private readonly OrderRepository orderRepository = orderRepository;
 
     [HttpPost("{offset}")]
+    [Authorize]
     public IActionResult Get(int offset, GetOrdersDto getOrdersDto)
     {
         var response = orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto());
@@ -52,12 +54,14 @@ public class OrderController(OrderRepository orderRepository) : Controller
     }
 
     [HttpGet("{offset}/{limit}")]
+    [Authorize]
     public IActionResult Get(int offset, int limit)
     {
         return Ok(orderRepository.GetOrders(offset: offset, limit: limit));
     }
 
     [HttpGet("items/{orderId}")]
+    [Authorize]
     public IActionResult GetItems(int orderId)
     {
         return Ok(orderRepository.GetOrderItems(orderId));

@@ -2,6 +2,7 @@
 using Luzyce.Core.Models.ProductionOrder;
 using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LuzyceApi.Controllers;
@@ -13,6 +14,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     private readonly ProductionOrderRepository productionOrderRepository = productionOrderRepository;
     
     [HttpPost("new")]
+    [Authorize]
     public IActionResult CreateProductionOrder(CreateProductionOrderDto createProductionOrderDto)
     {
         var operatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");

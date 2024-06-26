@@ -75,15 +75,28 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9121),
+                            CreatedAt = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(6597),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
-                            Number = "0001/M/2024",
+                            Number = "0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9191),
+                            UpdatedAt = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(6698),
                             WarehouseId = 1,
                             Year = 2023
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(7380),
+                            DocNumber = 1,
+                            DocumentsDefinitionId = 2,
+                            Number = "0001/ZP/2024",
+                            OperatorId = 1,
+                            StatusId = 1,
+                            UpdatedAt = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(7390),
+                            WarehouseId = 2,
+                            Year = 2024
                         });
                 });
 
@@ -142,6 +155,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("OperatorId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("OrderForProductionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuantityGross")
                         .HasColumnType("int");
 
@@ -168,6 +184,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
                     b.HasIndex("OperatorId");
 
+                    b.HasIndex("OrderForProductionId");
+
                     b.HasIndex("StatusId");
 
                     b.ToTable("DocumentPositions");
@@ -183,7 +201,21 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 13, 21, 40, 21, 334, DateTimeKind.Local).AddTicks(9249),
+                            StartTime = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(6843),
+                            StatusId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DocumentId = 2,
+                            LampshadeId = 1,
+                            OperatorId = 1,
+                            OrderForProductionId = 1,
+                            QuantityGross = 0,
+                            QuantityLoss = 0,
+                            QuantityNetto = 0,
+                            QuantityToImprove = 0,
+                            StartTime = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(7442),
                             StatusId = 1
                         });
                 });
@@ -234,6 +266,12 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             Id = 1,
                             Code = "KW",
                             Name = "Kwit"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "ZP",
+                            Name = "Zlecenie Produkcji"
                         });
                 });
 
@@ -391,13 +429,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 13, 21, 40, 21, 226, DateTimeKind.Local).AddTicks(3672),
+                            CreatedAt = new DateTime(2024, 6, 26, 16, 10, 51, 187, DateTimeKind.Local).AddTicks(864),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$ahky/TU0pO6GIFGKH2bWjuAnXzrKIyKfOl4iP9Twss1RXXnxrJodW",
+                            Password = "$2a$11$ibDV.saylzFvdEokXn.HOu.W58JDE0df9AWkqRN.Yf/KvQKIYi78G",
                             RoleId = 1
                         });
                 });
@@ -427,6 +465,132 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             Id = 1,
                             Code = "M",
                             Name = "Magazyn"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "P",
+                            Name = "Produkcja"
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderForProduction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CustomerSymbol")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrdersForProduction");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CustomerId = 1,
+                            CustomerName = "Testowanie",
+                            CustomerSymbol = "TEST",
+                            Date = new DateTime(2024, 6, 26, 16, 10, 51, 325, DateTimeKind.Local).AddTicks(6970),
+                            Number = "1"
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderItemForProduction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderItemLp")
+                        .HasColumnType("int");
+
+                    b.Property<string>("OrderNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductSymbol")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("QuantityInStock")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("SerialNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Unit")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderItemsForProduction");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Test",
+                            OrderId = 1,
+                            OrderItemId = 1,
+                            OrderItemLp = 1,
+                            OrderNumber = "1",
+                            ProductDescription = "Test",
+                            ProductId = 1,
+                            ProductName = "KL4124",
+                            ProductSymbol = "KL4124",
+                            Quantity = 1m,
+                            QuantityInStock = 1m,
+                            SerialNumber = "1",
+                            Symbol = "TEST",
+                            Unit = "szt"
                         });
                 });
 
@@ -449,6 +613,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "User"
                         });
                 });
 
@@ -542,6 +711,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.OrderForProduction", "OrderForProduction")
+                        .WithMany()
+                        .HasForeignKey("OrderForProductionId");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
@@ -553,6 +726,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Lampshade");
 
                     b.Navigation("Operator");
+
+                    b.Navigation("OrderForProduction");
 
                     b.Navigation("Status");
                 });
@@ -610,6 +785,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderItemForProduction", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }

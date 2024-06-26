@@ -1,3 +1,5 @@
+using LuzyceApi.Db.AppDb.Models;
+
 namespace LuzyceApi.Db.AppDb.Data.Models;
 
 public class DocumentPositions
@@ -17,4 +19,6 @@ public class DocumentPositions
     public Status? Status { get; set; }
     public int LampshadeId { get; set; }
     public Lampshade? Lampshade { get; set; }
+    public int? OrderForProductionId { get; set; }
+    public OrderForProduction? OrderForProduction { get; set; }
 }

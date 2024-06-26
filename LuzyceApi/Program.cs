@@ -70,6 +70,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddScoped<LuzyceApi.Repositories.UsersRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.OrderRepository>();
+builder.Services.AddScoped<LuzyceApi.Repositories.ProductionOrderRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddDbContext<SubiektDbContext>();

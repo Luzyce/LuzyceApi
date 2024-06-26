@@ -26,6 +26,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Status> Statuses { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<Role> Roles { get; set; }
+    public DbSet<OrderForProduction> OrdersForProduction { get; set; }
+    public DbSet<OrderItemForProduction> OrderItemsForProduction { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -98,7 +100,7 @@ public class ApplicationDbContext : DbContext
             Warehouse = null!,
             WarehouseId = magazyn.Id,
             Year = 2023,
-            Number = "0001/M/2024",
+            Number = "0001/KW/2024",
             DocumentsDefinition = null!,
             DocumentsDefinitionId = kwit.Id,
             Operator = null!,
@@ -139,5 +141,100 @@ public class ApplicationDbContext : DbContext
         };
 
         modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPosition);
+        
+        var exampleOrderForProduction = new OrderForProduction()
+        {
+            Id = 1,
+            Date = DateTime.Now,
+            Number = "1",
+            CustomerId = 1,
+            CustomerSymbol = "TEST",
+            CustomerName = "Testowanie"
+        };
+        
+        modelBuilder.Entity<OrderForProduction>().HasData(exampleOrderForProduction);
+        
+        var exampleOrderItemForProduction = new OrderItemForProduction()
+        {
+            Id = 1,
+            OrderId = 1,
+            OrderNumber = "1",
+            Symbol = "TEST",
+            OrderItemId = 1,
+            ProductId = exampleLampshade.Id,
+            Product = null!,
+            Description = "Test",
+            OrderItemLp = 1,
+            Quantity = 1,
+            QuantityInStock = 1,
+            Unit = "szt",
+            SerialNumber = "1",
+            ProductSymbol = "KL4124",
+            ProductName = "KL4124",
+            ProductDescription = "Test"
+        };
+        
+        modelBuilder.Entity<OrderItemForProduction>().HasData(exampleOrderItemForProduction);
+        
+        var ProductionOrder = new DocumentsDefinition
+        {
+            Id = 2,
+            Code = "ZP",
+            Name = "Zlecenie Produkcji"
+        };
+
+        modelBuilder.Entity<DocumentsDefinition>().HasData(ProductionOrder);
+        
+        var produkcja = new Warehouse()
+        {
+            Id = 2,
+            Code = "P",
+            Name = "Produkcja"
+        };
+        
+        modelBuilder.Entity<Warehouse>().HasData(produkcja);
+        
+        var exampleProductionOrder = new Document
+        {
+            Id = 2,
+            DocNumber = 1,
+            Warehouse = null!,
+            WarehouseId = produkcja.Id,
+            Year = 2024,
+            Number = "0001/ZP/2024",
+            DocumentsDefinition = null!,
+            DocumentsDefinitionId = ProductionOrder.Id,
+            Operator = null!,
+            OperatorId = adminUser.Id,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+            Status = null!,
+            StatusId = open.Id
+        };
+        
+        modelBuilder.Entity<Document>().HasData(exampleProductionOrder);
+        
+        var exampleProductionOrderPosition = new DocumentPositions
+        {
+            Id = 2,
+            DocumentId = exampleProductionOrder.Id,
+            Document = null!,
+            QuantityNetto = 0,
+            QuantityLoss = 0,
+            QuantityToImprove = 0,
+            QuantityGross = 0,
+            OperatorId = adminUser.Id,
+            Operator = null!,
+            StartTime = DateTime.Now,
+            EndTime = null,
+            StatusId = open.Id,
+            Status = null!,
+            LampshadeId = exampleLampshade.Id,
+            Lampshade = null!,
+            OrderForProductionId = exampleOrderForProduction.Id,
+            OrderForProduction = null!
+        };
+        
+        modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);
     }
 }

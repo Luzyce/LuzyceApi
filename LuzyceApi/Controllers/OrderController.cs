@@ -30,16 +30,15 @@ public class OrderController(OrderRepository orderRepository) : Controller
                 CustomerId = x.CustomerId,
                 CustomerSymbol = x.CustomerSymbol,
                 CustomerName = x.CustomerName,
-                Items = x.Items.Select(y => new GetOrderItemResponseDto
+                Positions = x.Positions.Select(y => new GetOrderPositionResponseDto
                 {
                     Id = y.Id,
                     OrderId = y.OrderId,
                     OrderNumber = y.OrderNumber,
                     Symbol = y.Symbol,
-                    OrderItemId = y.OrderItemId,
                     ProductId = y.ProductId,
                     Description = y.Description,
-                    OrderItemLp = y.OrderItemLp,
+                    OrderPositionLp = y.OrderPositionLp,
                     Quantity = y.Quantity,
                     QuantityInStock = y.QuantityInStock,
                     Unit = y.Unit,
@@ -60,10 +59,10 @@ public class OrderController(OrderRepository orderRepository) : Controller
         return Ok(orderRepository.GetOrders(offset: offset, limit: limit));
     }
 
-    [HttpGet("items/{orderId}")]
+    [HttpGet("positions/{orderId}")]
     [Authorize]
     public IActionResult GetItems(int orderId)
     {
-        return Ok(orderRepository.GetOrderItems(orderId));
+        return Ok(orderRepository.GetOrderPositions(orderId));
     }
 }

@@ -19,6 +19,6 @@ public class DocumentPositions
     public Status? Status { get; set; }
     public int LampshadeId { get; set; }
     public Lampshade? Lampshade { get; set; }
-    public int? OrderItemForProductionId { get; set; }
-    public OrderItemForProduction? OrderItemForProduction { get; set; }
+    public int? OrderPositionForProductionId { get; set; }
+    public OrderPositionForProduction? OrderPositionForProduction { get; set; }
 }

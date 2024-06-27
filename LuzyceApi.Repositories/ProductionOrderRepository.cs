@@ -35,9 +35,9 @@ namespace LuzyceApi.Repositories
                 };
                 applicationDbContext.OrdersForProduction.Add(orderForProduction);
 
-                foreach (var item in order.Items)
+                foreach (var position in order.Positions)
                 {
-                    var lampshadeCode = Regex.Match(item.Symbol, @"^[A-Z]{2}\d{4}").Value;
+                    var lampshadeCode = Regex.Match(position.Symbol, @"^[A-Z]{2}\d{4}").Value;
 
                     var lampshade = applicationDbContext.Lampshades
                         .FirstOrDefault(l => l.Code == lampshadeCode);
@@ -52,25 +52,24 @@ namespace LuzyceApi.Repositories
                         applicationDbContext.SaveChanges();
                     }
 
-                    var orderItemForProduction = new OrderItemForProduction
+                    var orderPositionForProduction = new OrderPositionForProduction
                     {
-                        Id = item.Id,
+                        Id = position.Id,
                         OrderId = order.Id,
                         OrderNumber = order.Number,
-                        Symbol = item.Symbol,
-                        OrderItemId = item.Id,
+                        Symbol = position.Symbol,
                         ProductId = lampshade.Id,
-                        Description = item.Description,
-                        OrderItemLp = item.OrderItemLp,
-                        Quantity = item.Quantity,
-                        QuantityInStock = item.QuantityInStock,
-                        Unit = item.Unit,
-                        SerialNumber = item.SerialNumber,
-                        ProductSymbol = item.ProductSymbol,
-                        ProductName = item.ProductName,
-                        ProductDescription = item.ProductDescription
+                        Description = position.Description,
+                        OrderPositionLp = position.OrderPositionLp,
+                        Quantity = position.Quantity,
+                        QuantityInStock = position.QuantityInStock,
+                        Unit = position.Unit,
+                        SerialNumber = position.SerialNumber,
+                        ProductSymbol = position.ProductSymbol,
+                        ProductName = position.ProductName,
+                        ProductDescription = position.ProductDescription
                     };
-                    applicationDbContext.OrderItemsForProduction.Add(orderItemForProduction);
+                    applicationDbContext.OrderPositionsForProduction.Add(orderPositionForProduction);
                 }
 
                 applicationDbContext.SaveChanges();
@@ -136,7 +135,7 @@ namespace LuzyceApi.Repositories
                         StartTime = DateTime.Now,
                         StatusId = 1,
                         LampshadeId = lampshade!.Id,
-                        OrderItemForProductionId = position.DocumentItemId
+                        OrderPositionForProductionId = position.DocumentPositionId
                     };
                     applicationDbContext.DocumentPositions.Add(documentPosition);
                 }

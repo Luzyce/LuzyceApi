@@ -15,16 +15,15 @@ public static class ProductionOrderMappers
             CustomerId = dto.Order.CustomerId,
             CustomerSymbol = dto.Order.CustomerSymbol,
             CustomerName = dto.Order.CustomerName,
-            Items = dto.Order.Items.Select(x => new OrderItem
+            Positions = dto.Order.Positions.Select(x => new OrderPosition
             {
                 Id = x.Id,
                 OrderId = x.OrderId,
                 OrderNumber = x.OrderNumber,
                 Symbol = x.Symbol,
-                OrderItemId = x.OrderItemId,
                 ProductId = x.ProductId,
                 Description = x.Description,
-                OrderItemLp = x.OrderItemLp,
+                OrderPositionLp = x.OrderPositionLp,
                 Quantity = x.Quantity,
                 QuantityInStock = x.QuantityInStock,
                 Unit = x.Unit,
@@ -42,7 +41,7 @@ public static class ProductionOrderMappers
             OperatorId = 0,
             ProductionOrderPositions = dto.ProductionOrderPositions.Select(x => new ProductionOrderPosition
             {
-                DocumentItemId = x.DocumentItemId,
+                DocumentPositionId = x.DocumentPositionId,
                 Symbol = x.Symbol,
                 Gross = x.Gross,
                 Net = x.Net

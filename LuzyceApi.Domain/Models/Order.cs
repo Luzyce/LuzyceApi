@@ -8,5 +8,5 @@ public class Order
     public int CustomerId { get; set; }
     public string CustomerSymbol { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
-    public List<OrderItem> Items { get; set; } = [];
+    public List<OrderPosition> Positions { get; set; } = [];
 }

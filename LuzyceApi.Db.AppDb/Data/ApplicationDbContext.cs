@@ -27,7 +27,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Warehouse> Warehouses { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<OrderForProduction> OrdersForProduction { get; set; }
-    public DbSet<OrderItemForProduction> OrderItemsForProduction { get; set; }
+    public DbSet<OrderPositionForProduction> OrderPositionsForProduction { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -154,17 +154,16 @@ public class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<OrderForProduction>().HasData(exampleOrderForProduction);
         
-        var exampleOrderItemForProduction = new OrderItemForProduction()
+        var exampleOrderPositionForProduction = new OrderPositionForProduction()
         {
             Id = 1,
             OrderId = 1,
             OrderNumber = "1",
             Symbol = "TEST",
-            OrderItemId = 1,
             ProductId = exampleLampshade.Id,
             Product = null!,
             Description = "Test",
-            OrderItemLp = 1,
+            OrderPositionLp = 1,
             Quantity = 1,
             QuantityInStock = 1,
             Unit = "szt",
@@ -174,7 +173,7 @@ public class ApplicationDbContext : DbContext
             ProductDescription = "Test"
         };
         
-        modelBuilder.Entity<OrderItemForProduction>().HasData(exampleOrderItemForProduction);
+        modelBuilder.Entity<OrderPositionForProduction>().HasData(exampleOrderPositionForProduction);
         
         var ProductionOrder = new DocumentsDefinition
         {
@@ -231,8 +230,8 @@ public class ApplicationDbContext : DbContext
             Status = null!,
             LampshadeId = exampleLampshade.Id,
             Lampshade = null!,
-            OrderItemForProductionId = exampleOrderItemForProduction.Id,
-            OrderItemForProduction = null!
+            OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
+            OrderPositionForProduction = null!
         };
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);

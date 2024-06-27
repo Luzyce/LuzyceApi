@@ -231,8 +231,8 @@ public class ApplicationDbContext : DbContext
             Status = null!,
             LampshadeId = exampleLampshade.Id,
             Lampshade = null!,
-            OrderForProductionId = exampleOrderForProduction.Id,
-            OrderForProduction = null!
+            OrderItemForProductionId = exampleOrderItemForProduction.Id,
+            OrderItemForProduction = null!
         };
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);

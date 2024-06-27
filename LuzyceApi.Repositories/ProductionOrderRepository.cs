@@ -9,6 +9,7 @@ namespace LuzyceApi.Repositories
     public class ProductionOrderRepository(ApplicationDbContext applicationDbContext)
     {
         private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
+
         public int SaveProductionOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
         {
             using var transaction = applicationDbContext.Database.BeginTransaction();
@@ -20,7 +21,7 @@ namespace LuzyceApi.Repositories
 
                 if (existingOrder != null)
                 {
-                    return CreateDocument(productionOrder, existingOrder.Id, transaction);
+                    return CreateDocument(productionOrder, transaction);
                 }
 
                 var orderForProduction = new OrderForProduction
@@ -37,7 +38,7 @@ namespace LuzyceApi.Repositories
                 foreach (var item in order.Items)
                 {
                     var lampshadeCode = Regex.Match(item.Symbol, @"^[A-Z]{2}\d{4}").Value;
-                    
+
                     var lampshade = applicationDbContext.Lampshades
                         .FirstOrDefault(l => l.Code == lampshadeCode);
 
@@ -50,7 +51,7 @@ namespace LuzyceApi.Repositories
                         applicationDbContext.Lampshades.Add(lampshade);
                         applicationDbContext.SaveChanges();
                     }
-                    
+
                     var orderItemForProduction = new OrderItemForProduction
                     {
                         Id = item.Id,
@@ -71,19 +72,19 @@ namespace LuzyceApi.Repositories
                     };
                     applicationDbContext.OrderItemsForProduction.Add(orderItemForProduction);
                 }
+
                 applicationDbContext.SaveChanges();
 
-                return CreateDocument(productionOrder, orderForProduction.Id, transaction);
+                return CreateDocument(productionOrder, transaction);
             }
-            catch (Exception exception)
+            catch
             {
-                exception.ToString();
                 transaction.Rollback();
                 return 0;
             }
         }
 
-        private int CreateDocument(Domain.Models.ProductionOrder productionOrder, int orderForProductionId, IDbContextTransaction transaction)
+        private int CreateDocument(Domain.Models.ProductionOrder productionOrder, IDbContextTransaction transaction)
         {
             try
             {
@@ -102,10 +103,15 @@ namespace LuzyceApi.Repositories
                     DocNumber = docNumber,
                     WarehouseId = Dictionaries.Warehouses.Produkcja,
                     Year = currentYear,
-                    Number = $"{docNumber:D4}/{applicationDbContext.DocumentsDefinitions
-                        .Where(w => w.Id == Dictionaries.DocumentsDefinitions.ZlecenieProdukcji)
-                        .Select(w => w.Code)
-                        .FirstOrDefault()}/{currentYear}",
+                    Number = $"{
+                        applicationDbContext.Warehouses
+                            .Where(w => w.Id == Dictionaries.Warehouses.Produkcja)
+                            .Select(w => w.Code)
+                            .FirstOrDefault()}/{docNumber:D4}/{
+                            applicationDbContext.DocumentsDefinitions
+                                .Where(w => w.Id == Dictionaries.DocumentsDefinitions.ZlecenieProdukcji)
+                                .Select(w => w.Code)
+                                .FirstOrDefault()}/{currentYear}",
                     DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.ZlecenieProdukcji,
                     OperatorId = productionOrder.OperatorId,
                     CreatedAt = DateTime.Now,
@@ -129,11 +135,12 @@ namespace LuzyceApi.Repositories
                         OperatorId = productionOrder.OperatorId,
                         StartTime = DateTime.Now,
                         StatusId = 1,
-                        LampshadeId = lampshade.Id,
-                        OrderForProductionId = orderForProductionId
+                        LampshadeId = lampshade!.Id,
+                        OrderItemForProductionId = position.DocumentItemId
                     };
                     applicationDbContext.DocumentPositions.Add(documentPosition);
                 }
+
                 applicationDbContext.SaveChanges();
 
                 transaction.Commit();

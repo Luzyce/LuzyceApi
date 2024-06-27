@@ -42,7 +42,7 @@ public static class ProductionOrderMappers
             OperatorId = 0,
             ProductionOrderPositions = dto.ProductionOrderPositions.Select(x => new ProductionOrderPosition
             {
-                DocumentId = x.DocumentId,
+                DocumentItemId = x.DocumentItemId,
                 Symbol = x.Symbol,
                 Gross = x.Gross,
                 Net = x.Net

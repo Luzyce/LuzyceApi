@@ -339,6 +339,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     LampshadeId = table.Column<int>(type: "int", nullable: false),
                     LampshadeNormId = table.Column<int>(type: "int", nullable: true),
+                    LampshadeDekorId = table.Column<int>(type: "int", nullable: true),
                     OrderPositionForProductionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -350,6 +351,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalTable: "Documents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DocumentPositions_LampshadeDekors_LampshadeDekorId",
+                        column: x => x.LampshadeDekorId,
+                        principalTable: "LampshadeDekors",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DocumentPositions_LampshadeNorms_LampshadeNormId",
                         column: x => x.LampshadeNormId,
@@ -515,7 +521,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
                 columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9052), "1" });
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(62), "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -553,24 +559,24 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 6, 28, 12, 18, 46, 281, DateTimeKind.Local).AddTicks(9397), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$uGcNugAU23TwPeANihER8uW8zU.sgYRqRqXVqzp0/SunurAqPf31u", 1 });
+                values: new object[] { 1, new DateTime(2024, 6, 28, 13, 16, 31, 290, DateTimeKind.Local).AddTicks(5354), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$etVf2zwOf7RDxMuu/FRRj.usilOe/u45/5EsbHZTWWvPoaU5Y9iLW", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(8884), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(8946), 1, 2023 },
-                    { 2, null, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9297), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9304), 2, 2024 }
+                    { 1, null, new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9921), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9973), 1, 2023 },
+                    { 2, null, new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(423), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(433), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekorId", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
                 values: new object[,]
                 {
-                    { 1, 1, null, 1, null, 1, null, 0, 0, 0, 0, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9021), 1 },
-                    { 2, 2, null, 1, 1, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9430), 1 }
+                    { 1, 1, null, null, 1, null, 1, null, 0, 0, 0, 0, new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(31), 1 },
+                    { 2, 2, null, 1, 1, 1, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(540), 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -597,6 +603,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "IX_DocumentPositions_DocumentId",
                 table: "DocumentPositions",
                 column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentPositions_LampshadeDekorId",
+                table: "DocumentPositions",
+                column: "LampshadeDekorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentPositions_LampshadeId",
@@ -699,9 +710,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "DocumentRelations");
 
             migrationBuilder.DropTable(
-                name: "LampshadeDekors");
-
-            migrationBuilder.DropTable(
                 name: "Operations");
 
             migrationBuilder.DropTable(
@@ -715,6 +723,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "Documents");
+
+            migrationBuilder.DropTable(
+                name: "LampshadeDekors");
 
             migrationBuilder.DropTable(
                 name: "LampshadeNorms");

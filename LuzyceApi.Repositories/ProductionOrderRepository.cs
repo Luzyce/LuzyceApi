@@ -12,6 +12,19 @@ namespace LuzyceApi.Repositories
 
         public int SaveProductionOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
         {
+            foreach (var position in productionOrder.ProductionOrderPositions)
+            {
+                var variant = applicationDbContext.LampshadeVariants
+                    .FirstOrDefault(l => l.Id == position.VariantId);
+                var dekor = applicationDbContext.LampshadeDekors
+                    .FirstOrDefault(l => l.Id == position.DekorId);
+
+                if (variant == null || dekor == null)
+                {
+                    return 0;
+                }
+            }
+            
             using var transaction = applicationDbContext.Database.BeginTransaction();
 
             try
@@ -125,6 +138,25 @@ namespace LuzyceApi.Repositories
                 {
                     var lampshade = applicationDbContext.Lampshades
                         .FirstOrDefault(l => l.Code == position.Symbol);
+                    var variant = applicationDbContext.LampshadeVariants
+                        .FirstOrDefault(l => l.Id == position.VariantId);
+                    var dekor = applicationDbContext.LampshadeDekors
+                        .FirstOrDefault(l => l.Id == position.DekorId);
+                    
+                    var lampshadeNorms = applicationDbContext.LampshadeNorms
+                        .FirstOrDefault(l => l.LampshadeId == lampshade!.Id
+                                             && l.VariantId == variant!.Id);
+                    
+                    if (lampshadeNorms == null)
+                    {
+                        lampshadeNorms = new LampshadeNorm
+                        {
+                            LampshadeId = lampshade!.Id,
+                            VariantId = variant!.Id
+                        };
+                        applicationDbContext.LampshadeNorms.Add(lampshadeNorms);
+                        applicationDbContext.SaveChanges();
+                    }
 
                     var documentPosition = new DocumentPositions
                     {
@@ -135,6 +167,8 @@ namespace LuzyceApi.Repositories
                         StartTime = DateTime.Now,
                         StatusId = 1,
                         LampshadeId = lampshade!.Id,
+                        LampshadeNormId = lampshadeNorms.Id,
+                        LampshadeDekorId = position.DekorId,
                         OrderPositionForProductionId = position.DocumentPositionId
                     };
                     applicationDbContext.DocumentPositions.Add(documentPosition);

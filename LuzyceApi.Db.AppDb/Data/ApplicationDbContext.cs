@@ -265,6 +265,8 @@ public class ApplicationDbContext : DbContext
             Lampshade = null!,
             LampshadeNormId = exampleLampshadeNorm.Id,
             LampshadeNorm = null!,
+            LampshadeDekorId = exampleDekor.Id,
+            LampshadeDekor = null!,
             OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
             OrderPositionForProduction = null!
         };

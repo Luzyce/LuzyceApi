@@ -9,5 +9,5 @@ public class LampshadeNorm
     public Lampshade? Lampshade { get; set; }
     public int VariantId { get; set; }
     public LampshadeVariant? Variant { get; set; }
-    public int QuantityPerChange { get; set; }
+    public int? QuantityPerChange { get; set; }
 }

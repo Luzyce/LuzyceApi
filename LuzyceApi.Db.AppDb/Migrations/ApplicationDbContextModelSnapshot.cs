@@ -75,26 +75,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(8884),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9921),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(8946),
+                            UpdatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9973),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9297),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(423),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9304),
+                            UpdatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(433),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -149,6 +149,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int?>("LampshadeDekorId")
+                        .HasColumnType("int");
+
                     b.Property<int>("LampshadeId")
                         .HasColumnType("int");
 
@@ -183,6 +186,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
                     b.HasIndex("DocumentId");
 
+                    b.HasIndex("LampshadeDekorId");
+
                     b.HasIndex("LampshadeId");
 
                     b.HasIndex("LampshadeNormId");
@@ -206,13 +211,14 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9021),
+                            StartTime = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(31),
                             StatusId = 1
                         },
                         new
                         {
                             Id = 2,
                             DocumentId = 2,
+                            LampshadeDekorId = 1,
                             LampshadeId = 1,
                             LampshadeNormId = 1,
                             OperatorId = 1,
@@ -221,7 +227,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9430),
+                            StartTime = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(540),
                             StatusId = 1
                         });
                 });
@@ -435,13 +441,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 12, 18, 46, 281, DateTimeKind.Local).AddTicks(9397),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 290, DateTimeKind.Local).AddTicks(5354),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$uGcNugAU23TwPeANihER8uW8zU.sgYRqRqXVqzp0/SunurAqPf31u",
+                            Password = "$2a$11$etVf2zwOf7RDxMuu/FRRj.usilOe/u45/5EsbHZTWWvPoaU5Y9iLW",
                             RoleId = 1
                         });
                 });
@@ -602,7 +608,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 6, 28, 12, 18, 46, 391, DateTimeKind.Local).AddTicks(9052),
+                            Date = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(62),
                             Number = "1"
                         });
                 });
@@ -788,6 +794,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.LampshadeDekor", "LampshadeDekor")
+                        .WithMany()
+                        .HasForeignKey("LampshadeDekorId");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Lampshade")
                         .WithMany()
                         .HasForeignKey("LampshadeId")
@@ -817,6 +827,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("Lampshade");
+
+                    b.Navigation("LampshadeDekor");
 
                     b.Navigation("LampshadeNorm");
 

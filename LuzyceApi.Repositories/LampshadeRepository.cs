@@ -12,9 +12,19 @@ public class LampshadeRepository(ApplicationDbContext applicationDbContext)
         return applicationDbContext.LampshadeVariants.ToList();
     }
     
-    public LampshadeVariant? GetLampshadeVariant(string name)
+    public LampshadeVariant? GetLampshadeVariant(string shortName)
     {
-        return applicationDbContext.LampshadeVariants.FirstOrDefault(x => x.Name == name);
+        return applicationDbContext.LampshadeVariants.FirstOrDefault(x => x.ShortName == shortName);
+    }
+    
+    public List<LampshadeDekor> GetLampshadeDekors()
+    {
+        return applicationDbContext.LampshadeDekors.ToList();
+    }
+    
+    public LampshadeDekor? GetLampshadeDekor(string shortName)
+    {
+        return applicationDbContext.LampshadeDekors.FirstOrDefault(x => x.ShortName == shortName);
     }
     
 }

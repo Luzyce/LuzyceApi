@@ -1,6 +1,6 @@
 ﻿namespace LuzyceApi.Db.AppDb.Models;
 
-public class LampshadeVariant
+public class LampshadeDekor
 {
     public int Id { get; set; }
     public string Name { get; set; }

@@ -15,9 +15,22 @@ public class LampshadeController(LampshadeRepository lampshadeRepository) : Cont
         return Ok(lampshadeRepository.GetLampshadeVariants());
     }
     
-    [HttpGet("variants/{name}")]
-    public IActionResult GetLampshadeVariant(string name)
+    [HttpGet("variants/{shortName}")]
+    public IActionResult GetLampshadeVariant(string shortName)
     {
-        return Ok(lampshadeRepository.GetLampshadeVariant(name));
+        return Ok(lampshadeRepository.GetLampshadeVariant(shortName));
+    }
+    
+    [HttpGet("dekors")]
+    public IActionResult GetLampshadeDekors()
+    {
+        return Ok(lampshadeRepository.GetLampshadeDekors());
+    }
+    
+    [HttpGet("dekors/{shortName}")]
+    public IActionResult GetLampshadeDekor(string shortName)
+    {
+        return Ok(lampshadeRepository.GetLampshadeDekor(shortName));
     }
 }
+

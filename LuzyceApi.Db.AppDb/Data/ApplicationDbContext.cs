@@ -24,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Lampshade> Lampshades { get; set; }
     public DbSet<LampshadeNorm> LampshadeNorms { get; set; }
     public DbSet<LampshadeVariant> LampshadeVariants { get; set; }
+    public DbSet<LampshadeDekor> LampshadeDekors { get; set; }
     public DbSet<Operation> Operations { get; set; }
     public DbSet<Status> Statuses { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
@@ -102,7 +103,7 @@ public class ApplicationDbContext : DbContext
             Warehouse = null!,
             WarehouseId = magazyn.Id,
             Year = 2023,
-            Number = "0001/KW/2024",
+            Number = "M/0001/KW/2024",
             DocumentsDefinition = null!,
             DocumentsDefinitionId = kwit.Id,
             Operator = null!,
@@ -199,10 +200,19 @@ public class ApplicationDbContext : DbContext
         {
             Id = 1,
             Name = "Jasny",
-            ShortName = 'J'
+            ShortName = "J"
         };
         
         modelBuilder.Entity<LampshadeVariant>().HasData(exampleLampshadeVariant);
+        
+        var exampleDekor = new LampshadeDekor
+        {
+            Id = 1,
+            Name = "Farba",
+            ShortName = "F"
+        };
+        
+        modelBuilder.Entity<LampshadeDekor>().HasData(exampleDekor);
         
         var exampleLampshadeNorm = new LampshadeNorm
         {
@@ -223,7 +233,7 @@ public class ApplicationDbContext : DbContext
             Warehouse = null!,
             WarehouseId = produkcja.Id,
             Year = 2024,
-            Number = "0001/ZP/2024",
+            Number = "P/0001/ZP/2024",
             DocumentsDefinition = null!,
             DocumentsDefinitionId = ProductionOrder.Id,
             Operator = null!,

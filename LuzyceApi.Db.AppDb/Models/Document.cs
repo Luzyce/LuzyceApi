@@ -27,5 +27,5 @@ public class Document
 
     [Required]
     public Status? Status { get; set; }
-    public string? lockedBy { get; set; }
+    public string? LockedBy { get; set; }
 }

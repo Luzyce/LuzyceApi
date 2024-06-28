@@ -22,6 +22,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<DocumentsDefinition> DocumentsDefinitions { get; set; }
     public DbSet<Error> Errors { get; set; }
     public DbSet<Lampshade> Lampshades { get; set; }
+    public DbSet<LampshadeNorm> LampshadeNorms { get; set; }
+    public DbSet<LampshadeVariant> LampshadeVariants { get; set; }
     public DbSet<Operation> Operations { get; set; }
     public DbSet<Status> Statuses { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
@@ -192,6 +194,27 @@ public class ApplicationDbContext : DbContext
         };
         
         modelBuilder.Entity<Warehouse>().HasData(produkcja);
+
+        var exampleLampshadeVariant = new LampshadeVariant
+        {
+            Id = 1,
+            Name = "Jasny",
+            ShortName = 'J'
+        };
+        
+        modelBuilder.Entity<LampshadeVariant>().HasData(exampleLampshadeVariant);
+        
+        var exampleLampshadeNorm = new LampshadeNorm
+        {
+            Id = 1,
+            LampshadeId = exampleLampshade.Id,
+            Lampshade = null!,
+            VariantId = exampleLampshadeVariant.Id,
+            Variant = null!,
+            QuantityPerChange = 50
+        };
+        
+        modelBuilder.Entity<LampshadeNorm>().HasData(exampleLampshadeNorm);
         
         var exampleProductionOrder = new Document
         {
@@ -230,6 +253,8 @@ public class ApplicationDbContext : DbContext
             Status = null!,
             LampshadeId = exampleLampshade.Id,
             Lampshade = null!,
+            LampshadeNormId = exampleLampshadeNorm.Id,
+            LampshadeNorm = null!,
             OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
             OrderPositionForProduction = null!
         };

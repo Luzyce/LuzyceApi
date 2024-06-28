@@ -145,7 +145,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         {
             return false;
         }
-        dbDocument.lockedBy = ip;
+        dbDocument.LockedBy = ip;
         dbDocument.UpdatedAt = DateTime.Now;
         applicationDbContext.SaveChanges();
         return true;
@@ -158,7 +158,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         {
             return false;
         }
-        dbDocument.lockedBy = null;
+        dbDocument.LockedBy = null;
         dbDocument.UpdatedAt = DateTime.Now;
         applicationDbContext.SaveChanges();
         return true;
@@ -167,11 +167,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     {
         logger.LogInformation("Checking if document is locked");
         var dbDocument = applicationDbContext.Documents.Find(id);
-        if (dbDocument == null || dbDocument.lockedBy == null)
-        {
-            return "";
-        }
-        return dbDocument.lockedBy;
+        return dbDocument?.LockedBy ?? "";
     }
     public Domain.Models.DocumentPositions AddDocumentPosition(Domain.Models.DocumentPositions documentPosition)
     {
@@ -323,7 +319,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = documentsDefinition.Name
         };
     }
-    public static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
+
+    private static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
     {
         ArgumentNullException.ThrowIfNull(warehouse);
 
@@ -334,7 +331,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = warehouse.Name
         };
     }
-    public static Domain.Models.User UserDomainFromDb(User user)
+
+    private static Domain.Models.User UserDomainFromDb(User user)
     {
         ArgumentNullException.ThrowIfNull(user);
 
@@ -361,7 +359,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = role.Name
         };
     }
-    public static Domain.Models.Status StatusDomainFromDb(Status status)
+
+    private static Domain.Models.Status StatusDomainFromDb(Status status)
     {
         ArgumentNullException.ThrowIfNull(status);
 
@@ -372,7 +371,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Priority = status.Priority
         };
     }
-    public static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
+
+    private static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
     {
         ArgumentNullException.ThrowIfNull(documentsDefinition);
 
@@ -383,7 +383,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Name = documentsDefinition.Name
         };
     }
-    public static Domain.Models.Lampshade LampshadeDomainFromDb(Lampshade lampshade)
+
+    private static Domain.Models.Lampshade LampshadeDomainFromDb(Lampshade lampshade)
     {
         ArgumentNullException.ThrowIfNull(lampshade);
 
@@ -393,7 +394,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             Code = lampshade.Code,
         };
     }
-    public static Domain.Models.Document DocumentDomainFromDb(Document document)
+
+    private static Domain.Models.Document DocumentDomainFromDb(Document document)
     {
         ArgumentNullException.ThrowIfNull(document);
 

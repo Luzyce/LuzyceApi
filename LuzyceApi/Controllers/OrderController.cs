@@ -65,4 +65,10 @@ public class OrderController(OrderRepository orderRepository) : Controller
     {
         return Ok(orderRepository.GetOrderPositions(orderId));
     }
+    
+    // [HttpGet]
+    // public IActionResult Get()
+    // {
+    //     return Ok(orderRepository.GetAllTowars());
+    // }
 }

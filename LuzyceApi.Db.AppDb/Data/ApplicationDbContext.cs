@@ -5,15 +5,9 @@ using LuzyceApi.Db.AppDb.Models;
 
 namespace LuzyceApi.Db.AppDb.Data;
 
-public class ApplicationDbContext : DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IConfiguration config)
+    : DbContext(dbContextOptions)
 {
-    private readonly IConfiguration config;
-
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions, IConfiguration config) : base(dbContextOptions)
-    {
-        this.config = config;
-    }
-
     public DbSet<User> Users { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<DocumentItemRelationships> DocumentItemRelationships { get; set; }
@@ -196,30 +190,294 @@ public class ApplicationDbContext : DbContext
         
         modelBuilder.Entity<Warehouse>().HasData(produkcja);
 
-        var exampleLampshadeVariant = new LampshadeVariant
+        var lampshadeVariants = new List<LampshadeVariant>
         {
-            Id = 1,
-            Name = "Jasny",
-            ShortName = "J"
+            new LampshadeVariant
+            {
+                Id = 1,
+                Name = "Opal",
+                ShortName = ""
+            },
+            new LampshadeVariant
+            {
+                Id = 2,
+                Name = "Opal Mat",
+                ShortName = "M"
+            },
+            new LampshadeVariant
+            {
+                Id = 3,
+                Name = "Opal Alabaster",
+                ShortName = "AL"
+            },
+            new LampshadeVariant
+            {
+                Id = 4,
+                Name = "Opal Falbanka",
+                ShortName = "FA"
+            },
+            new LampshadeVariant
+            {
+                Id = 5,
+                Name = "Jasny",
+                ShortName = "J"
+            },
+            new LampshadeVariant
+            {
+                Id = 6,
+                Name = "Jasny Kier",
+                ShortName = "J-KR"
+            },
+            new LampshadeVariant
+            {
+                Id = 7,
+                Name = "Jasny Pladry",
+                ShortName = "J-PL"
+            },
+            new LampshadeVariant
+            {
+                Id = 8,
+                Name = "Jasny Antiko",
+                ShortName = "J-AC"
+            },
+            new LampshadeVariant
+            {
+                Id = 9,
+                Name = "Jasny Alabaster",
+                ShortName = "J-AL"
+            },
+            new LampshadeVariant
+            {
+                Id = 10,
+                Name = "Jasny Mat",
+                ShortName = "J-M"
+            },
+            new LampshadeVariant
+            {
+                Id = 11,
+                Name = "Jasny Mrożony",
+                ShortName = "J-MR"
+            }
         };
+
+        modelBuilder.Entity<LampshadeVariant>().HasData(lampshadeVariants);
         
-        modelBuilder.Entity<LampshadeVariant>().HasData(exampleLampshadeVariant);
-        
-        var exampleDekor = new LampshadeDekor
+        var lampshadeDekors = new List<LampshadeDekor>
         {
-            Id = 1,
-            Name = "Farba",
-            ShortName = "F"
+            new LampshadeDekor
+            {
+                Id = 1,
+                Name = "farba",
+                ShortName = "F"
+            },
+            new LampshadeDekor
+            {
+                Id = 2,
+                Name = "Dekor",
+                ShortName = "D"
+            },
+            new LampshadeDekor
+            {
+                Id = 3,
+                Name = "Dekor D1",
+                ShortName = "D1"
+            },
+            new LampshadeDekor
+            {
+                Id = 4,
+                Name = "Dekor D2",
+                ShortName = "D2"
+            },
+            new LampshadeDekor
+            {
+                Id = 5,
+                Name = "Dekor D3",
+                ShortName = "D3"
+            },
+            new LampshadeDekor
+            {
+                Id = 6,
+                Name = "Dekor D4",
+                ShortName = "D4"
+            },
+            new LampshadeDekor
+            {
+                Id = 7,
+                Name = "Dekor D5",
+                ShortName = "D5"
+            },
+            new LampshadeDekor
+            {
+                Id = 8,
+                Name = "Dekor D6",
+                ShortName = "D6"
+            },
+            new LampshadeDekor
+            {
+                Id = 9,
+                Name = "Dekor D7",
+                ShortName = "D7"
+            },
+            new LampshadeDekor
+            {
+                Id = 10,
+                Name = "Dekor D8",
+                ShortName = "D8"
+            },
+            new LampshadeDekor
+            {
+                Id = 11,
+                Name = "Dekor D9",
+                ShortName = "D9"
+            },
+            new LampshadeDekor
+            {
+                Id = 12,
+                Name = "Dekor D10",
+                ShortName = "D10"
+            },
+            new LampshadeDekor
+            {
+                Id = 13,
+                Name = "Dekor D11",
+                ShortName = "D11"
+            },
+            new LampshadeDekor
+            {
+                Id = 14,
+                Name = "Dekor D12",
+                ShortName = "D12"
+            },
+            new LampshadeDekor
+            {
+                Id = 15,
+                Name = "Dekor D13",
+                ShortName = "D13"
+            },
+            new LampshadeDekor
+            {
+                Id = 16,
+                Name = "Dekor D14",
+                ShortName = "D14"
+            },
+            new LampshadeDekor
+            {
+                Id = 17,
+                Name = "Dekor D15",
+                ShortName = "D15"
+            },
+            new LampshadeDekor
+            {
+                Id = 18,
+                Name = "Dekor D16",
+                ShortName = "D16"
+            },
+            new LampshadeDekor
+            {
+                Id = 19,
+                Name = "Dekor D17",
+                ShortName = "D17"
+            },
+            new LampshadeDekor
+            {
+                Id = 20,
+                Name = "Dekor D18",
+                ShortName = "D18"
+            },
+            new LampshadeDekor
+            {
+                Id = 21,
+                Name = "Dekor D19",
+                ShortName = "D19"
+            },
+            new LampshadeDekor
+            {
+                Id = 22,
+                Name = "Dekor D20",
+                ShortName = "D20"
+            },
+            new LampshadeDekor
+            {
+                Id = 23,
+                Name = "Dekor D21",
+                ShortName = "D21"
+            },
+            new LampshadeDekor
+            {
+                Id = 24,
+                Name = "Dekor D22",
+                ShortName = "D22"
+            },
+            new LampshadeDekor
+            {
+                Id = 25,
+                Name = "Dekor D23",
+                ShortName = "D23"
+            },
+            new LampshadeDekor
+            {
+                Id = 26,
+                Name = "Dekor D24",
+                ShortName = "D24"
+            },
+            new LampshadeDekor
+            {
+                Id = 27,
+                Name = "Dekor D25",
+                ShortName = "D25"
+            },
+            new LampshadeDekor
+            {
+                Id = 28,
+                Name = "Dekor D26",
+                ShortName = "D26"
+            },
+            new LampshadeDekor
+            {
+                Id = 29,
+                Name = "Dekor D27",
+                ShortName = "D27"
+            },
+            new LampshadeDekor
+            {
+                Id = 30,
+                Name = "Dekor D28",
+                ShortName = "D28"
+            },
+            new LampshadeDekor
+            {
+                Id = 31,
+                Name = "Dekor D29",
+                ShortName = "D29"
+            },
+            new LampshadeDekor
+            {
+                Id = 32,
+                Name = "Dekor D30",
+                ShortName = "D30"
+            },
+            new LampshadeDekor
+            {
+                Id = 33,
+                Name = "Dekor D31",
+                ShortName = "D31"
+            },
+            new LampshadeDekor
+            {
+                Id = 34,
+                Name = "Dekor D32",
+                ShortName = "D32"
+            }
         };
-        
-        modelBuilder.Entity<LampshadeDekor>().HasData(exampleDekor);
+
+        modelBuilder.Entity<LampshadeDekor>().HasData(lampshadeDekors);
         
         var exampleLampshadeNorm = new LampshadeNorm
         {
             Id = 1,
             LampshadeId = exampleLampshade.Id,
             Lampshade = null!,
-            VariantId = exampleLampshadeVariant.Id,
+            VariantId = lampshadeVariants[0].Id,
             Variant = null!,
             QuantityPerChange = 50
         };
@@ -265,7 +523,7 @@ public class ApplicationDbContext : DbContext
             Lampshade = null!,
             LampshadeNormId = exampleLampshadeNorm.Id,
             LampshadeNorm = null!,
-            LampshadeDekorId = exampleDekor.Id,
+            LampshadeDekorId = lampshadeDekors[0].Id,
             LampshadeDekor = null!,
             OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
             OrderPositionForProduction = null!

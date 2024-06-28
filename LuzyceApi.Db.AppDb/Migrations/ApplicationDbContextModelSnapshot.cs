@@ -75,26 +75,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3740),
+                            CreatedAt = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(3232),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3818),
+                            UpdatedAt = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(3323),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4308),
+                            CreatedAt = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(4095),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4316),
+                            UpdatedAt = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(4109),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -211,7 +211,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3914),
+                            StartTime = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(3444),
                             StatusId = 1
                         },
                         new
@@ -227,7 +227,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4529),
+                            StartTime = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(4147),
                             StatusId = 1
                         });
                 });
@@ -441,13 +441,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 48, 913, DateTimeKind.Local).AddTicks(5645),
+                            CreatedAt = new DateTime(2024, 6, 28, 20, 9, 10, 785, DateTimeKind.Local).AddTicks(2454),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$loMeOj5s8tLvhDBRMzNME.A0H9/DNgvi5WJznIjSgyMReff4q9x/y",
+                            Password = "$2a$11$FgtdrRHQkMd1iQ79CEHAp.MgaSLv1MAuy0zS/Iur.rSbWTYVkUhdy",
                             RoleId = 1
                         });
                 });
@@ -508,8 +508,206 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Farba",
+                            Name = "farba",
                             ShortName = "F"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Dekor",
+                            ShortName = "D"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Dekor D1",
+                            ShortName = "D1"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Dekor D2",
+                            ShortName = "D2"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Dekor D3",
+                            ShortName = "D3"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Dekor D4",
+                            ShortName = "D4"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Dekor D5",
+                            ShortName = "D5"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Dekor D6",
+                            ShortName = "D6"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Dekor D7",
+                            ShortName = "D7"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Dekor D8",
+                            ShortName = "D8"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Dekor D9",
+                            ShortName = "D9"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "Dekor D10",
+                            ShortName = "D10"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "Dekor D11",
+                            ShortName = "D11"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Dekor D12",
+                            ShortName = "D12"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Dekor D13",
+                            ShortName = "D13"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Dekor D14",
+                            ShortName = "D14"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Name = "Dekor D15",
+                            ShortName = "D15"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Name = "Dekor D16",
+                            ShortName = "D16"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Name = "Dekor D17",
+                            ShortName = "D17"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Name = "Dekor D18",
+                            ShortName = "D18"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Name = "Dekor D19",
+                            ShortName = "D19"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Name = "Dekor D20",
+                            ShortName = "D20"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Name = "Dekor D21",
+                            ShortName = "D21"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Name = "Dekor D22",
+                            ShortName = "D22"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Name = "Dekor D23",
+                            ShortName = "D23"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Name = "Dekor D24",
+                            ShortName = "D24"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Name = "Dekor D25",
+                            ShortName = "D25"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Name = "Dekor D26",
+                            ShortName = "D26"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Name = "Dekor D27",
+                            ShortName = "D27"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Name = "Dekor D28",
+                            ShortName = "D28"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Name = "Dekor D29",
+                            ShortName = "D29"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Name = "Dekor D30",
+                            ShortName = "D30"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Name = "Dekor D31",
+                            ShortName = "D31"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Name = "Dekor D32",
+                            ShortName = "D32"
                         });
                 });
 
@@ -568,8 +766,68 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
+                            Name = "Opal",
+                            ShortName = ""
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Opal Mat",
+                            ShortName = "M"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Opal Alabaster",
+                            ShortName = "AL"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Opal Falbanka",
+                            ShortName = "FA"
+                        },
+                        new
+                        {
+                            Id = 5,
                             Name = "Jasny",
                             ShortName = "J"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Jasny Kier",
+                            ShortName = "J-KR"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Jasny Pladry",
+                            ShortName = "J-PL"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Jasny Antiko",
+                            ShortName = "J-AC"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Jasny Alabaster",
+                            ShortName = "J-AL"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "Jasny Mat",
+                            ShortName = "J-M"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "Jasny Mrożony",
+                            ShortName = "J-MR"
                         });
                 });
 
@@ -608,7 +866,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3955),
+                            Date = new DateTime(2024, 6, 28, 20, 9, 10, 896, DateTimeKind.Local).AddTicks(3492),
                             Number = "1"
                         });
                 });

@@ -12,19 +12,6 @@ namespace LuzyceApi.Repositories
 
         public int SaveProductionOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
         {
-            foreach (var position in productionOrder.ProductionOrderPositions)
-            {
-                var variant = applicationDbContext.LampshadeVariants
-                    .FirstOrDefault(l => l.Id == position.VariantId);
-                var dekor = applicationDbContext.LampshadeDekors
-                    .FirstOrDefault(l => l.Id == position.DekorId);
-
-                if (variant == null || dekor == null)
-                {
-                    return 0;
-                }
-            }
-            
             using var transaction = applicationDbContext.Database.BeginTransaction();
 
             try
@@ -142,10 +129,16 @@ namespace LuzyceApi.Repositories
                         .FirstOrDefault(l => l.Id == position.VariantId);
                     var dekor = applicationDbContext.LampshadeDekors
                         .FirstOrDefault(l => l.Id == position.DekorId);
+
+                    if (lampshade == null || variant == null || dekor == null)
+                    {
+                        transaction.Rollback();
+                        return 0;
+                    }
                     
                     var lampshadeNorms = applicationDbContext.LampshadeNorms
-                        .FirstOrDefault(l => l.LampshadeId == lampshade!.Id
-                                             && l.VariantId == variant!.Id);
+                        .FirstOrDefault(l => l.LampshadeId == lampshade.Id
+                                             && l.VariantId == variant.Id);
                     
                     if (lampshadeNorms == null)
                     {

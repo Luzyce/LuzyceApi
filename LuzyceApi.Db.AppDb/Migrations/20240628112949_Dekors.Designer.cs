@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240628111631_Dekors")]
+    [Migration("20240628112949_Dekors")]
     partial class Dekors
     {
         /// <inheritdoc />
@@ -78,26 +78,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9921),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3740),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 400, DateTimeKind.Local).AddTicks(9973),
+                            UpdatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3818),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(423),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4308),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(433),
+                            UpdatedAt = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4316),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -214,7 +214,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(31),
+                            StartTime = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3914),
                             StatusId = 1
                         },
                         new
@@ -230,7 +230,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(540),
+                            StartTime = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(4529),
                             StatusId = 1
                         });
                 });
@@ -444,13 +444,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 28, 13, 16, 31, 290, DateTimeKind.Local).AddTicks(5354),
+                            CreatedAt = new DateTime(2024, 6, 28, 13, 29, 48, 913, DateTimeKind.Local).AddTicks(5645),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$etVf2zwOf7RDxMuu/FRRj.usilOe/u45/5EsbHZTWWvPoaU5Y9iLW",
+                            Password = "$2a$11$loMeOj5s8tLvhDBRMzNME.A0H9/DNgvi5WJznIjSgyMReff4q9x/y",
                             RoleId = 1
                         });
                 });
@@ -525,7 +525,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("LampshadeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuantityPerChange")
+                    b.Property<int?>("QuantityPerChange")
                         .HasColumnType("int");
 
                     b.Property<int>("VariantId")
@@ -611,7 +611,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 6, 28, 13, 16, 31, 401, DateTimeKind.Local).AddTicks(62),
+                            Date = new DateTime(2024, 6, 28, 13, 29, 49, 24, DateTimeKind.Local).AddTicks(3955),
                             Number = "1"
                         });
                 });

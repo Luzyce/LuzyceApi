@@ -16,15 +16,4 @@ public class LampshadeRepository(ApplicationDbContext applicationDbContext)
     {
         return applicationDbContext.LampshadeVariants.FirstOrDefault(x => x.ShortName == shortName);
     }
-    
-    public List<LampshadeDekor> GetLampshadeDekors()
-    {
-        return applicationDbContext.LampshadeDekors.ToList();
-    }
-    
-    public LampshadeDekor? GetLampshadeDekor(string shortName)
-    {
-        return applicationDbContext.LampshadeDekors.FirstOrDefault(x => x.ShortName == shortName);
-    }
-    
 }

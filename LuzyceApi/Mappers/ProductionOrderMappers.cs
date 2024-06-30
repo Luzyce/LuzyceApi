@@ -44,7 +44,7 @@ public static class ProductionOrderMappers
                 DocumentPositionId = x.DocumentPositionId,
                 Symbol = x.Symbol,
                 VariantId = x.VariantId,
-                DekorId = x.DekorId,
+                Dekor = x.Dekor,
                 Gross = x.Gross,
                 Net = x.Net
             }).ToList()

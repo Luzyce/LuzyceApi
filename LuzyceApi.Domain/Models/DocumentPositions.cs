@@ -17,5 +17,10 @@ public class DocumentPositions
     public Status? Status { get; set; }
     public int LampshadeId { get; set; }
     public Lampshade? Lampshade { get; set; }
+    public int? LampshadeNormId { get; set; }
+    public LampshadeNorm? LampshadeNorm { get; set; }
+    public string? LampshadeDekor { get; set; }
+    public int? OrderPositionForProductionId { get; set; }
+    public OrderPositionForProduction? OrderPositionForProduction { get; set; }
 }
 

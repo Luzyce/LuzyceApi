@@ -44,39 +44,5 @@ public class LampshadeController(LampshadeRepository lampshadeRepository) : Cont
             ShortName = variant.ShortName
         });
     }
-    
-    [HttpGet("dekors")]
-    [Authorize]
-    public IActionResult GetLampshadeDekors()
-    {
-        return Ok(new GetDekorsResponseDto()
-        {
-            Dekors = lampshadeRepository.GetLampshadeDekors().Select(x => new GetDekorResponseDto
-                {
-                    Id = x.Id,
-                    ShortName = x.ShortName,
-                    Name = x.Name
-                }).ToList()
-        });
-    }
-    
-    [HttpGet("dekors/{shortName}")]
-    [Authorize]
-    public IActionResult GetLampshadeDekor(string shortName)
-    {
-        var dekor = lampshadeRepository.GetLampshadeDekor(shortName);
-        
-        if (dekor == null)
-        {
-            return NotFound();
-        }
-        
-        return Ok(new GetDekorResponseDto()
-        {
-            Id = dekor.Id,
-            Name = dekor.Name,
-            ShortName = dekor.ShortName
-        });
-    }
 }
 

@@ -127,10 +127,8 @@ namespace LuzyceApi.Repositories
                         .FirstOrDefault(l => l.Code == position.Symbol);
                     var variant = applicationDbContext.LampshadeVariants
                         .FirstOrDefault(l => l.Id == position.VariantId);
-                    var dekor = applicationDbContext.LampshadeDekors
-                        .FirstOrDefault(l => l.Id == position.DekorId);
 
-                    if (lampshade == null || variant == null || dekor == null)
+                    if (lampshade == null || variant == null)
                     {
                         transaction.Rollback();
                         return 0;
@@ -161,7 +159,7 @@ namespace LuzyceApi.Repositories
                         StatusId = 1,
                         LampshadeId = lampshade!.Id,
                         LampshadeNormId = lampshadeNorms.Id,
-                        LampshadeDekorId = position.DekorId,
+                        LampshadeDekor = position.Dekor,
                         OrderPositionForProductionId = position.DocumentPositionId
                     };
                     applicationDbContext.DocumentPositions.Add(documentPosition);

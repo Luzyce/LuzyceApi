@@ -21,8 +21,7 @@ public class DocumentPositions
     public Lampshade? Lampshade { get; set; }
     public int? LampshadeNormId { get; set; }
     public LampshadeNorm? LampshadeNorm { get; set; }
-    public int? LampshadeDekorId { get; set; }
-    public LampshadeDekor? LampshadeDekor { get; set; }
+    public string LampshadeDekor { get; set; } = string.Empty;
     public int? OrderPositionForProductionId { get; set; }
     public OrderPositionForProduction? OrderPositionForProduction { get; set; }
 }

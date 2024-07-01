@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240630135500_delDekorTable")]
-    partial class delDekorTable
+    [Migration("20240701093612_linkOrderWithPosition")]
+    partial class linkOrderWithPosition
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,26 +78,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3415),
+                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6191),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3476),
+                            UpdatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6245),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3931),
+                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6698),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3936),
+                            UpdatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6704),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -153,6 +153,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("LampshadeDekor")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("LampshadeId")
@@ -206,13 +207,14 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             DocumentId = 1,
+                            LampshadeDekor = "",
                             LampshadeId = 1,
                             OperatorId = 1,
                             QuantityGross = 0,
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3536),
+                            StartTime = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6308),
                             StatusId = 1
                         },
                         new
@@ -228,7 +230,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3996),
+                            StartTime = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6767),
                             StatusId = 1
                         });
                 });
@@ -442,13 +444,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 6, 30, 15, 55, 0, 195, DateTimeKind.Local).AddTicks(5097),
+                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 156, DateTimeKind.Local).AddTicks(5392),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$I0VbRVhR1aPqRnf3qEE/x.EEBCzefhOAaTpbl9KHu.x3seuXMZM66",
+                            Password = "$2a$11$QyOKhilgMYplJ.j7NDqupOXmQOeDNND4NVsNFrgTE4vMQR7XaQvt2",
                             RoleId = 1
                         });
                 });
@@ -642,7 +644,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3635),
+                            Date = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6330),
                             Number = "1"
                         });
                 });
@@ -698,6 +700,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
@@ -943,11 +947,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderPositionForProduction", b =>
                 {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.OrderForProduction", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

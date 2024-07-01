@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using LuzyceApi.Db.AppDb.Data.Models;
 using Microsoft.Extensions.Configuration;
 using LuzyceApi.Db.AppDb.Models;
 
@@ -154,6 +153,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         {
             Id = 1,
             OrderId = 1,
+            Order = null!,
             OrderNumber = "1",
             Symbol = "TEST",
             ProductId = exampleLampshade.Id,

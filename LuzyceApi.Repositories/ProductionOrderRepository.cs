@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using LuzyceApi.Db.AppDb.Data;
-using LuzyceApi.Db.AppDb.Data.Models;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore.Storage;
 

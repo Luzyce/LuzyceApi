@@ -1,5 +1,5 @@
 using LuzyceApi.Db.AppDb.Data;
-using LuzyceApi.Db.AppDb.Data.Models;
+using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

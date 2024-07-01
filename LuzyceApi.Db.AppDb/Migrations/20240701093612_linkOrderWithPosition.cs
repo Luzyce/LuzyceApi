@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
-    public partial class delDekorTable : Migration
+    public partial class linkOrderWithPosition : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -155,6 +155,34 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "LampshadeNorms",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    LampshadeId = table.Column<int>(type: "int", nullable: false),
+                    VariantId = table.Column<int>(type: "int", nullable: false),
+                    QuantityPerChange = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LampshadeNorms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LampshadeNorms_LampshadeVariants_VariantId",
+                        column: x => x.VariantId,
+                        principalTable: "LampshadeVariants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_LampshadeNorms_Lampshades_LampshadeId",
+                        column: x => x.LampshadeId,
+                        principalTable: "Lampshades",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "OrderPositionsForProduction",
                 columns: table => new
                 {
@@ -191,34 +219,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalTable: "Lampshades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "LampshadeNorms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    LampshadeId = table.Column<int>(type: "int", nullable: false),
-                    VariantId = table.Column<int>(type: "int", nullable: false),
-                    QuantityPerChange = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LampshadeNorms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LampshadeNorms_LampshadeVariants_VariantId",
-                        column: x => x.VariantId,
-                        principalTable: "LampshadeVariants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_LampshadeNorms_Lampshades_LampshadeId",
-                        column: x => x.LampshadeId,
-                        principalTable: "Lampshades",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_OrderPositionsForProduction_OrdersForProduction_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "OrdersForProduction",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -322,7 +327,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     LampshadeId = table.Column<int>(type: "int", nullable: false),
                     LampshadeNormId = table.Column<int>(type: "int", nullable: true),
-                    LampshadeDekor = table.Column<string>(type: "longtext", nullable: true)
+                    LampshadeDekor = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     OrderPositionForProductionId = table.Column<int>(type: "int", nullable: true)
                 },
@@ -508,7 +513,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
                 columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3635), "1" });
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6330), "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -546,15 +551,15 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 6, 30, 15, 55, 0, 195, DateTimeKind.Local).AddTicks(5097), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$I0VbRVhR1aPqRnf3qEE/x.EEBCzefhOAaTpbl9KHu.x3seuXMZM66", 1 });
+                values: new object[] { 1, new DateTime(2024, 7, 1, 11, 36, 12, 156, DateTimeKind.Local).AddTicks(5392), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$QyOKhilgMYplJ.j7NDqupOXmQOeDNND4NVsNFrgTE4vMQR7XaQvt2", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3415), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3476), 1, 2023 },
-                    { 2, null, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3931), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3936), 2, 2024 }
+                    { 1, null, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6191), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6245), 1, 2023 },
+                    { 2, null, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6698), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6704), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
@@ -562,8 +567,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "StartTime", "StatusId" },
                 values: new object[,]
                 {
-                    { 1, 1, null, null, 1, null, 1, null, 0, 0, 0, 0, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3536), 1 },
-                    { 2, 2, null, "F", 1, 1, 1, 1, 0, 0, 0, 0, new DateTime(2024, 6, 30, 15, 55, 0, 302, DateTimeKind.Local).AddTicks(3996), 1 }
+                    { 1, 1, null, "", 1, null, 1, null, 0, 0, 0, 0, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6308), 1 },
+                    { 2, 2, null, "F", 1, 1, 1, 1, 0, 0, 0, 0, new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6767), 1 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -672,6 +677,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 column: "OperatorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderPositionsForProduction_OrderId",
+                table: "OrderPositionsForProduction",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderPositionsForProduction_ProductId",
                 table: "OrderPositionsForProduction",
                 column: "ProductId");
@@ -693,9 +703,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "Operations");
-
-            migrationBuilder.DropTable(
-                name: "OrdersForProduction");
 
             migrationBuilder.DropTable(
                 name: "DocumentPositions");
@@ -729,6 +736,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "Lampshades");
+
+            migrationBuilder.DropTable(
+                name: "OrdersForProduction");
 
             migrationBuilder.DropTable(
                 name: "Roles");

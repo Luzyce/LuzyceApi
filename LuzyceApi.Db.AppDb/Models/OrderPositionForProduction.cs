@@ -1,11 +1,10 @@
-﻿using LuzyceApi.Db.AppDb.Data.Models;
-
-namespace LuzyceApi.Db.AppDb.Models;
+﻿namespace LuzyceApi.Db.AppDb.Models;
 
 public class OrderPositionForProduction
 {
     public int Id { get; set; }
     public int? OrderId { get; set; }
+    public OrderForProduction? Order { get; set; }
     public string OrderNumber { get; set; } = string.Empty;
     public string Symbol { get; set; } = string.Empty;
     public int ProductId { get; set; }

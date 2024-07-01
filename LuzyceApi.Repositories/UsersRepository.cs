@@ -1,4 +1,5 @@
 using LuzyceApi.Db.AppDb.Data;
+using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -120,7 +121,7 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
             user.RoleId = 2;
         }
 
-        var dbUser = new Db.AppDb.Data.Models.User
+        var dbUser = new User
         {
             Name = user.Name,
             LastName = user.LastName,

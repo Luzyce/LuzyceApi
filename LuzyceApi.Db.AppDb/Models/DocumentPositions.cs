@@ -1,6 +1,4 @@
-using LuzyceApi.Db.AppDb.Models;
-
-namespace LuzyceApi.Db.AppDb.Data.Models;
+namespace LuzyceApi.Db.AppDb.Models;
 
 public class DocumentPositions
 {

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using Luzyce.Core.Models.Order;
 using LuzyceApi.Db.Subiekt.Data;
 using LuzyceApi.Domain.Models;
 
@@ -70,7 +70,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
             });
 
         if (ordersFilters != null)
-        {
+        { 
             if (ordersFilters.StartDate.HasValue)
             {
                 query = query.Where(o => o.Date >= ordersFilters.StartDate.Value);
@@ -133,22 +133,23 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
             .ToList();
         return orderPositions;
     }
-    
-    // public int GetAllTowars()
-    // {
-    //     var tabela = subiektDbContext.TwTowars.ToList();
-    //
-    //     // Apply the filter in memory
-    //     var filteredTabela = tabela.Where(t => 
-    //         Regex.IsMatch(t.TwSymbol, @"^[A-Z]{2}\-?\d[^\-\/\ ]{2,}")
-    //         //&& t.TwNazwa.ToLower().Contains("klosz")
-    //         
-    //         ).Select(t => t.TwSymbol).ToList();
-    //
-    //     // Convert the filtered list to array (if needed)
-    //     filteredTabela.ToArray();
-    //
-    //     // Return the count of the filtered records
-    //     return filteredTabela.Count();
-    // }
+
+    public StockResponse GetWarehousesLevels(StockRequest filters)
+    {
+        return new StockResponse
+        {
+            WarehousesStocks = subiektDbContext.TwStans
+                .Where(x => filters.ProductIds.Contains(x.StTowId) && filters.WarehouseIds.Contains(x.StMagId))
+                .Select(x => new WarehouseStocks
+                {
+                    ProductId = x.StTowId,
+                    WarehouseId = x.StMagId,
+                    Quantity = (int)x.StStan,
+                    QuantityMin = (int)x.StStanMin,
+                    QuantityRes = (int)x.StStanRez,
+                    QuantityMax = (int)x.StStanMax
+                })
+                .ToList()
+        };
+    }
 }

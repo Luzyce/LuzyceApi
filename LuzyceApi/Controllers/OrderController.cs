@@ -66,9 +66,11 @@ public class OrderController(OrderRepository orderRepository) : Controller
         return Ok(orderRepository.GetOrderPositions(orderId));
     }
     
-    // [HttpGet]
-    // public IActionResult Get()
-    // {
-    //     return Ok(orderRepository.GetAllTowars());
-    // }
+    [HttpPost("getStock")]
+    [Authorize]
+    public IActionResult GetWarehousesLevels(StockRequest stockRequest)
+    {
+        var response = orderRepository.GetWarehousesLevels(stockRequest);
+        return Ok(response);
+    }
 }

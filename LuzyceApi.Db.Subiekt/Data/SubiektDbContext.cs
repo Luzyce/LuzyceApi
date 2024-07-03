@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using LuzyceApi.Db.Subiekt.DataModels;
+using LuzyceApi.Db.Subiekt.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace LuzyceApi.Db.Subiekt.Data;
@@ -23,6 +23,10 @@ public partial class SubiektDbContext : DbContext
     public virtual DbSet<DokPozycja> DokPozycjas { get; set; }
 
     public virtual DbSet<KhKontrahent> KhKontrahents { get; set; }
+
+    public virtual DbSet<SlMagazyn> SlMagazyns { get; set; }
+
+    public virtual DbSet<TwStan> TwStans { get; set; }
 
     public virtual DbSet<TwTowar> TwTowars { get; set; }
 
@@ -995,6 +999,86 @@ public partial class SubiektDbContext : DbContext
             entity.HasOne(d => d.KhIdOdbiorcaNavigation).WithMany(p => p.InverseKhIdOdbiorcaNavigation)
                 .HasForeignKey(d => d.KhIdOdbiorca)
                 .HasConstraintName("FK_kh__Kontrahent_kh__Kontrahent");
+        });
+
+        modelBuilder.Entity<SlMagazyn>(entity =>
+        {
+            entity.HasKey(e => e.MagId);
+
+            entity.ToTable("sl_Magazyn", tb =>
+                {
+                    tb.HasTrigger("tr_MagazynInsMod");
+                    tb.HasTrigger("tr_slMagazynInserting");
+                    tb.HasTrigger("tr_sl_Magazyn_Deleting");
+                });
+
+            entity.Property(e => e.MagId)
+                .ValueGeneratedNever()
+                .HasColumnName("mag_Id");
+            entity.Property(e => e.MagAnalityka)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("mag_Analityka");
+            entity.Property(e => e.MagGlowny).HasColumnName("mag_Glowny");
+            entity.Property(e => e.MagNazwa)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("mag_Nazwa");
+            entity.Property(e => e.MagOpis)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("mag_Opis");
+            entity.Property(e => e.MagPos).HasColumnName("mag_POS");
+            entity.Property(e => e.MagPosadres)
+                .HasMaxLength(82)
+                .IsUnicode(false)
+                .HasColumnName("mag_POSAdres");
+            entity.Property(e => e.MagPosident).HasColumnName("mag_POSIdent");
+            entity.Property(e => e.MagPosnazwa)
+                .HasMaxLength(255)
+                .IsUnicode(false)
+                .HasColumnName("mag_POSNazwa");
+            entity.Property(e => e.MagStatus).HasColumnName("mag_Status");
+            entity.Property(e => e.MagSymbol)
+                .HasMaxLength(3)
+                .IsUnicode(false)
+                .HasColumnName("mag_Symbol");
+        });
+
+        modelBuilder.Entity<TwStan>(entity =>
+        {
+            entity.HasKey(e => new { e.StTowId, e.StMagId });
+
+            entity.ToTable("tw_Stan");
+
+            entity.HasIndex(e => new { e.StTowId, e.StMagId }, "IX_tw_Stany").IsUnique();
+
+            entity.HasIndex(e => new { e.StTowId, e.StMagId, e.StStan, e.StStanRez }, "IX_tw_Stany_1");
+
+            entity.Property(e => e.StTowId).HasColumnName("st_TowId");
+            entity.Property(e => e.StMagId).HasColumnName("st_MagId");
+            entity.Property(e => e.StStan)
+                .HasColumnType("money")
+                .HasColumnName("st_Stan");
+            entity.Property(e => e.StStanMax)
+                .HasColumnType("money")
+                .HasColumnName("st_StanMax");
+            entity.Property(e => e.StStanMin)
+                .HasColumnType("money")
+                .HasColumnName("st_StanMin");
+            entity.Property(e => e.StStanRez)
+                .HasColumnType("money")
+                .HasColumnName("st_StanRez");
+
+            entity.HasOne(d => d.StMag).WithMany(p => p.TwStans)
+                .HasForeignKey(d => d.StMagId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_tw_Stan_sl_Magazyn");
+
+            entity.HasOne(d => d.StTow).WithMany(p => p.TwStans)
+                .HasForeignKey(d => d.StTowId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_tw_Stan_tw__Towar");
         });
 
         modelBuilder.Entity<TwTowar>(entity =>

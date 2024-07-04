@@ -319,7 +319,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             po_NumberOfChanges = 1,
             po_QuantityMade = 0,
             po_MethodOfPackaging = "300x300x110",
-            po_QuantityPerPack = 16
+            po_QuantityPerPack = 16,
+            po_SubiektProductId = 2628
         };
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);

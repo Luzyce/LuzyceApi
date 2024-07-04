@@ -46,7 +46,8 @@ public static class ProductionOrderMappers
                 VariantId = x.VariantId,
                 Dekor = x.Dekor,
                 Gross = x.Gross,
-                Net = x.Net
+                Net = x.Net,
+                SubiektProductId = x.SubiektProductId
             }).ToList()
         };
     }

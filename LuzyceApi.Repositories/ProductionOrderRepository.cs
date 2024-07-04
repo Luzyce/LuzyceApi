@@ -67,9 +67,9 @@ namespace LuzyceApi.Repositories
             };
         }
 
-        public GetProductionOrder GetProductionOrder(int Id)
+        public GetProductionOrder? GetProductionOrder(int Id)
         {
-            return applicationDbContext.Documents
+            var documentQuery = applicationDbContext.Documents
                 .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZlecenieProdukcji && d.Id == Id)
                 .Select(d => new
                 {
@@ -130,58 +130,65 @@ namespace LuzyceApi.Repositories
                                         })
                                         .FirstOrDefault()
                                 })
-                                .FirstOrDefault()
+                                .FirstOrDefault(),
+                            ProductId = dp.po_SubiektProductId
                         })
                         .ToList()
                 })
-                .AsEnumerable()
-                .Select(d => new GetProductionOrder
+                .FirstOrDefault();
+
+            if (documentQuery == null)
+            {
+                return null;
+            }
+
+            return new GetProductionOrder
+            {
+                Id = documentQuery.Document.Id,
+                DocNumber = documentQuery.Document.DocNumber,
+                Warehouse = new GetWarehouseResponseDto
                 {
-                    Id = d.Document.Id,
-                    DocNumber = d.Document.DocNumber,
-                    Warehouse = new GetWarehouseResponseDto
+                    Id = documentQuery.Document.WarehouseId,
+                    Code = documentQuery.WarehouseCode
+                },
+                Year = documentQuery.Document.Year,
+                Number = documentQuery.Document.Number,
+                DocumentsDefinition = new GetDocumentsDefinitionResponseDto
+                {
+                    Id = documentQuery.Document.DocumentsDefinitionId,
+                    Code = documentQuery.DocumentsDefinitionCode
+                },
+                User = new GetUserResponseDto
+                {
+                    Id = documentQuery.Document.OperatorId,
+                    Name = documentQuery.OperatorName ?? string.Empty
+                },
+                CreatedAt = documentQuery.Document.CreatedAt,
+                UpdatedAt = documentQuery.Document.UpdatedAt,
+                ClosedAt = documentQuery.Document.ClosedAt,
+                Status = documentQuery.Status,
+                Positions = documentQuery.Positions.Select(dp => new GetProductionOrderPosition
+                {
+                    Id = dp.Position.Id,
+                    QuantityNetto = dp.Position.QuantityNetto,
+                    QuantityGross = dp.Position.QuantityGross,
+                    ExecutionDate = dp.Position.EndTime,
+                    Lampshade = dp.Lampshade!,
+                    LampshadeNorm = new GetLampshadeNorm
                     {
-                        Id = d.Document.WarehouseId,
-                        Code = d.WarehouseCode
+                        Id = dp.LampshadeNorm!.Norm.Id,
+                        Lampshade = dp.LampshadeNorm.Lampshade!,
+                        Variant = dp.LampshadeNorm.Variant!
                     },
-                    Year = d.Document.Year,
-                    Number = d.Document.Number,
-                    DocumentsDefinition = new GetDocumentsDefinitionResponseDto
-                    {
-                        Id = d.Document.DocumentsDefinitionId,
-                        Code = d.DocumentsDefinitionCode
-                    },
-                    User = new GetUserResponseDto
-                    {
-                        Id = d.Document.OperatorId,
-                        Name = d.OperatorName ?? string.Empty
-                    },
-                    CreatedAt = d.Document.CreatedAt,
-                    UpdatedAt = d.Document.UpdatedAt,
-                    ClosedAt = d.Document.ClosedAt,
-                    Status = d.Status,
-                    Positions = d.Positions.Select(dp => new GetProductionOrderPositions
-                    {
-                        Id = dp.Position.Id,
-                        QuantityNetto = dp.Position.QuantityNetto,
-                        QuantityGross = dp.Position.QuantityGross,
-                        ExecutionDate = dp.Position.EndTime,
-                        Lampshade = dp.Lampshade!,
-                        LampshadeNorm = new GetLampshadeNorm
-                        {
-                            Id = dp.LampshadeNorm!.Norm.Id,
-                            Lampshade = dp.LampshadeNorm.Lampshade!,
-                            Variant = dp.LampshadeNorm.Variant!
-                        },
-                        LampshadeDekor = dp.Position.LampshadeDekor,
-                        Remarks = dp.Position.Remarks,
-                        NumberOfChanges = dp.Position.po_NumberOfChanges,
-                        QuantityMade = dp.Position.po_QuantityMade,
-                        MethodOfPackaging = dp.Position.po_MethodOfPackaging,
-                        QuantityPerPack = dp.Position.po_QuantityPerPack
-                    }).ToList()
-                })
-                .FirstOrDefault()!;
+                    LampshadeDekor = dp.Position.LampshadeDekor,
+                    Remarks = dp.Position.Remarks,
+                    NumberOfChanges = dp.Position.po_NumberOfChanges,
+                    QuantityMade = dp.Position.po_QuantityMade,
+                    MethodOfPackaging = dp.Position.po_MethodOfPackaging,
+                    QuantityPerPack = dp.Position.po_QuantityPerPack,
+                    ProductId = dp.ProductId ?? 0
+                }).ToList()
+            };
         }
 
         public int SaveProductionOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
@@ -334,7 +341,8 @@ namespace LuzyceApi.Repositories
                         LampshadeId = lampshade.Id,
                         LampshadeNormId = lampshadeNorms.Id,
                         LampshadeDekor = position.Dekor,
-                        OrderPositionForProductionId = position.DocumentPositionId
+                        OrderPositionForProductionId = position.DocumentPositionId,
+                        po_SubiektProductId = position.SubiektProductId
                     };
                     applicationDbContext.DocumentPositions.Add(documentPosition);
                 }
@@ -342,6 +350,57 @@ namespace LuzyceApi.Repositories
                 applicationDbContext.SaveChanges();
 
                 transaction.Commit();
+                return 1;
+            }
+            catch
+            {
+                transaction.Rollback();
+                return 0;
+            }
+        }
+
+        public int UpdateProductionOrder(int id, UpdateProductionOrder updateProductionOrderDto)
+        {
+            using var transaction = applicationDbContext.Database.BeginTransaction();
+            try
+            {
+                foreach (var position in updateProductionOrderDto.Positions)
+                {
+                    var existingPosition = applicationDbContext.DocumentPositions
+                        .Where(dp => dp.DocumentId == id)
+                        .FirstOrDefault(dp => dp.Id == position.Id);
+                    
+                    if (existingPosition == null)
+                    {
+                        transaction.Rollback();
+                        return 0;
+                    }
+                    
+                    existingPosition.QuantityNetto = position.QuantityNetto;
+                    existingPosition.po_NumberOfChanges = position.NumberOfChanges;
+                    
+                    var lampshadeNorm = applicationDbContext.LampshadeNorms
+                        .FirstOrDefault(ln => ln.Id == existingPosition.LampshadeNormId);
+                    
+                    if (lampshadeNorm == null)
+                    {
+                        transaction.Rollback();
+                        return 0;
+                    }
+                    
+                    lampshadeNorm.QuantityPerChange = position.QuantityPerChange;
+                    
+                    existingPosition.EndTime = position.ExecutionDate;
+                    existingPosition.po_QuantityMade = position.QuantityMade;
+                    existingPosition.Remarks = position.Remarks;
+                    existingPosition.po_MethodOfPackaging = position.MethodOfPackaging;
+                    existingPosition.po_QuantityPerPack = position.QuantityPerPack;
+                }
+
+                applicationDbContext.SaveChanges();
+
+                transaction.Commit();
+
                 return 1;
             }
             catch

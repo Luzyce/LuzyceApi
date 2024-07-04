@@ -52,4 +52,18 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         return Ok();
     }
+    
+    [HttpPost("update/{id:int}")]
+    [Authorize]
+    public IActionResult UpdateProductionOrder(int id, UpdateProductionOrder updateProductionOrderDto)
+    {
+        var resp = productionOrderRepository.UpdateProductionOrder(id, updateProductionOrderDto);
+        
+        if (resp == 0)
+        {
+            return Conflict();
+        }
+        
+        return Ok();
+    }
 }

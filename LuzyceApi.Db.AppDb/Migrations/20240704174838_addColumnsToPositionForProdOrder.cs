@@ -336,7 +336,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     po_QuantityMade = table.Column<int>(type: "int", nullable: true),
                     po_MethodOfPackaging = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    po_QuantityPerPack = table.Column<int>(type: "int", nullable: true)
+                    po_QuantityPerPack = table.Column<int>(type: "int", nullable: true),
+                    po_SubiektProductId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -520,7 +521,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
                 columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1642), "1" });
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(5980), "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -558,24 +559,24 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 7, 4, 18, 31, 53, 72, DateTimeKind.Local).AddTicks(664), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$djNzjLtImMG.X7TSRf1/XOEQG1VZj06sQLHUoaZqsAYcyciDk63.W", 1 });
+                values: new object[] { 1, new DateTime(2024, 7, 4, 19, 48, 37, 808, DateTimeKind.Local).AddTicks(7732), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$994y8yEnTRdpCr/vEKD./ufzEA3ICTiekmvYMnAay/2RUlrsE36Re", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1426), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1494), 1, 2023 },
-                    { 2, null, new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2152), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2166), 2, 2024 }
+                    { 1, null, new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(5835), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(5887), 1, 2023 },
+                    { 2, null, new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(6263), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(6269), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "StatusId", "po_MethodOfPackaging", "po_NumberOfChanges", "po_QuantityMade", "po_QuantityPerPack" },
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "StatusId", "po_MethodOfPackaging", "po_NumberOfChanges", "po_QuantityMade", "po_QuantityPerPack", "po_SubiektProductId" },
                 values: new object[,]
                 {
-                    { 1, 1, null, "", 1, null, 1, null, 0, 0, 0, 0, "", new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1606), 1, null, null, null, null },
-                    { 2, 2, null, "F", 1, 1, 1, 1, 0, 0, 0, 0, "Test", new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2252), 1, "300x300x110", 1, 0, 16 }
+                    { 1, 1, null, "", 1, null, 1, null, 0, 0, 0, 0, "", new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(5958), 1, null, null, null, null, null },
+                    { 2, 2, null, "F", 1, 1, 1, 1, 0, 0, 0, 0, "Test", new DateTime(2024, 7, 4, 19, 48, 37, 919, DateTimeKind.Local).AddTicks(6334), 1, "300x300x110", 1, 0, 16, 2628 }
                 });
 
             migrationBuilder.CreateIndex(

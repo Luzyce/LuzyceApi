@@ -27,4 +27,5 @@ public class DocumentPositions
     public int? po_QuantityMade { get; set; }
     public string? po_MethodOfPackaging { get; set; }
     public int? po_QuantityPerPack { get; set; }
+    public int? po_SubiektProductId { get; set; }
 }

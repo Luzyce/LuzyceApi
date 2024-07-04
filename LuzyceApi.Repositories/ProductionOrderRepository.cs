@@ -165,7 +165,7 @@ namespace LuzyceApi.Repositories
                         Id = dp.Position.Id,
                         QuantityNetto = dp.Position.QuantityNetto,
                         QuantityGross = dp.Position.QuantityGross,
-                        CreatedAt = dp.Position.StartTime,
+                        ExecutionDate = dp.Position.EndTime,
                         Lampshade = dp.Lampshade!,
                         LampshadeNorm = new GetLampshadeNorm
                         {
@@ -173,7 +173,12 @@ namespace LuzyceApi.Repositories
                             Lampshade = dp.LampshadeNorm.Lampshade!,
                             Variant = dp.LampshadeNorm.Variant!
                         },
-                        LampshadeDekor = dp.Position.LampshadeDekor
+                        LampshadeDekor = dp.Position.LampshadeDekor,
+                        Remarks = dp.Position.Remarks,
+                        NumberOfChanges = dp.Position.po_NumberOfChanges,
+                        QuantityMade = dp.Position.po_QuantityMade,
+                        MethodOfPackaging = dp.Position.po_MethodOfPackaging,
+                        QuantityPerPack = dp.Position.po_QuantityPerPack
                     }).ToList()
                 })
                 .FirstOrDefault()!;

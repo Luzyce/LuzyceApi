@@ -20,6 +20,11 @@ public class DocumentPositions
     public int? LampshadeNormId { get; set; }
     public LampshadeNorm? LampshadeNorm { get; set; }
     public string LampshadeDekor { get; set; } = string.Empty;
+    public string Remarks { get; set; } = string.Empty;
     public int? OrderPositionForProductionId { get; set; }
     public OrderPositionForProduction? OrderPositionForProduction { get; set; }
+    public int? po_NumberOfChanges { get; set; }
+    public int? po_QuantityMade { get; set; }
+    public string? po_MethodOfPackaging { get; set; }
+    public int? po_QuantityPerPack { get; set; }
 }

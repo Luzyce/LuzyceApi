@@ -313,8 +313,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             LampshadeNormId = exampleLampshadeNorm.Id,
             LampshadeNorm = null!,
             LampshadeDekor = "F",
+            Remarks = "Test",
             OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
-            OrderPositionForProduction = null!
+            OrderPositionForProduction = null!,
+            po_NumberOfChanges = 1,
+            po_QuantityMade = 0,
+            po_MethodOfPackaging = "300x300x110",
+            po_QuantityPerPack = 16
         };
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);

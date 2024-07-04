@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240701093612_linkOrderWithPosition")]
-    partial class linkOrderWithPosition
+    [Migration("20240704163153_addColumnsToPositionForProdOrder")]
+    partial class addColumnsToPositionForProdOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Document", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Document", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,32 +78,32 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6191),
+                            CreatedAt = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1426),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6245),
+                            UpdatedAt = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1494),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6698),
+                            CreatedAt = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2152),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6704),
+                            UpdatedAt = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2166),
                             WarehouseId = 2,
                             Year = 2024
                         });
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentItemRelationships", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentItemRelationships", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -140,7 +140,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.ToTable("DocumentItemRelationships");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentPositions", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentPositions", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,10 +180,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("QuantityToImprove")
                         .HasColumnType("int");
 
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("po_MethodOfPackaging")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("po_NumberOfChanges")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("po_QuantityMade")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("po_QuantityPerPack")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -214,7 +230,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6308),
+                            Remarks = "",
+                            StartTime = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1606),
                             StatusId = 1
                         },
                         new
@@ -230,12 +247,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityLoss = 0,
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
-                            StartTime = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6767),
-                            StatusId = 1
+                            Remarks = "Test",
+                            StartTime = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(2252),
+                            StatusId = 1,
+                            po_MethodOfPackaging = "300x300x110",
+                            po_NumberOfChanges = 1,
+                            po_QuantityMade = 0,
+                            po_QuantityPerPack = 16
                         });
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentRelations", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentRelations", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -256,7 +278,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.ToTable("DocumentRelations");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentsDefinition", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentsDefinition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,7 +312,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Error", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Error", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -313,7 +335,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.ToTable("Errors");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Lampshade", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Lampshade", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -332,160 +354,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             Code = "KL4124"
-                        });
-                });
-
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Operation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ErrorCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OperatorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityLossDelta")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityNetDelta")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityToImproveDelta")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("ErrorCodeId");
-
-                    b.HasIndex("OperatorId");
-
-                    b.ToTable("Operations");
-                });
-
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Status", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Statuses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Otwarty",
-                            Priority = 1
-                        });
-                });
-
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Hash")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Login")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2024, 7, 1, 11, 36, 12, 156, DateTimeKind.Local).AddTicks(5392),
-                            Email = "admin@gmail.com",
-                            Hash = "admin",
-                            LastName = "Admin",
-                            Login = "admin",
-                            Name = "Admin",
-                            Password = "$2a$11$QyOKhilgMYplJ.j7NDqupOXmQOeDNND4NVsNFrgTE4vMQR7XaQvt2",
-                            RoleId = 1
-                        });
-                });
-
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Warehouse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("varchar(2)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Warehouses");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "M",
-                            Name = "Magazyn"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "P",
-                            Name = "Produkcja"
                         });
                 });
 
@@ -609,6 +477,44 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Operation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ErrorCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("OperatorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityLossDelta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityNetDelta")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityToImproveDelta")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Time")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("ErrorCodeId");
+
+                    b.HasIndex("OperatorId");
+
+                    b.ToTable("Operations");
+                });
+
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderForProduction", b =>
                 {
                     b.Property<int>("Id")
@@ -644,7 +550,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 7, 1, 11, 36, 12, 264, DateTimeKind.Local).AddTicks(6330),
+                            Date = new DateTime(2024, 7, 4, 18, 31, 53, 183, DateTimeKind.Local).AddTicks(1642),
                             Number = "1"
                         });
                 });
@@ -754,27 +660,143 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Document", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Status", b =>
                 {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.DocumentsDefinition", "DocumentsDefinition")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Statuses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Otwarty",
+                            Priority = 1
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Login")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 7, 4, 18, 31, 53, 72, DateTimeKind.Local).AddTicks(664),
+                            Email = "admin@gmail.com",
+                            Hash = "admin",
+                            LastName = "Admin",
+                            Login = "admin",
+                            Name = "Admin",
+                            Password = "$2a$11$djNzjLtImMG.X7TSRf1/XOEQG1VZj06sQLHUoaZqsAYcyciDk63.W",
+                            RoleId = 1
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Warehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("varchar(2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Warehouses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "M",
+                            Name = "Magazyn"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "P",
+                            Name = "Produkcja"
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Document", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.DocumentsDefinition", "DocumentsDefinition")
                         .WithMany()
                         .HasForeignKey("DocumentsDefinitionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.User", "Operator")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.User", "Operator")
                         .WithMany()
                         .HasForeignKey("OperatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Status", "Status")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Warehouse", "Warehouse")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Warehouse", "Warehouse")
                         .WithMany()
                         .HasForeignKey("WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -789,27 +811,27 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentItemRelationships", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentItemRelationships", b =>
                 {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "ParentDocument")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "ParentDocument")
                         .WithMany()
                         .HasForeignKey("ParentDocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.DocumentPositions", "ParentPosition")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.DocumentPositions", "ParentPosition")
                         .WithMany()
                         .HasForeignKey("ParentPositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "SubordinateDocument")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "SubordinateDocument")
                         .WithMany()
                         .HasForeignKey("SubordinateDocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.DocumentPositions", "SubordinatePosition")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.DocumentPositions", "SubordinatePosition")
                         .WithMany()
                         .HasForeignKey("SubordinatePositionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -824,15 +846,15 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("SubordinatePosition");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentPositions", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentPositions", b =>
                 {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "Document")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "Document")
                         .WithMany()
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Lampshade")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Lampshade", "Lampshade")
                         .WithMany()
                         .HasForeignKey("LampshadeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -842,7 +864,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .WithMany()
                         .HasForeignKey("LampshadeNormId");
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.User", "Operator")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.User", "Operator")
                         .WithMany()
                         .HasForeignKey("OperatorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -852,7 +874,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .WithMany()
                         .HasForeignKey("OrderPositionForProductionId");
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Status", "Status")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Status", "Status")
                         .WithMany()
                         .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -871,15 +893,15 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Status");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.DocumentRelations", b =>
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.DocumentRelations", b =>
                 {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "ParentDocument")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "ParentDocument")
                         .WithMany()
                         .HasForeignKey("ParentDocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "SubordinateDocument")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "SubordinateDocument")
                         .WithMany()
                         .HasForeignKey("SubordinateDocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -890,45 +912,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("SubordinateDocument");
                 });
 
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.Operation", b =>
-                {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Document", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Error", "ErrorCode")
-                        .WithMany()
-                        .HasForeignKey("ErrorCodeId");
-
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.User", "Operator")
-                        .WithMany()
-                        .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Document");
-
-                    b.Navigation("ErrorCode");
-
-                    b.Navigation("Operator");
-                });
-
-            modelBuilder.Entity("LuzyceApi.Db.AppDb.Data.Models.User", b =>
-                {
-                    b.HasOne("LuzyceApi.Db.AppDb.Models.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.LampshadeNorm", b =>
                 {
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Lampshade")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Lampshade", "Lampshade")
                         .WithMany()
                         .HasForeignKey("LampshadeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -945,13 +931,38 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Variant");
                 });
 
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Operation", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Error", "ErrorCode")
+                        .WithMany()
+                        .HasForeignKey("ErrorCodeId");
+
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.User", "Operator")
+                        .WithMany()
+                        .HasForeignKey("OperatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("ErrorCode");
+
+                    b.Navigation("Operator");
+                });
+
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.OrderPositionForProduction", b =>
                 {
                     b.HasOne("LuzyceApi.Db.AppDb.Models.OrderForProduction", "Order")
                         .WithMany()
                         .HasForeignKey("OrderId");
 
-                    b.HasOne("LuzyceApi.Db.AppDb.Data.Models.Lampshade", "Product")
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Lampshade", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -960,6 +971,17 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.User", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

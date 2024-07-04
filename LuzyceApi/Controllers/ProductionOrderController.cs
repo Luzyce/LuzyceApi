@@ -13,9 +13,23 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
 {
     private readonly ProductionOrderRepository productionOrderRepository = productionOrderRepository;
     
+    [HttpGet]
+    [Authorize]
+    public IActionResult Get()
+    {
+        return Ok(productionOrderRepository.GetProductionOrders());
+    }
+    
+    [HttpGet("{id:int}")]
+    [Authorize]
+    public IActionResult Get(int id)
+    {
+        return Ok(productionOrderRepository.GetProductionOrder(id));
+    }
+    
     [HttpPost("new")]
     [Authorize]
-    public IActionResult CreateProductionOrder(CreateProductionOrderDto createProductionOrderDto)
+    public IActionResult CreateProductionOrder(CreateProductionOrderRequest createProductionOrderDto)
     {
         var operatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         

@@ -5,7 +5,7 @@ namespace LuzyceApi.Mappers;
 
 public static class ProductionOrderMappers
 {
-    public static Order ToOrderFromCreateDto(this CreateProductionOrderDto dto)
+    public static Order ToOrderFromCreateDto(this CreateProductionOrderRequest dto)
     {
         return new Order()
         {
@@ -34,7 +34,7 @@ public static class ProductionOrderMappers
             }).ToList()
         };
     } 
-    public static ProductionOrder ToProductionOrderFromCreateDto(this CreateProductionOrderDto dto)
+    public static ProductionOrder ToProductionOrderFromCreateDto(this CreateProductionOrderRequest dto)
     {
         return new ProductionOrder()
         {

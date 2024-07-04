@@ -66,7 +66,9 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                                  ProductSymbol = x.towar.TwSymbol,
                                  ProductName = x.towar.TwNazwa,
                                  ProductDescription = x.towar.TwOpis
-                             }).ToList()
+                             })
+                             .OrderBy(x => x.OrderPositionLp)
+                             .ToList()
             });
 
         if (ordersFilters != null)
@@ -136,20 +138,70 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
     public StockResponse GetWarehousesLevels(StockRequest filters)
     {
-        return new StockResponse
-        {
-            WarehousesStocks = subiektDbContext.TwStans
-                .Where(x => filters.ProductIds.Contains(x.StTowId) && filters.WarehouseIds.Contains(x.StMagId))
-                .Select(x => new WarehouseStocks
+        var productIds = filters.ProductIds;
+        var warehouseIds = filters.WarehouseIds;
+
+        var query = subiektDbContext.TwStans
+            .Where(x => productIds.Contains(x.StTowId) && warehouseIds.Contains(x.StMagId))
+            .Select(x => new
+            {
+                x.StTowId,
+                x.StMagId,
+                Quantity = (int)x.StStan,
+                QuantityMin = (int)x.StStanMin,
+                QuantityRes = (int)x.StStanRez,
+                QuantityMax = (int)x.StStanMax
+            })
+            .AsEnumerable()
+            .GroupBy(x => x.StTowId)
+            .ToDictionary(
+                g => g.Key,
+                g => new ProductWarehouseStocks
                 {
-                    ProductId = x.StTowId,
-                    WarehouseId = x.StMagId,
-                    Quantity = (int)x.StStan,
-                    QuantityMin = (int)x.StStanMin,
-                    QuantityRes = (int)x.StStanRez,
-                    QuantityMax = (int)x.StStanMax
-                })
-                .ToList()
+                    ProductId = g.Key,
+                    Quantity = g.Sum(x => x.Quantity),
+                    QuantityMin = g.Min(x => x.QuantityMin),
+                    QuantityRes = g.Sum(x => x.QuantityRes),
+                    QuantityMax = g.Max(x => x.QuantityMax),
+                    WarehouseStocks = g.Select(x => new WarehouseStocks
+                    {
+                        WarehouseId = x.StMagId,
+                        Quantity = x.Quantity,
+                        QuantityMin = x.QuantityMin,
+                        QuantityRes = x.QuantityRes,
+                        QuantityMax = x.QuantityMax
+                    }).ToList()
+                });
+
+        var response = new StockResponse
+        {
+            ProductWarehousesStocks = productIds.Select(productId =>
+            {
+                if (query.TryGetValue(productId, out var productStock))
+                {
+                    return productStock;
+                }
+
+                return new ProductWarehouseStocks
+                {
+                    ProductId = productId,
+                    Quantity = 0,
+                    QuantityMin = 0,
+                    QuantityRes = 0,
+                    QuantityMax = 0,
+                    WarehouseStocks = warehouseIds.Select(warehouseId => new WarehouseStocks
+                    {
+                        WarehouseId = warehouseId,
+                        Quantity = 0,
+                        QuantityMin = 0,
+                        QuantityRes = 0,
+                        QuantityMax = 0
+                    }).ToList()
+                };
+            }).ToList()
         };
+
+        return response;
     }
+
 }

@@ -66,7 +66,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
         return Ok(orderRepository.GetOrderPositions(orderId));
     }
     
-    [HttpPost("getStock")]
+    [HttpPost("stock")]
     [Authorize]
     public IActionResult GetWarehousesLevels(StockRequest stockRequest)
     {

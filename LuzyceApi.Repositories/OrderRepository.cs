@@ -97,7 +97,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
             Orders = query
                 .OrderByDescending(x => x.Date)
                 .ThenByDescending(x => x.Id)
-                .Skip(offset)
+                .Skip((offset - 1) * limit)
                 .Take(limit)
                 .ToList()
         };

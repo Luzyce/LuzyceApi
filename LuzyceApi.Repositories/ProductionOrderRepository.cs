@@ -78,6 +78,7 @@ namespace LuzyceApi.Repositories
                 .Include(dp => dp.Lampshade)
                 .Include(dp => dp.LampshadeNorm)
                     .ThenInclude(ln => ln!.Variant)
+                .Include(op => op.OrderPositionForProduction)
                 .Select(dp => new GetProductionOrderPosition
                 {
                     Id = dp.Id,
@@ -111,7 +112,8 @@ namespace LuzyceApi.Repositories
                     QuantityMade = dp.po_QuantityMade,
                     MethodOfPackaging = dp.po_MethodOfPackaging,
                     QuantityPerPack = dp.po_QuantityPerPack,
-                    ProductId = dp.po_SubiektProductId ?? 0
+                    ProductId = dp.po_SubiektProductId ?? 0,
+                    Unit = dp.OrderPositionForProduction!.Unit!
                 })
                 .ToList();
 

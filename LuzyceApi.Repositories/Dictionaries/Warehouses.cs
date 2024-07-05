@@ -2,5 +2,6 @@
 
 public static class Warehouses
 {
-    public const int Produkcja = 2;
+    public const int ProdukcjaId = 2;
+    public const string ProdukcjaCode = "P";
 }

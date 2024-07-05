@@ -2,5 +2,6 @@
 
 public static class DocumentsDefinitions
 {
-    public const int ZlecenieProdukcji = 2;
+    public const int ZlecenieProdukcjiId = 2;
+    public const string ZlecenieProdukcjiCode = "ZP";
 }

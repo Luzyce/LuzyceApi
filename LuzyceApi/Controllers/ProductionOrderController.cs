@@ -43,7 +43,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         var productionOrder = createProductionOrderDto.ToProductionOrderFromCreateDto();
         productionOrder.OperatorId = operatorId;
         
-        var status = productionOrderRepository.SaveProductionOrder(order, productionOrder);
+        var status = productionOrderRepository.SaveProdOrder(order, productionOrder);
         
         if (status == 0)
         {
@@ -57,7 +57,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     [Authorize]
     public IActionResult UpdateProductionOrder(int id, UpdateProductionOrder updateProductionOrderDto)
     {
-        var resp = productionOrderRepository.UpdateProductionOrder(id, updateProductionOrderDto);
+        var resp = productionOrderRepository.UpdateProdOrder(id, updateProductionOrderDto);
         
         if (resp == 0)
         {

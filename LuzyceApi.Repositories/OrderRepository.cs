@@ -1,6 +1,7 @@
 using Luzyce.Core.Models.Order;
 using LuzyceApi.Db.Subiekt.Data;
 using LuzyceApi.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace LuzyceApi.Repositories;
 
@@ -143,10 +144,12 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
         var query = subiektDbContext.TwStans
             .Where(x => productIds.Contains(x.StTowId) && warehouseIds.Contains(x.StMagId))
+            .Include(x => x.StMag)
             .Select(x => new
             {
                 x.StTowId,
                 x.StMagId,
+                x.StMag.MagNazwa,
                 Quantity = (int)x.StStan,
                 QuantityMin = (int)x.StStanMin,
                 QuantityRes = (int)x.StStanRez,
@@ -166,6 +169,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                     WarehouseStocks = g.Select(x => new WarehouseStocks
                     {
                         WarehouseId = x.StMagId,
+                        WarehouseName = x.MagNazwa,
                         Quantity = x.Quantity,
                         QuantityMin = x.QuantityMin,
                         QuantityRes = x.QuantityRes,
@@ -192,6 +196,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                     WarehouseStocks = warehouseIds.Select(warehouseId => new WarehouseStocks
                     {
                         WarehouseId = warehouseId,
+                        WarehouseName = string.Empty,
                         Quantity = 0,
                         QuantityMin = 0,
                         QuantityRes = 0,

@@ -70,14 +70,36 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
 
         modelBuilder.Entity<DocumentsDefinition>().HasData(kwit);
 
-        var open = new Status
+        
+        var statusList = new List<Status>
         {
-            Id = 1,
-            Name = "Otwarty",
-            Priority = 1
+            new Status
+            {
+                Id = 1,
+                Name = "Otwarty",
+                Priority = 10
+            },
+            new Status
+            {
+                Id = 2,
+                Name = "Anulowany",
+                Priority = 20
+            },
+            new Status
+            {
+                Id = 3,
+                Name = "Zamknięty",
+                Priority = 30
+            },
+            new Status
+            {
+                Id = 4,
+                Name = "Anulowany",
+                Priority = 40
+            }
         };
-
-        modelBuilder.Entity<Status>().HasData(open);
+        
+        modelBuilder.Entity<Status>().HasData(statusList);
 
         var magazyn = new Warehouse
         {
@@ -103,7 +125,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
             Status = null!,
-            StatusId = open.Id
+            StatusId = 1
         };
 
         modelBuilder.Entity<Document>().HasData(exampleDocument);
@@ -129,8 +151,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Operator = null!,
             StartTime = DateTime.Now,
             EndTime = null,
-            StatusId = open.Id,
-            Status = null!,
             LampshadeId = 1,
             Lampshade = null!
         };
@@ -288,7 +308,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
             Status = null!,
-            StatusId = open.Id
+            StatusId = 1
         };
         
         modelBuilder.Entity<Document>().HasData(exampleProductionOrder);
@@ -306,8 +326,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Operator = null!,
             StartTime = DateTime.Now,
             EndTime = null,
-            StatusId = open.Id,
-            Status = null!,
             LampshadeId = exampleLampshade.Id,
             Lampshade = null!,
             LampshadeNormId = exampleLampshadeNorm.Id,

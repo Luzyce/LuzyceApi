@@ -13,8 +13,6 @@ public class DocumentPositions
     public User? Operator { get; set; }
     public required DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
-    public int StatusId { get; set; }
-    public Status? Status { get; set; }
     public int LampshadeId { get; set; }
     public Lampshade? Lampshade { get; set; }
     public int? LampshadeNormId { get; set; }

@@ -181,7 +181,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             DocumentId = documentPosition.DocumentId,
             OperatorId = documentPosition.OperatorId,
             StartTime = documentPosition.StartTime,
-            StatusId = 1,
             LampshadeId = documentPosition.LampshadeId
         };
         applicationDbContext.DocumentPositions.Add(dbDocumentPosition);
@@ -199,7 +198,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
                         .Include(d => d.Document)
                         .ThenInclude(d => d!.Operator)
                         .Include(d => d.Operator)
-                        .Include(d => d.Status)
                         .Include(d => d.Lampshade)
                         .FirstOrDefault(x => x.DocumentId == id);
 
@@ -219,7 +217,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             QuantityGross = documentPositions.QuantityGross,
             Operator = UserDomainFromDb(documentPositions.Operator!),
             StartTime = documentPositions.StartTime,
-            Status = StatusDomainFromDb(documentPositions.Status!),
             LampshadeId = documentPositions.LampshadeId,
             Lampshade = LampshadeDomainFromDb(documentPositions.Lampshade!)
         };
@@ -230,7 +227,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         return applicationDbContext.DocumentPositions
             .Include(d => d.Document)
             .Include(d => d.Operator)
-            .Include(d => d.Status)
             .Include(d => d.Lampshade)
             .Where(d => d.DocumentId == documentId)
             .Select(
@@ -244,7 +240,6 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
                     QuantityGross = x.QuantityGross,
                     Operator = UserDomainFromDb(x.Operator!),
                     StartTime = x.StartTime,
-                    Status = StatusDomainFromDb(x.Status!),
                     LampshadeId = x.LampshadeId,
                     Lampshade = LampshadeDomainFromDb(x.Lampshade!)
                 }

@@ -19,6 +19,7 @@ namespace LuzyceApi.Repositories
             return new GetProductionOrdersResponse()
             {
                 ProductionOrders = applicationDbContext.Documents
+                    .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiId)
                     .Include(d => d.Warehouse)
                     .Include(d => d.DocumentsDefinition)
                     .Include(d => d.Operator)
@@ -150,8 +151,151 @@ namespace LuzyceApi.Repositories
                 Positions = positions
             };
         }
+        
+        public GetOrdersPositionsResponse GetPositions()
+        {
+            return new GetOrdersPositionsResponse
+            {
+                OrdersPositions = applicationDbContext.DocumentPositions
+                .Include(dp => dp.Document)
+                .Include(dp => dp.Lampshade)
+                .Include(dp => dp.LampshadeNorm)
+                .ThenInclude(ln => ln!.Variant)
+                .Include(op => op.OrderPositionForProduction)
+                .Where(dp => dp.Document!.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiId && dp.Document.StatusId == 1)
+                .Select(dp => new GetProductionOrderPosition
+                {
+                    Id = dp.Id,
+                    QuantityNetto = dp.QuantityNetto,
+                    QuantityGross = dp.QuantityGross,
+                    ExecutionDate = dp.EndTime,
+                    Lampshade = new GetLampshade
+                    {
+                        Id = dp.Lampshade!.Id,
+                        Code = dp.Lampshade.Code
+                    },
+                    LampshadeNorm = new GetLampshadeNorm()
+                    {
+                        Id = dp.LampshadeNorm!.Id,
+                        Lampshade = new GetLampshade
+                        {
+                            Id = dp.Lampshade.Id,
+                            Code = dp.Lampshade.Code
+                        },
+                        Variant = new GetVariantResponseDto
+                        {
+                            Id = dp.LampshadeNorm.Variant!.Id,
+                            Name = dp.LampshadeNorm.Variant.Name,
+                            ShortName = dp.LampshadeNorm.Variant.ShortName
+                        },
+                        QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0
+                    },
+                    LampshadeDekor = dp.LampshadeDekor,
+                    Remarks = dp.Remarks,
+                    NumberOfChanges = dp.po_NumberOfChanges,
+                    QuantityMade = dp.po_QuantityMade,
+                    MethodOfPackaging = dp.po_MethodOfPackaging,
+                    QuantityPerPack = dp.po_QuantityPerPack,
+                    ProductId = dp.po_SubiektProductId ?? 0,
+                    Unit = dp.OrderPositionForProduction!.Unit!,
+                    ProductionOrderNumber = dp.Document!.Number
+                })
+                .ToList()
+            };
+        }
 
+        public GetProductionOrder? GetProductionOrderByNumber(string number)
+        {
+           var document = applicationDbContext.Documents
+                .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiId && d.Number == number)
+                .Include(d => d.Warehouse)
+                .Include(d => d.DocumentsDefinition)
+                .Include(d => d.Operator)
+                .Include(d => d.Status)
+                .FirstOrDefault();
 
+            if (document == null)
+            {
+                return null;
+            }
+
+            var positions = applicationDbContext.DocumentPositions
+                .Where(dp => dp.DocumentId == document.Id)
+                .Include(dp => dp.Lampshade)
+                .Include(dp => dp.LampshadeNorm)
+                    .ThenInclude(ln => ln!.Variant)
+                .Include(op => op.OrderPositionForProduction)
+                .Select(dp => new GetProductionOrderPosition
+                {
+                    Id = dp.Id,
+                    QuantityNetto = dp.QuantityNetto,
+                    QuantityGross = dp.QuantityGross,
+                    ExecutionDate = dp.EndTime,
+                    Lampshade = new GetLampshade
+                    {
+                        Id = dp.Lampshade!.Id,
+                        Code = dp.Lampshade.Code
+                    },
+                    LampshadeNorm = new GetLampshadeNorm()
+                    {
+                        Id = dp.LampshadeNorm!.Id,
+                        Lampshade = new GetLampshade
+                        {
+                            Id = dp.Lampshade.Id,
+                            Code = dp.Lampshade.Code
+                        },
+                        Variant = new GetVariantResponseDto
+                        {
+                            Id = dp.LampshadeNorm.Variant!.Id,
+                            Name = dp.LampshadeNorm.Variant.Name,
+                            ShortName = dp.LampshadeNorm.Variant.ShortName
+                        },
+                        QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0
+                    },
+                    LampshadeDekor = dp.LampshadeDekor,
+                    Remarks = dp.Remarks,
+                    NumberOfChanges = dp.po_NumberOfChanges,
+                    QuantityMade = dp.po_QuantityMade,
+                    MethodOfPackaging = dp.po_MethodOfPackaging,
+                    QuantityPerPack = dp.po_QuantityPerPack,
+                    ProductId = dp.po_SubiektProductId ?? 0,
+                    Unit = dp.OrderPositionForProduction!.Unit!
+                })
+                .ToList();
+
+            return new GetProductionOrder
+            {
+                Id = document.Id,
+                DocNumber = document.DocNumber,
+                Warehouse = new GetWarehouseResponseDto
+                {
+                    Id = document.Warehouse!.Id,
+                    Code = document.Warehouse.Code
+                },
+                Year = document.Year,
+                Number = document.Number,
+                DocumentsDefinition = new GetDocumentsDefinitionResponseDto
+                {
+                    Id = document.DocumentsDefinition!.Id,
+                    Code = document.DocumentsDefinition.Code
+                },
+                User = new GetUserResponseDto
+                {
+                    Id = document.Operator!.Id,
+                    Name = document.Operator.Name
+                },
+                CreatedAt = document.CreatedAt,
+                UpdatedAt = document.UpdatedAt,
+                ClosedAt = document.ClosedAt,
+                Status = new GetStatusResponseDto
+                {
+                    Id = document.Status!.Id,
+                    Name = document.Status.Name,
+                    Priority = document.Status.Priority
+                },
+                Positions = positions
+            }; 
+        }
         public int SaveProdOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
         {
             using var transaction = applicationDbContext.Database.BeginTransaction();
@@ -291,7 +435,6 @@ namespace LuzyceApi.Repositories
                         QuantityGross = position.Gross,
                         OperatorId = productionOrder.OperatorId,
                         StartTime = DateTime.Now,
-                        StatusId = 1,
                         LampshadeId = lampshade.Id,
                         LampshadeNormId = lampshadeNorms.Id,
                         LampshadeDekor = position.Dekor,

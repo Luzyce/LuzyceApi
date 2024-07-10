@@ -61,14 +61,24 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
 
         modelBuilder.Entity<User>().HasData(adminUser);
 
-        var kwit = new DocumentsDefinition
+        
+        var documentsDefinitionsList = new List<DocumentsDefinition>
         {
-            Id = 1,
-            Code = "KW",
-            Name = "Kwit"
+            new DocumentsDefinition
+            {
+                Id = 1,
+                Code = "KW",
+                Name = "Kwit"
+            },
+            new DocumentsDefinition
+            {
+                Id = 2,
+                Code = "ZP",
+                Name = "Zlecenie Produkcji"
+            }
         };
-
-        modelBuilder.Entity<DocumentsDefinition>().HasData(kwit);
+        
+        modelBuilder.Entity<DocumentsDefinition>().HasData(documentsDefinitionsList);
 
         
         var statusList = new List<Status>
@@ -119,7 +129,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Year = 2023,
             Number = "M/0001/KW/2024",
             DocumentsDefinition = null!,
-            DocumentsDefinitionId = kwit.Id,
+            DocumentsDefinitionId = 1,
             Operator = null!,
             OperatorId = adminUser.Id,
             CreatedAt = DateTime.Now,
@@ -190,15 +200,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
         
         modelBuilder.Entity<OrderPositionForProduction>().HasData(exampleOrderPositionForProduction);
-        
-        var ProductionOrder = new DocumentsDefinition
-        {
-            Id = 2,
-            Code = "ZP",
-            Name = "Zlecenie Produkcji"
-        };
-
-        modelBuilder.Entity<DocumentsDefinition>().HasData(ProductionOrder);
         
         var produkcja = new Warehouse()
         {
@@ -302,7 +303,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Year = 2024,
             Number = "P/0001/ZP/2024",
             DocumentsDefinition = null!,
-            DocumentsDefinitionId = ProductionOrder.Id,
+            DocumentsDefinitionId = 2,
             Operator = null!,
             OperatorId = adminUser.Id,
             CreatedAt = DateTime.Now,
@@ -336,9 +337,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             OrderPositionForProduction = null!,
             po_NumberOfChanges = 1,
             po_QuantityMade = 0,
-            po_MethodOfPackaging = "300x300x110",
-            po_QuantityPerPack = 16,
-            po_SubiektProductId = 2628
+            MethodOfPackaging = "300x300x110",
+            QuantityPerPack = 16,
+            SubiektProductId = 2628
         };
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);

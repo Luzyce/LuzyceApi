@@ -73,6 +73,7 @@ builder.Services.AddScoped<LuzyceApi.Repositories.DocumentRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.OrderRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.ProductionOrderRepository>();
 builder.Services.AddScoped<LuzyceApi.Repositories.LampshadeRepository>();
+builder.Services.AddScoped<LuzyceApi.Repositories.ProductionPriorityRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddDbContext<SubiektDbContext>();

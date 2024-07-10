@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace LuzyceApi.Db.AppDb.Models;
 
 public class DocumentPositions
@@ -23,7 +25,16 @@ public class DocumentPositions
     public OrderPositionForProduction? OrderPositionForProduction { get; set; }
     public int? po_NumberOfChanges { get; set; }
     public int? po_QuantityMade { get; set; }
-    public string? po_MethodOfPackaging { get; set; }
-    public int? po_QuantityPerPack { get; set; }
-    public int? po_SubiektProductId { get; set; }
+    
+    [Column("po_MethodOfPackaging", TypeName = "varchar(100)")]
+    public string? MethodOfPackaging { get; set; }
+    
+    [Column("po_QuantityPerPack")]
+    public int? QuantityPerPack { get; set; }
+    
+    [Column("po_SubiektProductId")]
+    public int? SubiektProductId { get; set; }
+    
+    [Column("po_Priority")]
+    public int? Priority { get; set; }
 }

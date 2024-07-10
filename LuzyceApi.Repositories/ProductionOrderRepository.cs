@@ -198,7 +198,8 @@ namespace LuzyceApi.Repositories
                     QuantityPerPack = dp.po_QuantityPerPack,
                     ProductId = dp.po_SubiektProductId ?? 0,
                     Unit = dp.OrderPositionForProduction!.Unit!,
-                    ProductionOrderNumber = dp.Document!.Number
+                    ProductionOrderNumber = dp.Document!.Number,
+                    Client = dp.OrderPositionForProduction.Order!.CustomerName
                 })
                 .ToList()
             };
@@ -388,7 +389,7 @@ namespace LuzyceApi.Repositories
                     DocNumber = docNumber,
                     WarehouseId = Dictionaries.Warehouses.ProdukcjaId,
                     Year = currentYear,
-                    Number = $"{Dictionaries.Warehouses.ProdukcjaCode}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiCode}",
+                    Number = $"{Dictionaries.Warehouses.ProdukcjaCode}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiCode}/{currentYear}",
                     DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.ZlecenieProdukcjiId,
                     OperatorId = productionOrder.OperatorId,
                     CreatedAt = DateTime.Now,

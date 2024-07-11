@@ -6,6 +6,7 @@ using LuzyceApi.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LuzyceApi.Controllers;
 [Route("api/login")]
@@ -46,8 +47,8 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
     [HttpPost]
     public IActionResult Login([FromBody] LoginDto dto)
     {
-        bool isHashLogin = !string.IsNullOrEmpty(dto.Hash);
-        User? user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
+        var isHashLogin = !string.IsNullOrEmpty(dto.Hash);
+        var user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
 
         if (user == null)
@@ -56,6 +57,27 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         }
 
         var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);
+        return Ok(
+            new LoginResponseDto
+            {
+                Token = tokenString,
+                Result = new GetUserResponseDto { Id = user.Id, Name = user.Name, LastName = user.LastName, Login = user.Login }
+            });
+    }
+    
+    [HttpGet("refreshToken")]
+    [Authorize]
+    public IActionResult RefreshToken()
+    {
+        var user = usersRepository.GetUserById(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"));
+        var ipAddr = User.FindFirstValue(ClaimTypes.Sid);
+        
+        if (user == null || string.IsNullOrEmpty(ipAddr))
+        {
+            return Unauthorized();
+        }
+        
+        var tokenString = generateJSONWebToken(user, ipAddr, false);
         return Ok(
             new LoginResponseDto
             {

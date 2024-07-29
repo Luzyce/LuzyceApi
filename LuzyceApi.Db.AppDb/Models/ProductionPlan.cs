@@ -5,7 +5,7 @@ namespace LuzyceApi.Db.AppDb.Models;
 public class ProductionPlan
 {
     public int Id { get; set; }
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
     [Range(1, 3)]
     public int Change { get; set; }
     [Range(1, 3)]

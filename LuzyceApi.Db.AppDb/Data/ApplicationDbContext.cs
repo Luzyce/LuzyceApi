@@ -345,7 +345,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         var exampleProductionPlan = new ProductionPlan
         {
             Id = 1,
-            Date = DateTime.Now,
+            Date = DateOnly.FromDateTime(DateTime.Now),
             Change = 1,
             Team = 1,
             MetallurgistId = adminUser.Id,

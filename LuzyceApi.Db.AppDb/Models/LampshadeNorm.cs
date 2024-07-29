@@ -8,4 +8,6 @@ public class LampshadeNorm
     public int VariantId { get; set; }
     public LampshadeVariant? Variant { get; set; }
     public int? QuantityPerChange { get; set; }
+    public double? WeightBrutto { get; set; }
+    public double? WeightNetto { get; set; }
 }

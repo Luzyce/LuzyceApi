@@ -23,29 +23,35 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
     public DbSet<Role> Roles { get; set; }
     public DbSet<OrderForProduction> OrdersForProduction { get; set; }
     public DbSet<OrderPositionForProduction> OrderPositionsForProduction { get; set; }
+    public DbSet<ProductionPlan> ProductionPlans { get; set; }
+    public DbSet<ProductionPlanPositions> ProductionPlanPositions { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseMySql(config.GetConnectionString("AppDbConnection"), ServerVersion.AutoDetect(config.GetConnectionString("AppDbConnection")));
+        optionsBuilder
+            .UseMySql(config.GetConnectionString("AppDbConnection"), ServerVersion.AutoDetect(config.GetConnectionString("AppDbConnection")))
+            .UseValidationCheckConstraints(options => options.UseRegex(false));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        var adminRole = new Role
+        
+        var roles = new List<Role>
         {
-            Id = 1,
-            Name = "Admin"
+            new()
+            {
+                Id = 1,
+                Name = "Admin"
+            },
+            new()
+            {
+                Id = 2,
+                Name = "User"
+            }
         };
 
-        var userRole = new Role
-        {
-            Id = 2,
-            Name = "User"
-        };
-
-        modelBuilder.Entity<Role>().HasData(adminRole, userRole);
+        modelBuilder.Entity<Role>().HasData(roles);
 
         var adminUser = new User
         {
@@ -60,17 +66,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<User>().HasData(adminUser);
-
         
         var documentsDefinitionsList = new List<DocumentsDefinition>
         {
-            new DocumentsDefinition
+            new()
             {
                 Id = 1,
                 Code = "KW",
                 Name = "Kwit"
             },
-            new DocumentsDefinition
+            new()
             {
                 Id = 2,
                 Code = "ZP",
@@ -79,29 +84,28 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
         
         modelBuilder.Entity<DocumentsDefinition>().HasData(documentsDefinitionsList);
-
         
         var statusList = new List<Status>
         {
-            new Status
+            new()
             {
                 Id = 1,
                 Name = "Otwarty",
                 Priority = 10
             },
-            new Status
+            new()
             {
                 Id = 2,
                 Name = "Anulowany",
                 Priority = 20
             },
-            new Status
+            new()
             {
                 Id = 3,
                 Name = "Zamknięty",
                 Priority = 30
             },
-            new Status
+            new()
             {
                 Id = 4,
                 Name = "Anulowany",
@@ -111,34 +115,55 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         
         modelBuilder.Entity<Status>().HasData(statusList);
 
-        var magazyn = new Warehouse
+        var warehouseList = new List<Warehouse>
         {
-            Id = 1,
-            Code = "M",
-            Name = "Magazyn"
+            new()
+            {
+                Id = 1,
+                Code = "M",
+                Name = "Magazyn"
+            },
+            new()
+            {
+                Id = 2,
+                Code = "P",
+                Name = "Produkcja"
+            }
         };
-
-        modelBuilder.Entity<Warehouse>().HasData(magazyn);
-
-        var exampleDocument = new Document
+        
+        modelBuilder.Entity<Warehouse>().HasData(warehouseList);
+        
+        var exampleDocumentList = new List<Document>
         {
-            Id = 1,
-            DocNumber = 1,
-            Warehouse = null!,
-            WarehouseId = magazyn.Id,
-            Year = 2023,
-            Number = "M/0001/KW/2024",
-            DocumentsDefinition = null!,
-            DocumentsDefinitionId = 1,
-            Operator = null!,
-            OperatorId = adminUser.Id,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-            Status = null!,
-            StatusId = 1
+            new()
+            {
+                Id = 1,
+                DocNumber = 1,
+                WarehouseId = warehouseList[0].Id,
+                Year = 2023,
+                Number = "M/0001/KW/2024",
+                DocumentsDefinitionId = 1,
+                OperatorId = adminUser.Id,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                StatusId = 1
+            },
+            new()
+            {
+                Id = 2,
+                DocNumber = 1,
+                WarehouseId = warehouseList[1].Id,
+                Year = 2024,
+                Number = "P/0001/ZP/2024",
+                DocumentsDefinitionId = 2,
+                OperatorId = adminUser.Id,
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                StatusId = 1
+            }
         };
-
-        modelBuilder.Entity<Document>().HasData(exampleDocument);
+        
+        modelBuilder.Entity<Document>().HasData(exampleDocumentList);
 
         var exampleLampshade = new Lampshade
         {
@@ -147,25 +172,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<Lampshade>().HasData(exampleLampshade);
-
-        var exampleDocumentPosition = new DocumentPositions
-        {
-            Id = 1,
-            DocumentId = exampleDocument.Id,
-            Document = null!,
-            QuantityNetto = 0,
-            QuantityLoss = 0,
-            QuantityToImprove = 0,
-            QuantityGross = 0,
-            OperatorId = adminUser.Id,
-            Operator = null!,
-            StartTime = DateTime.Now,
-            EndTime = null,
-            LampshadeId = 1,
-            Lampshade = null!
-        };
-
-        modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPosition);
         
         var exampleOrderForProduction = new OrderForProduction()
         {
@@ -179,7 +185,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         
         modelBuilder.Entity<OrderForProduction>().HasData(exampleOrderForProduction);
         
-        var exampleOrderPositionForProduction = new OrderPositionForProduction()
+        var exampleOrderPositionForProduction = new OrderPositionForProduction
         {
             Id = 1,
             OrderId = 1,
@@ -200,79 +206,70 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
         
         modelBuilder.Entity<OrderPositionForProduction>().HasData(exampleOrderPositionForProduction);
-        
-        var produkcja = new Warehouse()
-        {
-            Id = 2,
-            Code = "P",
-            Name = "Produkcja"
-        };
-        
-        modelBuilder.Entity<Warehouse>().HasData(produkcja);
 
         var lampshadeVariants = new List<LampshadeVariant>
         {
-            new LampshadeVariant
+            new()
             {
                 Id = 1,
                 Name = "Opal",
                 ShortName = ""
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 2,
                 Name = "Opal Mat",
                 ShortName = "M"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 3,
                 Name = "Opal Alabaster",
                 ShortName = "AL"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 4,
                 Name = "Opal Falbanka",
                 ShortName = "FA"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 5,
                 Name = "Jasny",
                 ShortName = "J"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 6,
                 Name = "Jasny Kier",
                 ShortName = "J-KR"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 7,
                 Name = "Jasny Pladry",
                 ShortName = "J-PL"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 8,
                 Name = "Jasny Antiko",
                 ShortName = "J-AC"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 9,
                 Name = "Jasny Alabaster",
                 ShortName = "J-AL"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 10,
                 Name = "Jasny Mat",
                 ShortName = "J-M"
             },
-            new LampshadeVariant
+            new()
             {
                 Id = 11,
                 Name = "Jasny Mrożony",
@@ -289,59 +286,85 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Lampshade = null!,
             VariantId = lampshadeVariants[0].Id,
             Variant = null!,
-            QuantityPerChange = 50
+            QuantityPerChange = 50,
+            WeightBrutto = 3,
+            WeightNetto = 0.45
         };
         
         modelBuilder.Entity<LampshadeNorm>().HasData(exampleLampshadeNorm);
-        
-        var exampleProductionOrder = new Document
+
+        var exampleDocumentPositionList = new List<DocumentPositions>
         {
-            Id = 2,
-            DocNumber = 1,
-            Warehouse = null!,
-            WarehouseId = produkcja.Id,
-            Year = 2024,
-            Number = "P/0001/ZP/2024",
-            DocumentsDefinition = null!,
-            DocumentsDefinitionId = 2,
-            Operator = null!,
-            OperatorId = adminUser.Id,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now,
-            Status = null!,
+            new()
+            {
+                Id = 1,
+                DocumentId = exampleDocumentList[0].Id,
+                Document = null!,
+                QuantityNetto = 0,
+                QuantityLoss = 0,
+                QuantityToImprove = 0,
+                QuantityGross = 0,
+                OperatorId = adminUser.Id,
+                Operator = null!,
+                StartTime = DateTime.Now,
+                EndTime = null,
+                LampshadeId = 1,
+                Lampshade = null!
+            },
+            new()
+            {
+                Id = 2,
+                DocumentId = exampleDocumentList[1].Id,
+                Document = null!,
+                QuantityNetto = 0,
+                QuantityLoss = 0,
+                QuantityToImprove = 0,
+                QuantityGross = 0,
+                OperatorId = adminUser.Id,
+                Operator = null!,
+                StartTime = DateTime.Now,
+                EndTime = null,
+                LampshadeId = exampleLampshade.Id,
+                Lampshade = null!,
+                LampshadeNormId = exampleLampshadeNorm.Id,
+                LampshadeNorm = null!,
+                LampshadeDekor = "F",
+                Remarks = "Test",
+                OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
+                OrderPositionForProduction = null!,
+                po_NumberOfChanges = 1,
+                po_QuantityMade = 0,
+                MethodOfPackaging = "300x300x110",
+                QuantityPerPack = 16,
+                SubiektProductId = 2628
+            }
+        };
+        
+        modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPositionList);
+        
+        var exampleProductionPlan = new ProductionPlan
+        {
+            Id = 1,
+            Date = DateTime.Now,
+            Change = 1,
+            Team = 1,
+            MetallurgistId = adminUser.Id,
+            Metallurgist = null!,
             StatusId = 1
         };
         
-        modelBuilder.Entity<Document>().HasData(exampleProductionOrder);
+        modelBuilder.Entity<ProductionPlan>().HasData(exampleProductionPlan);
         
-        var exampleProductionOrderPosition = new DocumentPositions
+        var exampleProductionPlanPosition = new ProductionPlanPositions
         {
-            Id = 2,
-            DocumentId = exampleProductionOrder.Id,
-            Document = null!,
-            QuantityNetto = 0,
-            QuantityLoss = 0,
-            QuantityToImprove = 0,
-            QuantityGross = 0,
-            OperatorId = adminUser.Id,
-            Operator = null!,
-            StartTime = DateTime.Now,
-            EndTime = null,
-            LampshadeId = exampleLampshade.Id,
-            Lampshade = null!,
-            LampshadeNormId = exampleLampshadeNorm.Id,
-            LampshadeNorm = null!,
-            LampshadeDekor = "F",
-            Remarks = "Test",
-            OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
-            OrderPositionForProduction = null!,
-            po_NumberOfChanges = 1,
-            po_QuantityMade = 0,
-            MethodOfPackaging = "300x300x110",
-            QuantityPerPack = 16,
-            SubiektProductId = 2628
+            Id = 1,
+            ProductionPlanId = exampleProductionPlan.Id,
+            ProductionPlan = null!,
+            DocumentPositionId = exampleDocumentPositionList[1].Id,
+            DocumentPosition = null!,
+            NumberOfHours = 8
         };
         
-        modelBuilder.Entity<DocumentPositions>().HasData(exampleProductionOrderPosition);
+        modelBuilder.Entity<ProductionPlanPositions>().HasData(exampleProductionPlanPosition);
     }
 }

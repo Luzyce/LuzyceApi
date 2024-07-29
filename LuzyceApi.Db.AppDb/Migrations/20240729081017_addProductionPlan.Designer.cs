@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240710183502_addPriority")]
-    partial class addPriority
+    [Migration("20240729081017_addProductionPlan")]
+    partial class addProductionPlan
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -78,26 +78,26 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8154),
+                            CreatedAt = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(1906),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8212),
+                            UpdatedAt = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(1965),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8601),
+                            CreatedAt = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(1971),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8609),
+                            UpdatedAt = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(1973),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -236,7 +236,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
                             Remarks = "",
-                            StartTime = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8294)
+                            StartTime = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(2315)
                         },
                         new
                         {
@@ -254,7 +254,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityPerPack = 16,
                             QuantityToImprove = 0,
                             Remarks = "Test",
-                            StartTime = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8637),
+                            StartTime = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(2346),
                             SubiektProductId = 2628,
                             po_NumberOfChanges = 1,
                             po_QuantityMade = 0
@@ -299,7 +299,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DocumentsDefinitions");
+                    b.ToTable("DocumentsDefinitions", t =>
+                        {
+                            t.HasCheckConstraint("CK_DocumentsDefinitions_Code_MinLength", "LENGTH(`Code`) >= 1");
+                        });
 
                     b.HasData(
                         new
@@ -376,6 +379,12 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("VariantId")
                         .HasColumnType("int");
 
+                    b.Property<double?>("WeightBrutto")
+                        .HasColumnType("double");
+
+                    b.Property<double?>("WeightNetto")
+                        .HasColumnType("double");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LampshadeId");
@@ -390,7 +399,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             Id = 1,
                             LampshadeId = 1,
                             QuantityPerChange = 50,
-                            VariantId = 1
+                            VariantId = 1,
+                            WeightBrutto = 3.0,
+                            WeightNetto = 0.45000000000000001
                         });
                 });
 
@@ -554,7 +565,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 7, 10, 20, 35, 1, 714, DateTimeKind.Local).AddTicks(8317),
+                            Date = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(2096),
                             Number = "1"
                         });
                 });
@@ -634,6 +645,85 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             SerialNumber = "1",
                             Symbol = "TEST",
                             Unit = "szt"
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.ProductionPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("Change")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("MetallurgistId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Team")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MetallurgistId");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("ProductionPlans", t =>
+                        {
+                            t.HasCheckConstraint("CK_ProductionPlans_Change_Range", "`Change` BETWEEN 1 AND 3");
+
+                            t.HasCheckConstraint("CK_ProductionPlans_Team_Range", "`Team` BETWEEN 1 AND 3");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Change = 1,
+                            Date = new DateTime(2024, 7, 29, 10, 10, 17, 391, DateTimeKind.Local).AddTicks(2390),
+                            MetallurgistId = 1,
+                            StatusId = 1,
+                            Team = 1
+                        });
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.ProductionPlanPositions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentPositionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfHours")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductionPlanId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentPositionId");
+
+                    b.HasIndex("ProductionPlanId");
+
+                    b.ToTable("ProductionPlanPositions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DocumentPositionId = 2,
+                            NumberOfHours = 8,
+                            ProductionPlanId = 1
                         });
                 });
 
@@ -753,13 +843,13 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 7, 10, 20, 35, 1, 604, DateTimeKind.Local).AddTicks(9060),
+                            CreatedAt = new DateTime(2024, 7, 29, 10, 10, 17, 281, DateTimeKind.Local).AddTicks(1312),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$9WvHkInAyAjvtqHQx3E1VuwOmu8.tHp21pHUqLOKva19DMRKMwUry",
+                            Password = "$2a$11$N0Y5CEfwPshrq2eVG3GKN.ZVEpUYWfNJxCzqPwxoJNcuhMdISn0H.",
                             RoleId = 1
                         });
                 });
@@ -781,7 +871,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Warehouses");
+                    b.ToTable("Warehouses", t =>
+                        {
+                            t.HasCheckConstraint("CK_Warehouses_Code_MinLength", "LENGTH(`Code`) >= 1");
+                        });
 
                     b.HasData(
                         new
@@ -985,6 +1078,44 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.ProductionPlan", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.User", "Metallurgist")
+                        .WithMany()
+                        .HasForeignKey("MetallurgistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Status", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Metallurgist");
+
+                    b.Navigation("Status");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.ProductionPlanPositions", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.DocumentPositions", "DocumentPosition")
+                        .WithMany()
+                        .HasForeignKey("DocumentPositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.ProductionPlan", "ProductionPlan")
+                        .WithMany()
+                        .HasForeignKey("ProductionPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DocumentPosition");
+
+                    b.Navigation("ProductionPlan");
                 });
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.User", b =>

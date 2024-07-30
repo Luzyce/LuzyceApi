@@ -88,10 +88,10 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         .ThenInclude(op => op!.Order)
                 .Select(x => new GetProductionPlanPosition
                 {
-                    Id = x.DocumentPosition!.Id,
+                    Id = x.Id,
                     DocumentPosition = new GetProductionOrderPosition
                     {
-                        Id = x.DocumentPosition.Id,
+                        Id = x.DocumentPosition!.Id,
                         QuantityNetto = x.DocumentPosition.QuantityNetto,
                         QuantityGross = x.DocumentPosition.QuantityGross,
                         ExecutionDate = x.DocumentPosition.EndTime,
@@ -132,5 +132,30 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 })
                 .ToList()
         };
+    }
+    
+    public void DeletePosition(int id)
+    {
+        var position = applicationDbContext.ProductionPlanPositions.FirstOrDefault(x => x.Id == id);
+
+        if (position == null)
+        {
+            return;
+        }
+        
+        var productionPlan = applicationDbContext.ProductionPlans.FirstOrDefault(x => x.Id == position.ProductionPlanId);
+        
+        if (productionPlan == null)
+        {
+            return;
+        }
+        
+        if (applicationDbContext.ProductionPlanPositions.Count(x => x.ProductionPlanId == productionPlan.Id) == 1)
+        {
+            applicationDbContext.ProductionPlans.Remove(productionPlan);
+        }
+        
+        applicationDbContext.ProductionPlanPositions.Remove(position);
+        applicationDbContext.SaveChanges();
     }
 }

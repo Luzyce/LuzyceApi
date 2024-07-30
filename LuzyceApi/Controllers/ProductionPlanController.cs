@@ -30,4 +30,12 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     {
         return Ok(productionPlanRepository.GetProductionPlanPositions(request));
     }
+    
+    [HttpDelete("delPosition/{id:int}")]
+    [Authorize]
+    public IActionResult DeletePosition(int id)
+    {
+        productionPlanRepository.DeletePosition(id);
+        return Ok();
+    }
 }

@@ -15,4 +15,19 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     {
         return Ok(productionPlanRepository.GetProductionPlans(request));
     }
+    
+    [HttpPost("addPositions")]
+    [Authorize]
+    public IActionResult AddPositionsToProductionPlan(AddPositionsToProductionPlan request)
+    {
+        productionPlanRepository.AddPositionsToProductionPlan(request);
+        return Ok();
+    }
+    
+    [HttpPost("getPositions")]
+    [Authorize]
+    public IActionResult GetProductionPlanPositions(GetProductionPlanPositionsRequest request)
+    {
+        return Ok(productionPlanRepository.GetProductionPlanPositions(request));
+    }
 }

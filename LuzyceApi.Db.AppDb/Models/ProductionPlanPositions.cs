@@ -7,5 +7,5 @@ public class ProductionPlanPositions
     public ProductionPlan? ProductionPlan { get; set; }
     public int DocumentPositionId { get; set; }
     public DocumentPositions? DocumentPosition { get; set; }
-    public int NumberOfHours { get; set; }
+    public int? NumberOfHours { get; set; }
 }

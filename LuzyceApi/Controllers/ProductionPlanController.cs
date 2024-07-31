@@ -24,11 +24,11 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
         return Ok();
     }
     
-    [HttpPost("getPositions")]
+    [HttpPost("getProductionPlan")]
     [Authorize]
-    public IActionResult GetProductionPlanPositions(GetProductionPlanPositionsRequest request)
+    public IActionResult GetProductionPlan(GetProductionPlanPositionsRequest request)
     {
-        return Ok(productionPlanRepository.GetProductionPlanPositions(request));
+        return Ok(productionPlanRepository.GetProductionPlan(request));
     }
     
     [HttpDelete("delPosition/{id:int}")]
@@ -36,6 +36,28 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     public IActionResult DeletePosition(int id)
     {
         productionPlanRepository.DeletePosition(id);
+        return Ok();
+    }
+    
+    [HttpGet("getShiftSupervisor")]
+    [Authorize]
+    public IActionResult getShiftSupervisor()
+    {
+        return Ok(productionPlanRepository.ShiftSupervisor());
+    }
+    
+    [HttpGet("headsOfMetallurgicalTeams")]
+    [Authorize]
+    public IActionResult GetHeadsOfMetallurgicalTeams()
+    {
+        return Ok(productionPlanRepository.GetHeadsOfMetallurgicalTeams());
+    }
+    
+    [HttpPut("updateProductionPlan")]
+    [Authorize]
+    public IActionResult UpdatePositions(UpdateProductionPlan request)
+    {
+        productionPlanRepository.UpdateProductionPlan(request);
         return Ok();
     }
 }

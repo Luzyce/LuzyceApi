@@ -17,16 +17,16 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         {
             ProductionPlans = applicationDbContext.ProductionPlans
                 .Where(x => x.Date.Month == request.ProductionPlanDate.Month && x.Date.Year == request.ProductionPlanDate.Year)
-                .Select(x => new GetProductionPlan
+                .Select(x => new GetProductionPlanForCalendar
                 {
                     Id = x.Id,
                     Date = x.Date,
                     Change = x.Change,
                     Team = x.Team,
-                    Metallurgist = x.Metallurgist == null ? null : new GetUserResponseDto
+                    ShiftSupervisor = x.ShiftSupervisor == null ? null : new GetUserResponseDto
                     {
-                        Id = x.Metallurgist.Id,
-                        Name = x.Metallurgist.Name
+                        Id = x.ShiftSupervisor.Id,
+                        Name = x.ShiftSupervisor.Name
                     },
                     Status = x.Status == null ? null : new GetStatusResponseDto
                     {
@@ -70,12 +70,37 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         return 1;
     }
     
-    public GetProductionPlanPositions GetProductionPlanPositions(GetProductionPlanPositionsRequest request)
+    public GetProductionPlan GetProductionPlan(GetProductionPlanPositionsRequest request)
     {
-        return new GetProductionPlanPositions
+        var productionPlan = applicationDbContext.ProductionPlans
+            .Include(x => x.ShiftSupervisor)
+            .Include(x => x.Status)
+            .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Change == request.Change);
+        
+        if (productionPlan == null)
         {
+            return new GetProductionPlan();
+        }
+        
+        return new GetProductionPlan
+        {
+            Id = productionPlan.Id,
+            Date = productionPlan.Date,
+            Change = productionPlan.Change,
+            Team = productionPlan.Team,
+            ShiftSupervisor = productionPlan.ShiftSupervisor == null ? null : new GetUserResponseDto
+            {
+                Id = productionPlan.ShiftSupervisor.Id,
+                Name = productionPlan.ShiftSupervisor.Name,
+                LastName = productionPlan.ShiftSupervisor.LastName
+            },
+            Status = productionPlan.Status == null ? null : new GetStatusResponseDto
+            {
+                Id = productionPlan.Status.Id,
+                Name = productionPlan.Status.Name
+            },
             ProductionPlanPositions = applicationDbContext.ProductionPlanPositions
-                .Where(x => x.ProductionPlan!.Date == request.Date && x.ProductionPlan.Team == request.Team && x.ProductionPlan.Change == request.Change)
+                .Where(x => x.ProductionPlan!.Id == productionPlan.Id)
                 .Include(x => x.DocumentPosition)
                     .ThenInclude(dp => dp!.Document)
                 .Include(x => x.DocumentPosition)
@@ -114,7 +139,9 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                                 Name = x.DocumentPosition.LampshadeNorm.Variant.Name,
                                 ShortName = x.DocumentPosition.LampshadeNorm.Variant.ShortName
                             },
-                            QuantityPerChange = x.DocumentPosition.LampshadeNorm.QuantityPerChange ?? 0
+                            QuantityPerChange = x.DocumentPosition.LampshadeNorm.QuantityPerChange ?? 0,
+                            WeightBrutto = x.DocumentPosition.LampshadeNorm.WeightBrutto,
+                            WeightNetto = x.DocumentPosition.LampshadeNorm.WeightNetto
                         },
                         LampshadeDekor = x.DocumentPosition.LampshadeDekor,
                         Remarks = x.DocumentPosition.Remarks,
@@ -127,6 +154,13 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         ProductionOrderNumber = x.DocumentPosition.Document!.Number,
                         Client = x.DocumentPosition.OrderPositionForProduction.Order!.CustomerName,
                         Priority = x.DocumentPosition.Priority ?? 0
+                    },
+                    HeadsOfMetallurgicalTeamsId = x.HeadsOfMetallurgicalTeamsId,
+                    HeadsOfMetallurgicalTeams = x.HeadsOfMetallurgicalTeams == null ? null : new GetUserResponseDto
+                    {
+                        Id = x.HeadsOfMetallurgicalTeams.Id,
+                        Name = x.HeadsOfMetallurgicalTeams.Name,
+                        LastName = x.HeadsOfMetallurgicalTeams.LastName
                     },
                     NumberOfHours = x.NumberOfHours
                 })
@@ -156,6 +190,66 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         }
         
         applicationDbContext.ProductionPlanPositions.Remove(position);
+        applicationDbContext.SaveChanges();
+    }
+
+    public IEnumerable<GetUserResponseDto> ShiftSupervisor()
+    {
+        return applicationDbContext.Users
+            // .Where(x => x.Role!.Name == "ShiftSupervisor")
+            .Select(x => new GetUserResponseDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                LastName = x.LastName
+            })
+            .ToList();
+    }
+    
+    public IEnumerable<GetUserResponseDto> GetHeadsOfMetallurgicalTeams()
+    {
+        return applicationDbContext.Users
+            // .Where(x => x.Role!.Name == "HeadOfMetallurgicalTeam")
+            .Select(x => new GetUserResponseDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                LastName = x.LastName
+            })
+            .ToList();
+    }
+    
+    public void UpdateProductionPlan(UpdateProductionPlan request)
+    {
+        var productionPlan = applicationDbContext.ProductionPlans
+            .FirstOrDefault(x => x.Id == request.Id);
+        
+        if (productionPlan == null)
+        {
+            return;
+        }
+        
+        productionPlan.ShiftSupervisorId = request.ShiftSupervisorId;
+        
+        foreach (var position in request.ProductionPlanPositions)
+        {
+            var productionPlanPosition = applicationDbContext.ProductionPlanPositions
+                .Include(productionPlanPositions => productionPlanPositions.DocumentPosition!)
+                .ThenInclude(documentPositions => documentPositions.LampshadeNorm!)
+                .FirstOrDefault(x => x.Id == position.Id);
+            
+            if (productionPlanPosition == null)
+            {
+                continue;
+            }
+            
+            productionPlanPosition.HeadsOfMetallurgicalTeamsId = position.GetHeadsOfMetallurgicalTeamsId;
+            productionPlanPosition.NumberOfHours = position.NumberOfHours;
+            productionPlanPosition.DocumentPosition!.LampshadeNorm!.WeightNetto = position.WeightNetto;
+            productionPlanPosition.DocumentPosition!.LampshadeNorm!.WeightBrutto = position.WeightBrutto;
+            productionPlanPosition.DocumentPosition!.LampshadeNorm!.QuantityPerChange = position.QuantityPerChange;
+        }
+        
         applicationDbContext.SaveChanges();
     }
 }

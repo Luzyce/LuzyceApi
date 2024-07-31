@@ -348,8 +348,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Date = DateOnly.FromDateTime(DateTime.Now),
             Change = 1,
             Team = 1,
-            MetallurgistId = adminUser.Id,
-            Metallurgist = null!,
+            ShiftSupervisorId = adminUser.Id,
+            ShiftSupervisor = null!,
             StatusId = 1
         };
         
@@ -362,6 +362,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             ProductionPlan = null!,
             DocumentPositionId = exampleDocumentPositionList[1].Id,
             DocumentPosition = null!,
+            HeadsOfMetallurgicalTeamsId = 1,
+            HeadsOfMetallurgicalTeams = null!,
             NumberOfHours = 8
         };
         

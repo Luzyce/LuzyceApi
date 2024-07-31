@@ -23,7 +23,7 @@ jobs:
             docker container rm luzyceapi
           fi
           if [ $(docker image ls -q luzyceapi:latest) ]; then
-            docker image rm luzyceapi:latest
+            docker image rm -f luzyceapi:latest
           fi
 
       - name: Build and Push Docker image

@@ -15,15 +15,17 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Stop & clean old containers
         run: |
-          if [ $(docker container ls -q -f name=luzyceapi) ]; then
-            docker container stop luzyceapi
-            docker container rm luzyceapi
+          if [ $(docker ps -q -f name=luzyceapi) ]; then
+            docker stop luzyceapi
           fi
-          if [ $(docker image ls -q luzyceapi:latest) ]; then
-            docker image rm -f luzyceapi:latest
+          if [ $(docker ps -aq -f name=luzyceapi) ]; then
+            docker rm luzyceapi
+          fi
+          if [ $(docker images -q luzyceapi:latest) ]; then
+            docker rmi -f luzyceapi:latest
           fi
 
       - name: Build and Push Docker image

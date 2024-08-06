@@ -61,6 +61,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             applicationDbContext.ProductionPlanPositions.Add(new ProductionPlanPositions()
             {
                 ProductionPlanId = productionPlan.Id,
+                Quantity = position.Value,
                 DocumentPositionId = position.Key
             });
         }

@@ -37,4 +37,6 @@ public class DocumentPositions
     
     [Column("po_Priority")]
     public int? Priority { get; set; }
+    
+    public List<ProductionPlanPositions> ProductionPlanPositions { get; set; } = [];
 }

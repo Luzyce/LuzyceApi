@@ -358,6 +358,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         var exampleProductionPlanPosition = new ProductionPlanPositions
         {
             Id = 1,
+            Quantity = 50,
             ProductionPlanId = exampleProductionPlan.Id,
             ProductionPlan = null!,
             DocumentPositionId = exampleDocumentPositionList[1].Id,

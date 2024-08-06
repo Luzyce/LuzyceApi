@@ -160,7 +160,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(dp => dp.Document)
                 .Include(dp => dp.Lampshade)
                 .Include(dp => dp.LampshadeNorm)
-                .ThenInclude(ln => ln!.Variant)
+                    .ThenInclude(ln => ln!.Variant)
                 .Include(op => op.OrderPositionForProduction)
                 .Where(dp => dp.Document!.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && dp.Document.StatusId == 1)
                 .Select(dp => new GetProductionOrderPosition
@@ -168,6 +168,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     Id = dp.Id,
                     QuantityNetto = dp.QuantityNetto,
                     QuantityGross = dp.QuantityGross,
+                    QuantityOnPlans = dp.ProductionPlanPositions.Sum(pp => pp.Quantity),
                     ExecutionDate = dp.EndTime,
                     Lampshade = new GetLampshade
                     {
@@ -182,7 +183,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                             Id = dp.Lampshade.Id,
                             Code = dp.Lampshade.Code
                         },
-                        Variant = new GetVariantResponseDto
+                        Variant = new GetVariantResponseDto 
                         {
                             Id = dp.LampshadeNorm.Variant!.Id,
                             Name = dp.LampshadeNorm.Variant.Name,
@@ -206,7 +207,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .OrderBy(x => x.Priority))
         };
     }
-
+    
     public GetProductionOrder? GetProductionOrderByNumber(string number)
     {
         var document = applicationDbContext.Documents

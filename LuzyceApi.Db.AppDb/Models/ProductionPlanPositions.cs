@@ -3,6 +3,7 @@
 public class ProductionPlanPositions
 {
     public int Id { get; set; }
+    public int Quantity { get; set; }
     public int ProductionPlanId { get; set; }
     public ProductionPlan? ProductionPlan { get; set; }
     public int DocumentPositionId { get; set; }

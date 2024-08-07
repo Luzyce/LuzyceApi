@@ -20,7 +20,13 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     [Authorize]
     public IActionResult AddPositionsToProductionPlan(AddPositionsToProductionPlan request)
     {
-        productionPlanRepository.AddPositionsToProductionPlan(request);
+        var resp = productionPlanRepository.AddPositionsToProductionPlan(request);
+        
+        if (resp == 0)
+        {
+            return Conflict();
+        }
+        
         return Ok();
     }
     

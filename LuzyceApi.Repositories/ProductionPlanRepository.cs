@@ -40,35 +40,102 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     
     public int AddPositionsToProductionPlan(AddPositionsToProductionPlan request)
     {
-        var productionPlan = applicationDbContext.ProductionPlans
-            .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Change == request.Change);
-        
-        if (productionPlan == null)
+        using var transaction = applicationDbContext.Database.BeginTransaction();
+        try
         {
-            productionPlan = new ProductionPlan
+            var productionPlan = applicationDbContext.ProductionPlans
+                .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Change == request.Change);
+                
+            if (productionPlan == null)
             {
-                Date = request.Date,
-                Change = request.Change,
-                Team = request.Team,
-                StatusId = 1
-            };
-            applicationDbContext.ProductionPlans.Add(productionPlan);
+                productionPlan = new ProductionPlan
+                {
+                    Date = request.Date,
+                    Change = request.Change,
+                    Team = request.Team,
+                    StatusId = 1
+                };
+                applicationDbContext.ProductionPlans.Add(productionPlan);
+                applicationDbContext.SaveChanges();
+            }
+                
+            foreach (var position in request.Positions)
+            {
+                var productionPlanPositions = new ProductionPlanPositions
+                {
+                    ProductionPlanId = productionPlan.Id,
+                    Quantity = position.Value,
+                    DocumentPositionId = position.Key
+                };
+                    
+                applicationDbContext.ProductionPlanPositions.Add(productionPlanPositions);
+                    
+                var currentYear = DateTime.Now.Year;
+                var docNumber = applicationDbContext.Documents
+                    .Where(d => d.WarehouseId == Dictionaries.Warehouses.MAG_ID
+                                && d.Year == currentYear
+                                && d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
+                    .Select(d => d.DocNumber)
+                    .ToList()
+                    .DefaultIfEmpty(0)
+                    .Max() + 1;
+                    
+                var kwit = new Document
+                {
+                    DocNumber = docNumber,
+                    WarehouseId = Dictionaries.Warehouses.MAG_ID,
+                    Year = currentYear,
+                    Number = $"{Dictionaries.Warehouses.MAG_CODE}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.KW_CODE}/{currentYear}",
+                    DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.KW_ID,
+                    OperatorId = 1,
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    ClosedAt = null,
+                    StatusId = 1
+                };
+                    
+                applicationDbContext.Documents.Add(kwit);
+                applicationDbContext.SaveChanges();
+                    
+                var documentPosition = applicationDbContext.DocumentPositions
+                    .Include(dp => dp.Document)
+                    .Include(dp => dp.Lampshade)
+                    .Include(dp => dp.LampshadeNorm)
+                    .ThenInclude(ln => ln!.Variant)
+                    .Include(op => op.OrderPositionForProduction)
+                    .FirstOrDefault(dp => dp.Id == position.Key);
+                    
+                if (documentPosition == null)
+                {
+                   transaction.Rollback();
+                   return 0;
+                }
+
+                var newDocumentPosition = new DocumentPositions
+                {
+                    DocumentId = kwit.Id,
+                    OperatorId = documentPosition.OperatorId,
+                    StartTime = DateTime.Now,
+                    LampshadeId = documentPosition.LampshadeId,
+                    LampshadeNormId = documentPosition.LampshadeNormId,
+                    Remarks = documentPosition.Remarks,
+                    OrderPositionForProductionId = documentPosition.OrderPositionForProductionId,
+                    ProductionPlanPositionId = productionPlanPositions.Id
+                };
+                    
+                applicationDbContext.DocumentPositions.Add(newDocumentPosition);
+            }
+                
             applicationDbContext.SaveChanges();
+            transaction.Commit();
+                
+            return 1;
         }
-        
-        foreach (var position in request.Positions)
+        catch (Exception)
         {
-            applicationDbContext.ProductionPlanPositions.Add(new ProductionPlanPositions()
-            {
-                ProductionPlanId = productionPlan.Id,
-                Quantity = position.Value,
-                DocumentPositionId = position.Key
-            });
+            transaction.Rollback();
+            return 0;
         }
-        
-        applicationDbContext.SaveChanges();
-        
-        return 1;
     }
     
     public GetProductionPlan GetProductionPlan(GetProductionPlanPositionsRequest request)
@@ -185,12 +252,28 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             return;
         }
         
+        var documentPosition = applicationDbContext.DocumentPositions.FirstOrDefault(x => x.ProductionPlanPositionId == position.DocumentPositionId);
+        
+        if (documentPosition == null)
+        {
+            return;
+        }
+        
+        var document = applicationDbContext.Documents.FirstOrDefault(x => x.DocumentPositions.Any(dp => dp.Id == documentPosition.Id));
+        
+        if (document == null)
+        {
+            return;
+        }
+        
         if (applicationDbContext.ProductionPlanPositions.Count(x => x.ProductionPlanId == productionPlan.Id) == 1)
         {
             applicationDbContext.ProductionPlans.Remove(productionPlan);
         }
         
         applicationDbContext.ProductionPlanPositions.Remove(position);
+        applicationDbContext.DocumentPositions.Remove(documentPosition);
+        applicationDbContext.Documents.Remove(document);
         applicationDbContext.SaveChanges();
     }
 

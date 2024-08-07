@@ -379,7 +379,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         {
             var currentYear = DateTime.Now.Year;
             var docNumber = applicationDbContext.Documents
-                .Where(d => d.WarehouseId == Dictionaries.Warehouses.P_ID
+                .Where(d => d.WarehouseId == Dictionaries.Warehouses.PROD_ID
                             && d.Year == currentYear
                             && d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID)
                 .Select(d => d.DocNumber)
@@ -390,9 +390,9 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             var document = new Document
             {
                 DocNumber = docNumber,
-                WarehouseId = Dictionaries.Warehouses.P_ID,
+                WarehouseId = Dictionaries.Warehouses.PROD_ID,
                 Year = currentYear,
-                Number = $"{Dictionaries.Warehouses.P_CODE}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.ZP_CODE}/{currentYear}",
+                Number = $"{Dictionaries.Warehouses.PROD_CODE}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.ZP_CODE}/{currentYear}",
                 DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.ZP_ID,
                 OperatorId = productionOrder.OperatorId,
                 CreatedAt = DateTime.Now,

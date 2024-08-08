@@ -2,6 +2,7 @@
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using QRCoder;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -71,38 +72,44 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     }
     
     [HttpGet("kwit-{id:int}.pdf")]
-    public IResult GetZlecenieProdPDF(int id)
+    public IResult GetKwitPdf(int id)
     {
-        // var prodOrder = productionPlanRepository.GetProductionOrder(id);
-        
-        // if (prodOrder == null)
-        // {
-        //     return Results.File(Array.Empty<byte>(), "application/pdf");
-        // }
-        //
+        var kwit = productionPlanRepository.GetKwit(id);
+    
+        if (kwit == null)
+        {
+            return Results.File(Array.Empty<byte>(), "application/pdf");
+        }
+
+        var url = $"http://localhost:5132/api/productionPlan/kwit-{id}.pdf";
+        var qrSVGString = "";
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+        using var qrSVG = new SvgQRCode(qrCodeData);
+        qrSVGString = qrSVG.GetGraphic(100);
+    
         var document = Document.Create(container =>
         {
             container.Page(page =>
             {
                 page.Size(PageSizes.A4);
-                page.Margin(2, Unit.Centimetre);
+                page.Margin(1, Unit.Centimetre);
                 page.PageColor(Colors.White);
                 page.DefaultTextStyle(x => x.FontSize(20));
-
-                // page.Header()
-                //     .Text(prodOrder.Number)
-                //     .SemiBold().FontSize(36);
-
-                page.Content()
-                    .PaddingVertical(1, Unit.Centimetre)
-                    .Column(x =>
+                
+                page.Content().Layers(layers =>
                     {
-                        x.Spacing(20);
+                        layers.Layer()
+                            .AlignRight()
+                            .Width(2, Unit.Centimetre)
+                            .Svg(qrSVGString);
 
-                        x.Item().Text(Placeholders.LoremIpsum());
-                        x.Item().Image(Placeholders.Image(200, 100));
+                        layers.PrimaryLayer()
+                            .Text(kwit.Number)
+                            .SemiBold()
+                            .FontSize(16);
                     });
-
+                
                 page.Footer()
                     .AlignCenter()
                     .Text(x =>
@@ -112,9 +119,10 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                     });
             });
         });
-        
+    
         var pdf = document.GeneratePdf();
-        
+    
         return Results.File(pdf, "application/pdf");
     }
+
 }

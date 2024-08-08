@@ -358,4 +358,99 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         
         applicationDbContext.SaveChanges();
     }
+    
+    public Domain.Models.Document? GetKwit(int id)
+    {
+        var document = applicationDbContext.Documents
+            .Include(d => d.Warehouse)
+            .Include(d => d.Operator)
+            .Include(d => d.Status)
+            .Include(d => d.DocumentsDefinition)
+            .Where(x => x.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
+            .FirstOrDefault(x => x.Id == id);
+
+        if (document == null)
+        {
+            return null;
+        }
+        
+        return new Domain.Models.Document
+        {
+            Id = document.Id,
+            DocNumber = document.DocNumber,
+            Warehouse = WarehouseDomainFromDb(document.Warehouse!),
+            Year = document.Year,
+            Number = document.Number,
+            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition!),
+            Operator = UserDomainFromDb(document.Operator!),
+            CreatedAt = document.CreatedAt,
+            UpdatedAt = document.UpdatedAt,
+            ClosedAt = document.ClosedAt,
+            Status = StatusDomainFromDb(document.Status!)
+        };
+    }
+    
+    private static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
+    {
+        ArgumentNullException.ThrowIfNull(warehouse);
+
+        return new Domain.Models.Warehouse
+        {
+            Id = warehouse.Id,
+            Code = warehouse.Code,
+            Name = warehouse.Name
+        };
+    }
+
+    private static Domain.Models.User UserDomainFromDb(User user)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        return new Domain.Models.User
+        {
+            Id = user.Id,
+            Name = user.Name,
+            LastName = user.LastName,
+            Email = user.Email,
+            Login = user.Login,
+            Password = user.Password,
+            Hash = user.Hash,
+            CreatedAt = user.CreatedAt,
+            RoleId = user.RoleId
+        };
+    }
+    public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
+    {
+        ArgumentNullException.ThrowIfNull(role);
+
+        return new Domain.Models.Role
+        {
+            Id = role.Id,
+            Name = role.Name
+        };
+    }
+
+    private static Domain.Models.Status StatusDomainFromDb(Status status)
+    {
+        ArgumentNullException.ThrowIfNull(status);
+
+        return new Domain.Models.Status
+        {
+            Id = status.Id,
+            Name = status.Name,
+            Priority = status.Priority
+        };
+    }
+
+    private static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
+    {
+        ArgumentNullException.ThrowIfNull(documentsDefinition);
+
+        return new Domain.Models.DocumentsDefinition
+        {
+            Id = documentsDefinition.Id,
+            Code = documentsDefinition.Code,
+            Name = documentsDefinition.Name
+        };
+    }
 }

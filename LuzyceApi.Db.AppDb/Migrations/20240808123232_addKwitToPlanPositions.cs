@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
-    public partial class addNavigationProperty : Migration
+    public partial class addKwitToPlanPositions : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -265,56 +265,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Documents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    DocNumber = table.Column<int>(type: "int", nullable: false),
-                    WarehouseId = table.Column<int>(type: "int", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Number = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DocumentsDefinitionId = table.Column<int>(type: "int", nullable: false),
-                    OperatorId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    LockedBy = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Documents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Documents_DocumentsDefinitions_DocumentsDefinitionId",
-                        column: x => x.DocumentsDefinitionId,
-                        principalTable: "DocumentsDefinitions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Documents_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Documents_Users_OperatorId",
-                        column: x => x.OperatorId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Documents_Warehouses_WarehouseId",
-                        column: x => x.WarehouseId,
-                        principalTable: "Warehouses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "ProductionPlans",
                 columns: table => new
                 {
@@ -346,6 +296,25 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "DocumentItemRelationships",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ParentDocumentId = table.Column<int>(type: "int", nullable: false),
+                    SubordinateDocumentId = table.Column<int>(type: "int", nullable: false),
+                    ParentPositionId = table.Column<int>(type: "int", nullable: false),
+                    SubordinatePositionId = table.Column<int>(type: "int", nullable: false),
+                    NetQuantityParent = table.Column<int>(type: "int", nullable: false),
+                    QuantityLossParent = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentItemRelationships", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "DocumentPositions",
                 columns: table => new
                 {
@@ -372,18 +341,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     po_QuantityPerPack = table.Column<int>(type: "int", nullable: true),
                     po_SubiektProductId = table.Column<int>(type: "int", nullable: true),
-                    po_Priority = table.Column<int>(type: "int", nullable: true),
-                    kw_ProductionPlanPositionId = table.Column<int>(type: "int", nullable: true)
+                    po_Priority = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentPositions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DocumentPositions_Documents_DocumentId",
-                        column: x => x.DocumentId,
-                        principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DocumentPositions_LampshadeNorms_LampshadeNormId",
                         column: x => x.LampshadeNormId,
@@ -404,6 +366,97 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         name: "FK_DocumentPositions_Users_OperatorId",
                         column: x => x.OperatorId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ProductionPlanPositions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    ProductionPlanId = table.Column<int>(type: "int", nullable: false),
+                    DocumentPositionId = table.Column<int>(type: "int", nullable: false),
+                    HeadsOfMetallurgicalTeamsId = table.Column<int>(type: "int", nullable: true),
+                    NumberOfHours = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductionPlanPositions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductionPlanPositions_DocumentPositions_DocumentPositionId",
+                        column: x => x.DocumentPositionId,
+                        principalTable: "DocumentPositions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductionPlanPositions_ProductionPlans_ProductionPlanId",
+                        column: x => x.ProductionPlanId,
+                        principalTable: "ProductionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductionPlanPositions_Users_HeadsOfMetallurgicalTeamsId",
+                        column: x => x.HeadsOfMetallurgicalTeamsId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    DocNumber = table.Column<int>(type: "int", nullable: false),
+                    WarehouseId = table.Column<int>(type: "int", nullable: false),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DocumentsDefinitionId = table.Column<int>(type: "int", nullable: false),
+                    OperatorId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ClosedAt = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    LockedBy = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    kw_ProductionPlanPositionsId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_DocumentsDefinitions_DocumentsDefinitionId",
+                        column: x => x.DocumentsDefinitionId,
+                        principalTable: "DocumentsDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_ProductionPlanPositions_kw_ProductionPlanPositions~",
+                        column: x => x.kw_ProductionPlanPositionsId,
+                        principalTable: "ProductionPlanPositions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Documents_Statuses_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "Statuses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_Users_OperatorId",
+                        column: x => x.OperatorId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -473,84 +526,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.CreateTable(
-                name: "DocumentItemRelationships",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ParentDocumentId = table.Column<int>(type: "int", nullable: false),
-                    SubordinateDocumentId = table.Column<int>(type: "int", nullable: false),
-                    ParentPositionId = table.Column<int>(type: "int", nullable: false),
-                    SubordinatePositionId = table.Column<int>(type: "int", nullable: false),
-                    NetQuantityParent = table.Column<int>(type: "int", nullable: false),
-                    QuantityLossParent = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DocumentItemRelationships", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DocumentItemRelationships_DocumentPositions_ParentPositionId",
-                        column: x => x.ParentPositionId,
-                        principalTable: "DocumentPositions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DocumentItemRelationships_DocumentPositions_SubordinatePosit~",
-                        column: x => x.SubordinatePositionId,
-                        principalTable: "DocumentPositions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DocumentItemRelationships_Documents_ParentDocumentId",
-                        column: x => x.ParentDocumentId,
-                        principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DocumentItemRelationships_Documents_SubordinateDocumentId",
-                        column: x => x.SubordinateDocumentId,
-                        principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ProductionPlanPositions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    ProductionPlanId = table.Column<int>(type: "int", nullable: false),
-                    DocumentPositionId = table.Column<int>(type: "int", nullable: false),
-                    HeadsOfMetallurgicalTeamsId = table.Column<int>(type: "int", nullable: true),
-                    NumberOfHours = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductionPlanPositions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductionPlanPositions_DocumentPositions_DocumentPositionId",
-                        column: x => x.DocumentPositionId,
-                        principalTable: "DocumentPositions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionPlanPositions_ProductionPlans_ProductionPlanId",
-                        column: x => x.ProductionPlanId,
-                        principalTable: "ProductionPlans",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionPlanPositions_Users_HeadsOfMetallurgicalTeamsId",
-                        column: x => x.HeadsOfMetallurgicalTeamsId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.InsertData(
                 table: "DocumentsDefinitions",
                 columns: new[] { "Id", "Code", "Name" },
@@ -586,7 +561,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
                 columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9341), "1" });
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3071), "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -630,29 +605,29 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 8, 7, 15, 8, 4, 765, DateTimeKind.Local).AddTicks(4728), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$mLnoZwPgW6B/a96EpQWBaeXSWEzDQ8zfqQ8iVOhaOsVI7dGe4U01K", 1 });
+                values: new object[] { 1, new DateTime(2024, 8, 8, 14, 32, 31, 615, DateTimeKind.Local).AddTicks(2373), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$IBXReh9ejtGEUypCYXLpb.PfwkqPCX2YqIG4/47cXYaqFmkr1rXVW", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
-                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
+                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9201), 1, 1, null, "M/0001/KW/2024", 1, 1, new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9258), 1, 2023 },
-                    { 2, null, new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9264), 1, 2, null, "P/0001/ZP/2024", 1, 1, new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9266), 2, 2024 }
+                    { 1, null, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2925), 1, 1, null, "M/0001/KW/2024", 1, null, 1, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2984), 1, 2023 },
+                    { 2, null, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2992), 1, 2, null, "P/0001/ZP/2024", 1, null, 1, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2994), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
                 table: "ProductionPlans",
                 columns: new[] { "Id", "Change", "Date", "ShiftSupervisorId", "StatusId", "Team" },
-                values: new object[] { 1, 1, new DateOnly(2024, 8, 7), 1, 1, 1 });
+                values: new object[] { 1, 1, new DateOnly(2024, 8, 8), 1, 1, 1 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "po_MethodOfPackaging", "OperatorId", "OrderPositionForProductionId", "po_Priority", "kw_ProductionPlanPositionId", "QuantityGross", "QuantityLoss", "QuantityNetto", "po_QuantityPerPack", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "po_MethodOfPackaging", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "po_QuantityPerPack", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
                 values: new object[,]
                 {
-                    { 1, 1, null, "", 1, null, null, 1, null, null, null, 0, 0, 0, null, 0, "", new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9574), null, null, null },
-                    { 2, 2, null, "F", 1, 1, "300x300x110", 1, 1, null, null, 0, 0, 0, 16, 0, "Test", new DateTime(2024, 8, 7, 15, 8, 4, 875, DateTimeKind.Local).AddTicks(9658), 2628, 1, 0 }
+                    { 1, 1, null, "", 1, null, null, 1, null, null, 0, 0, 0, null, 0, "", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3367), null, null, null },
+                    { 2, 2, null, "F", 1, 1, "300x300x110", 1, 1, null, 0, 0, 0, 16, 0, "Test", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3395), 2628, 1, 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -719,6 +694,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "IX_Documents_DocumentsDefinitionId",
                 table: "Documents",
                 column: "DocumentsDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_kw_ProductionPlanPositionsId",
+                table: "Documents",
+                column: "kw_ProductionPlanPositionsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_OperatorId",
@@ -799,11 +779,55 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentItemRelationships_DocumentPositions_ParentPositionId",
+                table: "DocumentItemRelationships",
+                column: "ParentPositionId",
+                principalTable: "DocumentPositions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentItemRelationships_DocumentPositions_SubordinatePosit~",
+                table: "DocumentItemRelationships",
+                column: "SubordinatePositionId",
+                principalTable: "DocumentPositions",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentItemRelationships_Documents_ParentDocumentId",
+                table: "DocumentItemRelationships",
+                column: "ParentDocumentId",
+                principalTable: "Documents",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentItemRelationships_Documents_SubordinateDocumentId",
+                table: "DocumentItemRelationships",
+                column: "SubordinateDocumentId",
+                principalTable: "Documents",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DocumentPositions_Documents_DocumentId",
+                table: "DocumentPositions",
+                column: "DocumentId",
+                principalTable: "Documents",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ProductionPlanPositions_DocumentPositions_DocumentPositionId",
+                table: "ProductionPlanPositions");
+
             migrationBuilder.DropTable(
                 name: "DocumentItemRelationships");
 
@@ -814,16 +838,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "Operations");
 
             migrationBuilder.DropTable(
-                name: "ProductionPlanPositions");
-
-            migrationBuilder.DropTable(
                 name: "Errors");
 
             migrationBuilder.DropTable(
                 name: "DocumentPositions");
-
-            migrationBuilder.DropTable(
-                name: "ProductionPlans");
 
             migrationBuilder.DropTable(
                 name: "Documents");
@@ -838,10 +856,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "DocumentsDefinitions");
 
             migrationBuilder.DropTable(
-                name: "Statuses");
-
-            migrationBuilder.DropTable(
-                name: "Users");
+                name: "ProductionPlanPositions");
 
             migrationBuilder.DropTable(
                 name: "Warehouses");
@@ -854,6 +869,15 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrdersForProduction");
+
+            migrationBuilder.DropTable(
+                name: "ProductionPlans");
+
+            migrationBuilder.DropTable(
+                name: "Statuses");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Roles");

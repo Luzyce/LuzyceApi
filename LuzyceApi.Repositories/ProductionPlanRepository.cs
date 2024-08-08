@@ -69,6 +69,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 };
                     
                 applicationDbContext.ProductionPlanPositions.Add(productionPlanPositions);
+                applicationDbContext.SaveChanges();
                     
                 var currentYear = DateTime.Now.Year;
                 var docNumber = applicationDbContext.Documents
@@ -91,7 +92,8 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     ClosedAt = null,
-                    StatusId = 1
+                    StatusId = 1,
+                    ProductionPlanPositionsId = productionPlanPositions.Id
                 };
                     
                 applicationDbContext.Documents.Add(kwit);
@@ -119,8 +121,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                     LampshadeId = documentPosition.LampshadeId,
                     LampshadeNormId = documentPosition.LampshadeNormId,
                     Remarks = documentPosition.Remarks,
-                    OrderPositionForProductionId = documentPosition.OrderPositionForProductionId,
-                    ProductionPlanPositionId = productionPlanPositions.Id
+                    OrderPositionForProductionId = documentPosition.OrderPositionForProductionId
                 };
                     
                 applicationDbContext.DocumentPositions.Add(newDocumentPosition);
@@ -143,7 +144,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         var productionPlan = applicationDbContext.ProductionPlans
             .Include(x => x.ShiftSupervisor)
             .Include(x => x.Status)
-            .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Change == request.Change);
+            .FirstOrDefault(x => x.Date == request.Date && x.Change == request.Change && x.Team == request.Team);
         
         if (productionPlan == null)
         {
@@ -177,8 +178,15 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                     .ThenInclude(dp => dp!.LampshadeNorm)
                         .ThenInclude(ln => ln!.Variant)
                 .Include(x => x.DocumentPosition)
+                    .ThenInclude(dp => dp!.LampshadeNorm)
+                        .ThenInclude(ln => ln!.Lampshade)
+                .Include(x => x.DocumentPosition)
                     .ThenInclude(dp => dp!.OrderPositionForProduction)
                         .ThenInclude(op => op!.Order)
+                .Include(x => x.Kwit)
+                    .ThenInclude(k => k.DocumentPositions)
+                .Include(x => x.HeadsOfMetallurgicalTeams)
+                .ToList()
                 .Select(x => new GetProductionPlanPosition
                 {
                     Id = x.Id,
@@ -230,7 +238,21 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         Name = x.HeadsOfMetallurgicalTeams.Name,
                         LastName = x.HeadsOfMetallurgicalTeams.LastName
                     },
-                    NumberOfHours = x.NumberOfHours
+                    NumberOfHours = x.NumberOfHours,
+                    Kwit = x.Kwit.Count == 0 ? null : new GetDocumentWithPositions
+                    {
+                        Id = x.Kwit.First().Id,
+                        Number = x.Kwit.First().Number,
+                        DocumentPositions = x.Kwit.First().DocumentPositions
+                            .Select(dp => new GetDocumentPositionResponseDto
+                            {
+                                Id = dp.Id,
+                                QuantityNetto = dp.QuantityNetto,
+                                QuantityLoss = dp.QuantityLoss,
+                                QuantityToImprove = dp.QuantityToImprove
+                            })
+                            .ToList()
+                    }
                 })
                 .ToList()
         };
@@ -252,16 +274,16 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             return;
         }
         
-        var documentPosition = applicationDbContext.DocumentPositions.FirstOrDefault(x => x.ProductionPlanPositionId == position.DocumentPositionId);
+        var document = applicationDbContext.Documents.FirstOrDefault(x => x.DocumentPositions.Any(dp => dp.Id == position.Kwit.First().Id));
         
-        if (documentPosition == null)
+        if (document == null)
         {
             return;
         }
         
-        var document = applicationDbContext.Documents.FirstOrDefault(x => x.DocumentPositions.Any(dp => dp.Id == documentPosition.Id));
+        var documentPosition = applicationDbContext.DocumentPositions.FirstOrDefault(x => x.Id == document.DocumentPositions.First().Id);
         
-        if (document == null)
+        if (documentPosition == null)
         {
             return;
         }

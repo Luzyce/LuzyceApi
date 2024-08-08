@@ -11,4 +11,6 @@ public class ProductionPlanPositions
     public int? HeadsOfMetallurgicalTeamsId { get; set; }
     public User? HeadsOfMetallurgicalTeams { get; set; }
     public int? NumberOfHours { get; set; }
+    
+    public List<Document> Kwit { get; set; } = [];
 }

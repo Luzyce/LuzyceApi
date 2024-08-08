@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace LuzyceApi.Db.AppDb.Models;
 
 public class Document
@@ -18,6 +20,10 @@ public class Document
     public int StatusId { get; set; }
     public Status? Status { get; set; }
     public string? LockedBy { get; set; }
+    
+    [Column("kw_ProductionPlanPositionsId")]
+    public int? ProductionPlanPositionsId { get; set; }
+    public ProductionPlanPositions? ProductionPlanPositions { get; set; }
     
     public List<DocumentPositions> DocumentPositions { get; set; } = [];
 }

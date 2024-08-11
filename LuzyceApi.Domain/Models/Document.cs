@@ -17,5 +17,5 @@ public class Document
     public DateTime? ClosedAt { get; set; }
     public int StatusId { get; set; }
     public Status? Status { get; set; }
-    public string? lockedBy { get; set; }
+    public string? LockedBy { get; set; }
 }

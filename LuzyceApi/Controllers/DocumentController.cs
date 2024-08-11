@@ -4,6 +4,7 @@ using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using Luzyce.Core.Models.User;
 
 namespace LuzyceApi.Controllers;
@@ -161,23 +162,25 @@ public class DocumentController(DocumentRepository documentRepository) : Control
             });
     }
 
-    [HttpPost("getByNumber")]
+    [HttpPost("getDocumentByQrCode")]
     [Authorize]
-    public IActionResult GetByNumber([FromBody] GetDocumentByNumberDto dto)
+    public IActionResult GetDocumentByQrCode([FromBody] GetDocumentByQrCodeDto dto)
     {
-        var document = documentRepository.GetDocumentByNumber(dto.Number);
+        var document = documentRepository
+            .GetDocument(Int32.Parse(Regex.Match(dto.Number, "(kwit-(\\d+))").Groups[2].Value));
+        
         if (document == null)
         {
             return NotFound();
         }
-        if (documentRepository.IsDocumentLocked(document.Id) != "")
+        if (documentRepository.IsDocumentLocked(document.Id))
         {
             return Conflict();
         }
 
         documentRepository.LockDocument(document.Id, User.FindFirstValue(ClaimTypes.Sid) ?? "0");
 
-        return Ok(new GetDocumentByNumberResponseDto
+        return Ok(new GetDocumentByQrCodeResponseDto
         {
             Id = document.Id,
             Number = document.Number,
@@ -322,16 +325,18 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         });
     }
 
-    [HttpPut("updateDocumentPositionOnKwit/{id}")]
+    [HttpPut("updateDocumentPositionOnKwit/{id:int}")]
     [Authorize]
     public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwitDto dto)
     {
         var document = documentRepository.GetDocument(id);
-        if (document == null || document.DocumentsDefinition == null || document.DocumentsDefinition.Code != "KW" || (dto.Type.Equals("+") && dto.Type.Equals("-")))
+        
+        if (document?.DocumentsDefinition is not { Code: "KW" } || (dto.Type.Equals("+") && dto.Type.Equals("-")))
         {
             return BadRequest("Invalid request");
         }
-        if (documentRepository.IsDocumentLocked(id) != User.FindFirstValue(ClaimTypes.Sid))
+        
+        if (!documentRepository.IsDocumentLockedByUser(id, User.FindFirstValue(ClaimTypes.Sid)))
         {
             return BadRequest("Document is locked by another user or not locked");
         }
@@ -407,13 +412,9 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     [Authorize]
     public IActionResult CloseDocument(int id)
     {
-        if (documentRepository.IsDocumentLocked(id) == null)
+        if (!documentRepository.IsDocumentLockedByUser(id, User.FindFirstValue(ClaimTypes.Sid)))
         {
-            return BadRequest("Document is not locked");
-        }
-        if (documentRepository.IsDocumentLocked(id) != User.FindFirstValue(ClaimTypes.Sid))
-        {
-            return BadRequest("Document is locked by another user");
+            return BadRequest("Document is not locked or locked by another user");
         }
 
         documentRepository.UnlockDocument(id);

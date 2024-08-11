@@ -58,7 +58,8 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             CreatedAt = document.CreatedAt,
             UpdatedAt = document.UpdatedAt,
             ClosedAt = document.ClosedAt,
-            Status = StatusDomainFromDb(document.Status!)
+            Status = StatusDomainFromDb(document.Status!),
+            LockedBy = document.LockedBy
         };
     }
     public Domain.Models.Document? GetDocumentByNumber(string number)
@@ -163,11 +164,18 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return true;
     }
-    public string IsDocumentLocked(int id)
+    
+    public bool IsDocumentLocked(int id)
     {
         logger.LogInformation("Checking if document is locked");
         var dbDocument = applicationDbContext.Documents.Find(id);
-        return dbDocument?.LockedBy ?? "";
+        return dbDocument?.LockedBy != null;
+    }
+    public bool IsDocumentLockedByUser(int id, string? userId)
+    {
+        logger.LogInformation("Checking if document is locked");
+        var dbDocument = applicationDbContext.Documents.Find(id);
+        return dbDocument?.LockedBy == userId;
     }
     public Domain.Models.DocumentPositions AddDocumentPosition(Domain.Models.DocumentPositions documentPosition)
     {

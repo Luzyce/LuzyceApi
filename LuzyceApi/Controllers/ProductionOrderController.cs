@@ -4,9 +4,6 @@ using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 
 namespace LuzyceApi.Controllers;
 
@@ -35,54 +32,6 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     public IActionResult GetPositions()
     {
         return Ok(productionOrderRepository.GetPositions());
-    }
-    
-    [HttpGet("zlecenieProdukcji-{id:int}.pdf")]
-    public IResult GetZlecenieProdPDF(int id)
-    {
-        var prodOrder = productionOrderRepository.GetProductionOrder(id);
-        
-        if (prodOrder == null)
-        {
-            return Results.File(Array.Empty<byte>(), "application/pdf");
-        }
-        
-        var document = Document.Create(container =>
-        {
-            container.Page(page =>
-            {
-                page.Size(PageSizes.A4);
-                page.Margin(2, Unit.Centimetre);
-                page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(20));
-
-                page.Header()
-                    .Text(prodOrder.Number)
-                    .SemiBold().FontSize(36);
-
-                page.Content()
-                    .PaddingVertical(1, Unit.Centimetre)
-                    .Column(x =>
-                    {
-                        x.Spacing(20);
-
-                        x.Item().Text(Placeholders.LoremIpsum());
-                        x.Item().Image(Placeholders.Image(200, 100));
-                    });
-
-                page.Footer()
-                    .AlignCenter()
-                    .Text(x =>
-                    {
-                        x.Span("Page ");
-                        x.CurrentPageNumber();
-                    });
-            });
-        });
-        
-        var pdf = document.GeneratePdf();
-        
-        return Results.File(pdf, "application/pdf");
     }
     
     [HttpPost("new")]

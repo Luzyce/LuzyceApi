@@ -97,19 +97,34 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                 page.PageColor(Colors.White);
                 page.DefaultTextStyle(x => x.FontSize(20));
 
-                page.Content().Layers(layers =>
+                page.Header().Layers(layers =>
                 {
-                    layers.Layer()
+                    layers.PrimaryLayer()
                         .TranslateX(-1, Unit.Centimetre)
                         .AlignRight()
                         .Width(2, Unit.Centimetre)
                         .Svg(qrSVGString);
 
-                    layers.PrimaryLayer()
+                    layers.Layer()
                         .Text(kwit.Number)
                         .SemiBold()
                         .FontSize(16);
                 });
+                
+                page.Content()
+                    .PaddingVertical(1, Unit.Centimetre)
+                    .Column(x =>
+                    {
+                        x.Spacing(20);
+                
+                        x.Item()
+                            .Text($"Asortyment: {kwit.DocumentPositions[0].Lampshade?.Code} {kwit.DocumentPositions[0].LampshadeNorm?.Variant?.Name} {kwit.DocumentPositions[0].LampshadeDekor}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text($"Ilość: {kwit.ProductionPlanPositions?.Quantity} {kwit.DocumentPositions[0].OrderPositionForProduction?.Unit}")
+                            .FontSize(16);
+                    });
+
             });
         });
 

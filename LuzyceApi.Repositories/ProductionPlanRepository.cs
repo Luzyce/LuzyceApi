@@ -359,35 +359,28 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         applicationDbContext.SaveChanges();
     }
     
-    public Domain.Models.Document? GetKwit(int id)
+    public Document? GetKwit(int id)
     {
         var document = applicationDbContext.Documents
             .Include(d => d.Warehouse)
             .Include(d => d.Operator)
             .Include(d => d.Status)
             .Include(d => d.DocumentsDefinition)
+            .Include(d => d.ProductionPlanPositions)
+            .Include(d => d.DocumentPositions)
+            .ThenInclude(dp => dp.Lampshade)
+            .Include(d => d.DocumentPositions)
+            .ThenInclude(dp => dp.LampshadeNorm)
+            .ThenInclude(ln => ln!.Variant)
+            .Include(d => d.DocumentPositions)
+            .ThenInclude(dp => dp.LampshadeNorm)
+            .ThenInclude(ln => ln!.Lampshade)
+            .Include(d => d.DocumentPositions)
+            .ThenInclude(dp => dp.OrderPositionForProduction)
             .Where(x => x.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
             .FirstOrDefault(x => x.Id == id);
 
-        if (document == null)
-        {
-            return null;
-        }
-        
-        return new Domain.Models.Document
-        {
-            Id = document.Id,
-            DocNumber = document.DocNumber,
-            Warehouse = WarehouseDomainFromDb(document.Warehouse!),
-            Year = document.Year,
-            Number = document.Number,
-            DocumentsDefinition = DocumentsDefinitionDomainFromDb(document.DocumentsDefinition!),
-            Operator = UserDomainFromDb(document.Operator!),
-            CreatedAt = document.CreatedAt,
-            UpdatedAt = document.UpdatedAt,
-            ClosedAt = document.ClosedAt,
-            Status = StatusDomainFromDb(document.Status!)
-        };
+        return document ?? null;
     }
     
     public List<ProductionPlan> GetProductionPlanPdf(DateOnly data)

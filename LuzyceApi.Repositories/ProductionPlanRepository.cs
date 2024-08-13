@@ -390,6 +390,17 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         };
     }
     
+    public List<ProductionPlan> GetProductionPlanPdf(DateOnly data)
+    {
+        return applicationDbContext.ProductionPlans
+            .Include(x => x.ShiftSupervisor)
+            .Include(x => x.Status)
+            .Include(x => x.Positions)
+            .ThenInclude(x => x.Kwit)
+            .Where(x => x.Date == data)
+            .ToList();
+    } 
+    
     private static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
     {
         ArgumentNullException.ThrowIfNull(warehouse);

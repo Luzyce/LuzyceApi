@@ -79,12 +79,13 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             .Include(dp => dp.Lampshade)
             .Include(dp => dp.LampshadeNorm)
             .ThenInclude(ln => ln!.Variant)
-            .Include(op => op.OrderPositionForProduction)
+            .Include(dp => dp.OrderPositionForProduction)
             .Select(dp => new GetProductionOrderPosition
             {
                 Id = dp.Id,
                 QuantityNetto = dp.QuantityNetto,
                 QuantityGross = dp.QuantityGross,
+                QuantityOnPlans = dp.ProductionPlanPositions.Sum(pp => pp.Quantity),
                 ExecutionDate = dp.EndTime,
                 Lampshade = new GetLampshade
                 {
@@ -161,7 +162,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(dp => dp.Lampshade)
                 .Include(dp => dp.LampshadeNorm)
                     .ThenInclude(ln => ln!.Variant)
-                .Include(op => op.OrderPositionForProduction)
+                .Include(dp => dp.OrderPositionForProduction)
                 .Where(dp => dp.Document!.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && dp.Document.StatusId == 1)
                 .Select(dp => new GetProductionOrderPosition
                 {

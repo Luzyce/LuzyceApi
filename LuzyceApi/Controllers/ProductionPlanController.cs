@@ -110,21 +110,22 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                         .SemiBold()
                         .FontSize(16);
                 });
-                
+
                 page.Content()
                     .PaddingVertical(1, Unit.Centimetre)
                     .Column(x =>
                     {
                         x.Spacing(20);
-                
+
                         x.Item()
-                            .Text($"Asortyment: {kwit.DocumentPositions[0].Lampshade?.Code} {kwit.DocumentPositions[0].LampshadeNorm?.Variant?.Name} {kwit.DocumentPositions[0].LampshadeDekor}")
+                            .Text(
+                                $"Asortyment: {kwit.DocumentPositions[0].Lampshade?.Code} {kwit.DocumentPositions[0].LampshadeNorm?.Variant?.Name} {kwit.DocumentPositions[0].LampshadeDekor}")
                             .FontSize(16);
                         x.Item()
-                            .Text($"Ilość: {kwit.ProductionPlanPositions?.Quantity} {kwit.DocumentPositions[0].OrderPositionForProduction?.Unit}")
+                            .Text(
+                                $"Ilość: {kwit.ProductionPlanPositions?.Quantity} {kwit.DocumentPositions[0].OrderPositionForProduction?.Unit}")
                             .FontSize(16);
                     });
-
             });
         });
 
@@ -159,6 +160,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                         {
                             table.ColumnsDefinition(columns =>
                             {
+                                columns.RelativeColumn(0.2f);
                                 columns.RelativeColumn();
                                 columns.RelativeColumn();
                                 columns.RelativeColumn();
@@ -166,14 +168,17 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
                             table.Header(header =>
                             {
-                                header.Cell().Element(CellStyle).Text("Zespół 1");
-                                header.Cell().Element(CellStyle).Text("Zespół 2");
-                                header.Cell().Element(CellStyle).Text("Zespół 3");
+                                header.Cell().Element(CellStyle).Padding(5).Text("").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 1").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 2").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 3").FontSize(16);
                             });
 
-                            for (var y = 1; y <= 3; y++)
+                            for (var x = 1; x <= 3; x++)
                             {
-                                for (var x = 1; x <= 3; x++)
+                                table.Cell().Element(CellStyle).Padding(5).AlignCenter().RotateLeft().Width(90).Text("Zespół " + x).AlignCenter().FontSize(16);;
+                                
+                                for (var y = 1; y <= 3; y++)
                                 {
                                     var plan = productionPlans
                                         .Find(p => p.Team == x && p.Change == y);
@@ -187,16 +192,22 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                             {
                                                 cellText += "\n";
                                             }
+
                                             var position = plan.Positions[i];
-                                            cellText += $"{i + 1}.\nIlość: {position.Quantity}\nKwit: {position.Kwit.First().Number}";
+                                            cellText += $"{i + 1}. " +
+                                                        $"{position.Kwit.First().DocumentPositions.First().Lampshade!.Code} " +
+                                                        $"{position.Kwit.First().DocumentPositions.First().LampshadeNorm!.Variant!.Name} " +
+                                                        $"{position.Kwit.First().DocumentPositions.First().LampshadeDekor}\n" +
+                                                        $"Ilość: {position.Quantity}\n" +
+                                                        $"Kwit: {position.Kwit.First().Number}\n";
                                         }
 
-
-                                        table.Cell().Element(CellStyle).Text(cellText).FontSize(15);
+                                        table.Cell()
+                                            .Element(CellStyle).Padding(5).Text(cellText).FontSize(11);
                                     }
                                     else
                                     {
-                                        table.Cell().Element(CellStyle).Text("-");
+                                        table.Cell().Element(CellStyle).Text("-").AlignCenter();
                                     }
                                 }
                             }
@@ -213,10 +224,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     IContainer CellStyle(IContainer container)
     {
         return container
-            .Padding(5)
             .Border(1)
-            .BorderColor(Colors.Black)
-            .AlignCenter()
-            .AlignMiddle();
+            .BorderColor(Colors.Black);
     }
 }

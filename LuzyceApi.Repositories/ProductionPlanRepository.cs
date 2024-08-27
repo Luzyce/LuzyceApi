@@ -190,6 +190,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 .Select(x => new GetProductionPlanPosition
                 {
                     Id = x.Id,
+                    Quantity = x.Quantity,
                     DocumentPosition = new GetProductionOrderPosition
                     {
                         Id = x.DocumentPosition!.Id,
@@ -349,6 +350,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 continue;
             }
             
+            productionPlanPosition.Quantity = position.Quantity;
             productionPlanPosition.HeadsOfMetallurgicalTeamsId = position.GetHeadsOfMetallurgicalTeamsId;
             productionPlanPosition.NumberOfHours = position.NumberOfHours;
             productionPlanPosition.DocumentPosition!.LampshadeNorm!.WeightNetto = position.WeightNetto;

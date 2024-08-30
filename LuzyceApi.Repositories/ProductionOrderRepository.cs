@@ -501,4 +501,37 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             return 0;
         }
     }
+    
+    public GetNormsResponse GetNorms(GetNorms getNormsRequest)
+    {
+        var norms = new GetNormsResponse();
+        
+        foreach (var norm in getNormsRequest.Norms)
+        {
+            var lampshade = applicationDbContext.Lampshades
+                .FirstOrDefault(l => l.Code == norm.Lampshade);
+            var variant = applicationDbContext.LampshadeVariants
+                .FirstOrDefault(l => l.Name == norm.Variant);
+
+            if (lampshade == null || variant == null)
+            {
+                norms.Norms.Add(new GetNormResponse
+                {
+                    Norm = 0
+                });
+                continue;
+            }
+
+            var lampshadeNorms = applicationDbContext.LampshadeNorms
+                .FirstOrDefault(l => l.LampshadeId == lampshade.Id
+                                     && l.VariantId == variant.Id);
+
+            norms.Norms.Add(new GetNormResponse
+            {
+                Norm = lampshadeNorms?.QuantityPerChange ?? 0
+            });
+        }
+        
+        return norms;
+    }
 }

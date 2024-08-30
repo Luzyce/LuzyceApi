@@ -73,4 +73,11 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         return Ok();
     }
+    
+    [HttpPost("getNorms")]
+    [Authorize]
+    public IActionResult GetNorms(GetNorms getNorms)
+    {
+        return Ok(productionOrderRepository.GetNorms(getNorms));
+    }
 }

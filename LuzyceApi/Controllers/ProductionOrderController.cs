@@ -52,12 +52,12 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         var status = productionOrderRepository.SaveProdOrder(order, productionOrder);
         
-        if (status == 0)
+        if (status == null)
         {
             return Conflict();
         }
         
-        return Ok();
+        return Ok(status);
     }
     
     [HttpPost("update/{id:int}")]

@@ -301,7 +301,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             Positions = positions
         }; 
     }
-    public int SaveProdOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
+    public int? SaveProdOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
     {
         using var transaction = applicationDbContext.Database.BeginTransaction();
 
@@ -328,7 +328,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
 
             foreach (var position in order.Positions)
             {
-                var lampshadeCode = Regex.Match(position.Symbol, @"^[A-Z]{2}\d{4}").Value;
+                var lampshadeCode = Regex.Match(position.Symbol, @"^[A-Z]{2}\d{3,4}").Value;
 
                 var lampshade = applicationDbContext.Lampshades
                     .FirstOrDefault(l => l.Code == lampshadeCode);
@@ -370,11 +370,11 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         catch
         {
             transaction.Rollback();
-            return 0;
+            return null;
         }
     }
 
-    private int CreateProdOrder(Domain.Models.ProductionOrder productionOrder, IDbContextTransaction transaction)
+    private int? CreateProdOrder(Domain.Models.ProductionOrder productionOrder, IDbContextTransaction transaction)
     {
         try
         {
@@ -415,7 +415,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 if (lampshade == null || variant == null)
                 {
                     transaction.Rollback();
-                    return 0;
+                    return null;
                 }
                     
                 var lampshadeNorms = applicationDbContext.LampshadeNorms
@@ -452,12 +452,12 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             applicationDbContext.SaveChanges();
 
             transaction.Commit();
-            return 1;
+            return document.Id;
         }
         catch
         {
             transaction.Rollback();
-            return 0;
+            return null;
         }
     }
 

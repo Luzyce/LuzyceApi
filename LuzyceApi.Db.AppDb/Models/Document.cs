@@ -21,6 +21,10 @@ public class Document
     public Status? Status { get; set; }
     public string? LockedBy { get; set; }
     
+    [Column("po_OrderId")]
+    public int? OrderId { get; set; }
+    public OrderForProduction? Order { get; set; }
+    
     [Column("kw_ProductionPlanPositionsId")]
     public int? ProductionPlanPositionsId { get; set; }
     public ProductionPlanPositions? ProductionPlanPositions { get; set; }

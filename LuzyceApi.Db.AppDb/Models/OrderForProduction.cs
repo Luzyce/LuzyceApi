@@ -8,4 +8,5 @@ public class OrderForProduction
     public int CustomerId { get; set; }
     public string CustomerSymbol { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
+    public DateTime? DeliveryDate { get; set; }
 }

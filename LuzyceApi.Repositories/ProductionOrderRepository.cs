@@ -16,7 +16,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
 
     public GetProductionOrdersResponse GetProductionOrders()
     {
-        return new GetProductionOrdersResponse()
+        return new GetProductionOrdersResponse
         {
             ProductionOrders = applicationDbContext.Documents
                 .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID)
@@ -24,30 +24,16 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(d => d.DocumentsDefinition)
                 .Include(d => d.Operator)
                 .Include(d => d.Status)
-                .Select(d => new GetProductionOrder
+                .Include(d => d.Order)
+                .Select(d => new GetProductionOrderForList
                 {
                     Id = d.Id,
-                    DocNumber = d.DocNumber,
-                    Warehouse = new GetWarehouseResponseDto
-                    {
-                        Id = d.Warehouse!.Id,
-                        Code = d.Warehouse.Code
-                    },
-                    Year = d.Year,
-                    Number = d.Number,
-                    DocumentsDefinition = new GetDocumentsDefinitionResponseDto
-                    {
-                        Id = d.DocumentsDefinition!.Id,
-                        Code = d.DocumentsDefinition.Code
-                    },
-                    User = new GetUserResponseDto
-                    {
-                        Id = d.Operator!.Id,
-                        Name = d.Operator.Name
-                    },
-                    CreatedAt = d.CreatedAt,
-                    UpdatedAt = d.UpdatedAt,
-                    ClosedAt = d.ClosedAt,
+                    OrderDate = d.CreatedAt,
+                    OrderNumber = d.Number,
+                    CustomerName = d.Order!.CustomerName,
+                    ProdOrderDate = d.CreatedAt,
+                    ProdOrderNumber = d.Number,
+                    DeliveryDate = d.Order!.DeliveryDate,
                     Status = new GetStatusResponseDto
                     {
                         Id = d.Status!.Id,
@@ -312,7 +298,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
 
             if (existingOrder != null)
             {
-                return CreateProdOrder(productionOrder, transaction);
+                return CreateProdOrder(productionOrder, order.Id, transaction);
             }
 
             var orderForProduction = new OrderForProduction
@@ -322,7 +308,8 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 Number = order.Number,
                 CustomerId = order.CustomerId,
                 CustomerSymbol = order.CustomerSymbol,
-                CustomerName = order.CustomerName
+                CustomerName = order.CustomerName,
+                DeliveryDate = order.DeliveryDate
             };
             applicationDbContext.OrdersForProduction.Add(orderForProduction);
 
@@ -365,7 +352,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
 
             applicationDbContext.SaveChanges();
 
-            return CreateProdOrder(productionOrder, transaction);
+            return CreateProdOrder(productionOrder, order.Id, transaction);
         }
         catch
         {
@@ -374,7 +361,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         }
     }
 
-    private int? CreateProdOrder(Domain.Models.ProductionOrder productionOrder, IDbContextTransaction transaction)
+    private int? CreateProdOrder(Domain.Models.ProductionOrder productionOrder, int OrderId, IDbContextTransaction transaction)
     {
         try
         {
@@ -399,7 +386,8 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 ClosedAt = null,
-                StatusId = 1
+                StatusId = 1,
+                OrderId = OrderId
             };
                 
             applicationDbContext.Documents.Add(document);

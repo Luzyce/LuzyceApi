@@ -15,6 +15,7 @@ public static class ProductionOrderMappers
             CustomerId = dto.Order.CustomerId,
             CustomerSymbol = dto.Order.CustomerSymbol,
             CustomerName = dto.Order.CustomerName,
+            DeliveryDate = dto.Order.DeliveryDate,
             Positions = dto.Order.Positions.Select(x => new OrderPosition
             {
                 Id = x.Id,

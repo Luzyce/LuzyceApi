@@ -30,6 +30,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
                 CustomerId = x.CustomerId,
                 CustomerSymbol = x.CustomerSymbol,
                 CustomerName = x.CustomerName,
+                DeliveryDate = x.DeliveryDate,
                 Positions = x.Positions.Select(y => new GetOrderPositionResponseDto
                 {
                     Id = y.Id,

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
-    public partial class addKwitToPlanPositions : Migration
+    public partial class addDeliveryDate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -99,7 +99,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     CustomerSymbol = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CustomerName = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DeliveryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -425,6 +426,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     LockedBy = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    po_OrderId = table.Column<int>(type: "int", nullable: true),
                     kw_ProductionPlanPositionsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -436,6 +438,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalTable: "DocumentsDefinitions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_OrdersForProduction_po_OrderId",
+                        column: x => x.po_OrderId,
+                        principalTable: "OrdersForProduction",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Documents_ProductionPlanPositions_kw_ProductionPlanPositions~",
                         column: x => x.kw_ProductionPlanPositionsId,
@@ -560,8 +567,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
-                columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3071), "1" });
+                columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "DeliveryDate", "Number" },
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(8907), null, "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -605,29 +612,29 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 8, 8, 14, 32, 31, 615, DateTimeKind.Local).AddTicks(2373), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$IBXReh9ejtGEUypCYXLpb.PfwkqPCX2YqIG4/47cXYaqFmkr1rXVW", 1 });
+                values: new object[] { 1, new DateTime(2024, 8, 30, 13, 4, 13, 610, DateTimeKind.Local).AddTicks(6043), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$.cGN4GdadphLQ834H2HgTuuRqeSztkqhoBnrw9n7W.vUmk5VMt89e", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
-                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
+                columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "po_OrderId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2925), 1, 1, null, "M/0001/KW/2024", 1, null, 1, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2984), 1, 2023 },
-                    { 2, null, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2992), 1, 2, null, "P/0001/ZP/2024", 1, null, 1, new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(2994), 2, 2024 }
+                    { 1, null, new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(8719), 1, 1, null, "M/0001/KW/2024", 1, null, null, 1, new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(8778), 1, 2023 },
+                    { 2, null, new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(8845), 1, 2, null, "P/0001/ZP/2024", 1, null, null, 1, new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(8847), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
                 table: "ProductionPlans",
                 columns: new[] { "Id", "Change", "Date", "ShiftSupervisorId", "StatusId", "Team" },
-                values: new object[] { 1, 1, new DateOnly(2024, 8, 8), 1, 1, 1 });
+                values: new object[] { 1, 1, new DateOnly(2024, 8, 30), 1, 1, 1 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "po_MethodOfPackaging", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "po_QuantityPerPack", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
                 values: new object[,]
                 {
-                    { 1, 1, null, "", 1, null, null, 1, null, null, 0, 0, 0, null, 0, "", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3367), null, null, null },
-                    { 2, 2, null, "F", 1, 1, "300x300x110", 1, 1, null, 0, 0, 0, 16, 0, "Test", new DateTime(2024, 8, 8, 14, 32, 31, 723, DateTimeKind.Local).AddTicks(3395), 2628, 1, 0 }
+                    { 1, 1, null, "", 1, null, null, 1, null, null, 0, 0, 0, null, 0, "", new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(9050), null, null, null },
+                    { 2, 2, null, "F", 1, 1, "300x300x110", 1, 1, null, 0, 0, 0, 16, 0, "Test", new DateTime(2024, 8, 30, 13, 4, 13, 718, DateTimeKind.Local).AddTicks(9074), 2628, 1, 0 }
                 });
 
             migrationBuilder.InsertData(
@@ -704,6 +711,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "IX_Documents_OperatorId",
                 table: "Documents",
                 column: "OperatorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_po_OrderId",
+                table: "Documents",
+                column: "po_OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_StatusId",

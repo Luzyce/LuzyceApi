@@ -38,6 +38,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 temp.d.DokId,
                 temp.d.DokDataWyst,
                 temp.d.DokNrPelny,
+                temp.d.DokTerminRealizacji,
                 temp.k.KhId,
                 temp.k.KhSymbol,
                 temp.o.AdrhNazwaPelna
@@ -50,6 +51,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 CustomerId = group.Key.KhId,
                 CustomerSymbol = group.Key.KhSymbol,
                 CustomerName = group.Key.AdrhNazwaPelna,
+                DeliveryDate = group.Key.DokTerminRealizacji,
                 Positions = group.Where(x => x.pozycja != null && x.towar != null)
                              .Select(x => new OrderPosition
                              {

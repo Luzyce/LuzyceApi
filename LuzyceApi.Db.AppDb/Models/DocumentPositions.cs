@@ -23,7 +23,7 @@ public class DocumentPositions
     public string Remarks { get; set; } = string.Empty;
     public int? OrderPositionForProductionId { get; set; }
     public OrderPositionForProduction? OrderPositionForProduction { get; set; }
-    public int? po_NumberOfChanges { get; set; }
+    public decimal? po_NumberOfChanges { get; set; }
     public int? po_QuantityMade { get; set; }
     
     [Column("po_MethodOfPackaging", TypeName = "varchar(100)")]

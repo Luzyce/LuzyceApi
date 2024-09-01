@@ -74,10 +74,26 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         return Ok();
     }
     
+    [HttpPost("updateRemark/{id:int}")]
+    [Authorize]
+    public IActionResult UpdateRemark(int id, UpdateRemark updateRemark)
+    {
+        var resp = productionOrderRepository.UpdateRemark(id, updateRemark);
+        
+        if (resp == 0)
+        {
+            return Conflict();
+        }
+        
+        return Ok();
+    }
+    
+    
     [HttpPost("getNorms")]
     [Authorize]
     public IActionResult GetNorms(GetNorms getNorms)
     {
         return Ok(productionOrderRepository.GetNorms(getNorms));
     }
+    
 }

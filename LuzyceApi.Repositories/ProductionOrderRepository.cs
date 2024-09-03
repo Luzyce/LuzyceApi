@@ -92,14 +92,14 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                         Name = dp.LampshadeNorm.Variant.Name,
                         ShortName = dp.LampshadeNorm.Variant.ShortName
                     },
-                    QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0
+                    QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0,
+                    MethodOfPackaging = dp.LampshadeNorm.MethodOfPackaging,
+                    QuantityPerPack = dp.LampshadeNorm.QuantityPerPack ?? 0,
                 },
                 LampshadeDekor = dp.LampshadeDekor,
                 Remarks = dp.Remarks,
                 NumberOfChanges = dp.po_NumberOfChanges,
                 QuantityMade = dp.po_QuantityMade,
-                MethodOfPackaging = dp.MethodOfPackaging,
-                QuantityPerPack = dp.QuantityPerPack,
                 ProductId = dp.SubiektProductId ?? 0,
                 Unit = dp.OrderPositionForProduction!.Unit!
             })
@@ -162,7 +162,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                         Id = dp.Lampshade!.Id,
                         Code = dp.Lampshade.Code
                     },
-                    LampshadeNorm = new GetLampshadeNorm()
+                    LampshadeNorm = new GetLampshadeNorm
                     {
                         Id = dp.LampshadeNorm!.Id,
                         Lampshade = new GetLampshade
@@ -176,14 +176,14 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                             Name = dp.LampshadeNorm.Variant.Name,
                             ShortName = dp.LampshadeNorm.Variant.ShortName
                         },
-                        QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0
+                        QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0,
+                        MethodOfPackaging = dp.LampshadeNorm.MethodOfPackaging,
+                        QuantityPerPack = dp.LampshadeNorm.QuantityPerPack ?? 0
                     },
                     LampshadeDekor = dp.LampshadeDekor,
                     Remarks = dp.Remarks,
                     NumberOfChanges = dp.po_NumberOfChanges,
                     QuantityMade = dp.po_QuantityMade,
-                    MethodOfPackaging = dp.MethodOfPackaging,
-                    QuantityPerPack = dp.QuantityPerPack,
                     ProductId = dp.SubiektProductId ?? 0,
                     Unit = dp.OrderPositionForProduction!.Unit!,
                     ProductionOrderNumber = dp.Document!.Number,
@@ -241,14 +241,14 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                         Name = dp.LampshadeNorm.Variant.Name,
                         ShortName = dp.LampshadeNorm.Variant.ShortName
                     },
-                    QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0
+                    QuantityPerChange = dp.LampshadeNorm.QuantityPerChange ?? 0,
+                    MethodOfPackaging = dp.LampshadeNorm.MethodOfPackaging,
+                    QuantityPerPack = dp.LampshadeNorm.QuantityPerPack ?? 0,
                 },
                 LampshadeDekor = dp.LampshadeDekor,
                 Remarks = dp.Remarks,
                 NumberOfChanges = dp.po_NumberOfChanges,
                 QuantityMade = dp.po_QuantityMade,
-                MethodOfPackaging = dp.MethodOfPackaging,
-                QuantityPerPack = dp.QuantityPerPack,
                 ProductId = dp.SubiektProductId ?? 0,
                 Unit = dp.OrderPositionForProduction!.Unit!
             })
@@ -470,11 +470,11 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 existingPosition.QuantityNetto = position.QuantityNetto;
                 existingPosition.po_NumberOfChanges = position.NumberOfChanges;
                 existingPosition.LampshadeNorm.QuantityPerChange = position.QuantityPerChange;
+                existingPosition.LampshadeNorm.MethodOfPackaging = position.MethodOfPackaging;
+                existingPosition.LampshadeNorm.QuantityPerPack = position.QuantityPerPack;
                 existingPosition.EndTime = position.ExecutionDate;
                 existingPosition.po_QuantityMade = position.QuantityMade;
                 existingPosition.Remarks = position.Remarks;
-                existingPosition.MethodOfPackaging = position.MethodOfPackaging;
-                existingPosition.QuantityPerPack = position.QuantityPerPack;
             }
 
             applicationDbContext.SaveChanges();

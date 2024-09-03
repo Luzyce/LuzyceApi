@@ -26,12 +26,6 @@ public class DocumentPositions
     public decimal? po_NumberOfChanges { get; set; }
     public int? po_QuantityMade { get; set; }
     
-    [Column("po_MethodOfPackaging", TypeName = "varchar(100)")]
-    public string? MethodOfPackaging { get; set; }
-    
-    [Column("po_QuantityPerPack")]
-    public int? QuantityPerPack { get; set; }
-    
     [Column("po_SubiektProductId")]
     public int? SubiektProductId { get; set; }
     

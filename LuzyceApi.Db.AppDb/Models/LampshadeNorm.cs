@@ -10,4 +10,6 @@ public class LampshadeNorm
     public int? QuantityPerChange { get; set; }
     public double? WeightBrutto { get; set; }
     public double? WeightNetto { get; set; }
+    public string? MethodOfPackaging { get; set; }
+    public int? QuantityPerPack { get; set; }
 }

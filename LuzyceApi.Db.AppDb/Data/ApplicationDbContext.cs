@@ -288,7 +288,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Variant = null!,
             QuantityPerChange = 50,
             WeightBrutto = 3,
-            WeightNetto = 0.45
+            WeightNetto = 0.45,
+            MethodOfPackaging = "300x300x110",
+            QuantityPerPack = 16
         };
         
         modelBuilder.Entity<LampshadeNorm>().HasData(exampleLampshadeNorm);
@@ -334,8 +336,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 OrderPositionForProduction = null!,
                 po_NumberOfChanges = 1,
                 po_QuantityMade = 0,
-                MethodOfPackaging = "300x300x110",
-                QuantityPerPack = 16,
                 SubiektProductId = 2628
             }
         };

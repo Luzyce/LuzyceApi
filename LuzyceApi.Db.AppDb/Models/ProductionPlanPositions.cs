@@ -8,8 +8,6 @@ public class ProductionPlanPositions
     public ProductionPlan? ProductionPlan { get; set; }
     public int DocumentPositionId { get; set; }
     public DocumentPositions? DocumentPosition { get; set; }
-    public int? HeadsOfMetallurgicalTeamsId { get; set; }
-    public User? HeadsOfMetallurgicalTeams { get; set; }
     public int? NumberOfHours { get; set; }
     
     public List<Document> Kwit { get; set; } = [];

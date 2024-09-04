@@ -25,6 +25,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
     public DbSet<OrderPositionForProduction> OrderPositionsForProduction { get; set; }
     public DbSet<ProductionPlan> ProductionPlans { get; set; }
     public DbSet<ProductionPlanPositions> ProductionPlanPositions { get; set; }
+    public DbSet<Shift> Shifts { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -342,15 +343,26 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         
         modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPositionList);
         
+        var exampleShift = new Shift
+        {
+            Id = 1,
+            Date = DateOnly.FromDateTime(DateTime.Now),
+            ShiftNumber = 1,
+            ShiftSupervisorId = adminUser.Id,
+            ShiftSupervisor = null!
+        };
+        
+        modelBuilder.Entity<Shift>().HasData(exampleShift);
+        
         var exampleProductionPlan = new ProductionPlan
         {
             Id = 1,
             Date = DateOnly.FromDateTime(DateTime.Now),
-            Change = 1,
+            ShiftId = 1,
             Team = 1,
-            ShiftSupervisorId = adminUser.Id,
-            ShiftSupervisor = null!,
-            StatusId = 1
+            StatusId = 1,
+            HeadsOfMetallurgicalTeamsId = 1,
+            HeadsOfMetallurgicalTeams = null!
         };
         
         modelBuilder.Entity<ProductionPlan>().HasData(exampleProductionPlan);
@@ -363,8 +375,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             ProductionPlan = null!,
             DocumentPositionId = exampleDocumentPositionList[1].Id,
             DocumentPosition = null!,
-            HeadsOfMetallurgicalTeamsId = 1,
-            HeadsOfMetallurgicalTeams = null!,
             NumberOfHours = 8
         };
         

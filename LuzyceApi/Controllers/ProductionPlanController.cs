@@ -181,7 +181,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                 for (var y = 1; y <= 3; y++)
                                 {
                                     var plan = productionPlans
-                                        .Find(p => p.Team == x && p.Change == y);
+                                        .Find(p => p.Team == x && p.Shift!.ShiftNumber == y);
 
                                     if (plan != null)
                                     {

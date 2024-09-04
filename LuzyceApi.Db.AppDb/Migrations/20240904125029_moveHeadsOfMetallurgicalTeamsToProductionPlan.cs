@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
-    public partial class addToNorms : Migration
+    public partial class moveHeadsOfMetallurgicalTeamsToProductionPlan : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -269,22 +269,48 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Shifts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    ShiftNumber = table.Column<int>(type: "int", nullable: false),
+                    ShiftSupervisorId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Shifts", x => x.Id);
+                    table.CheckConstraint("CK_Shifts_ShiftNumber_Range", "`ShiftNumber` BETWEEN 1 AND 3");
+                    table.ForeignKey(
+                        name: "FK_Shifts_Users_ShiftSupervisorId",
+                        column: x => x.ShiftSupervisorId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "ProductionPlans",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    Change = table.Column<int>(type: "int", nullable: false),
+                    ShiftId = table.Column<int>(type: "int", nullable: true),
                     Team = table.Column<int>(type: "int", nullable: false),
-                    ShiftSupervisorId = table.Column<int>(type: "int", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false)
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    HeadsOfMetallurgicalTeamsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductionPlans", x => x.Id);
-                    table.CheckConstraint("CK_ProductionPlans_Change_Range", "`Change` BETWEEN 1 AND 3");
                     table.CheckConstraint("CK_ProductionPlans_Team_Range", "`Team` BETWEEN 1 AND 3");
+                    table.ForeignKey(
+                        name: "FK_ProductionPlans_Shifts_ShiftId",
+                        column: x => x.ShiftId,
+                        principalTable: "Shifts",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionPlans_Statuses_StatusId",
                         column: x => x.StatusId,
@@ -292,8 +318,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductionPlans_Users_ShiftSupervisorId",
-                        column: x => x.ShiftSupervisorId,
+                        name: "FK_ProductionPlans_Users_HeadsOfMetallurgicalTeamsId",
+                        column: x => x.HeadsOfMetallurgicalTeamsId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 })
@@ -381,7 +407,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     ProductionPlanId = table.Column<int>(type: "int", nullable: false),
                     DocumentPositionId = table.Column<int>(type: "int", nullable: false),
-                    HeadsOfMetallurgicalTeamsId = table.Column<int>(type: "int", nullable: true),
                     NumberOfHours = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -399,11 +424,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         principalTable: "ProductionPlans",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionPlanPositions_Users_HeadsOfMetallurgicalTeamsId",
-                        column: x => x.HeadsOfMetallurgicalTeamsId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -568,7 +588,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "OrdersForProduction",
                 columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "DeliveryDate", "Number" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(1011), null, "1" });
+                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4328), null, "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -612,35 +632,40 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
-                values: new object[] { 1, new DateTime(2024, 9, 3, 14, 55, 0, 684, DateTimeKind.Local).AddTicks(251), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$RXwbXJN.lbRQM8/7LNe6wegy60nUdjwftTYJet05efU7QdzQO4NnO", 1 });
+                values: new object[] { 1, new DateTime(2024, 9, 4, 14, 50, 28, 551, DateTimeKind.Local).AddTicks(501), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$LO8.0JTvvQBDvADmpwCAc.estbRQR0ivty4/Vr.ypMHmixo0t1up.", 1 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "po_OrderId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
                 values: new object[,]
                 {
-                    { 1, null, new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(861), 1, 1, null, "M/0001/KW/2024", 1, null, null, 1, new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(923), 1, 2023 },
-                    { 2, null, new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(930), 1, 2, null, "P/0001/ZP/2024", 1, null, null, 1, new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(932), 2, 2024 }
+                    { 1, null, new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4201), 1, 1, null, "M/0001/KW/2024", 1, null, null, 1, new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4256), 1, 2023 },
+                    { 2, null, new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4262), 1, 2, null, "P/0001/ZP/2024", 1, null, null, 1, new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4263), 2, 2024 }
                 });
 
             migrationBuilder.InsertData(
-                table: "ProductionPlans",
-                columns: new[] { "Id", "Change", "Date", "ShiftSupervisorId", "StatusId", "Team" },
-                values: new object[] { 1, 1, new DateOnly(2024, 9, 3), 1, 1, 1 });
+                table: "Shifts",
+                columns: new[] { "Id", "Date", "ShiftNumber", "ShiftSupervisorId" },
+                values: new object[] { 1, new DateOnly(2024, 9, 4), 1, 1 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
                 columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
                 values: new object[,]
                 {
-                    { 1, 1, null, "", 1, null, 1, null, null, 0, 0, 0, 0, "", new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(1231), null, null, null },
-                    { 2, 2, null, "F", 1, 1, 1, 1, null, 0, 0, 0, 0, "Test", new DateTime(2024, 9, 3, 14, 55, 0, 793, DateTimeKind.Local).AddTicks(1263), 2628, 1m, 0 }
+                    { 1, 1, null, "", 1, null, 1, null, null, 0, 0, 0, 0, "", new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4498), null, null, null },
+                    { 2, 2, null, "F", 1, 1, 1, 1, null, 0, 0, 0, 0, "Test", new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4633), 2628, 1m, 0 }
                 });
 
             migrationBuilder.InsertData(
+                table: "ProductionPlans",
+                columns: new[] { "Id", "Date", "HeadsOfMetallurgicalTeamsId", "ShiftId", "StatusId", "Team" },
+                values: new object[] { 1, new DateOnly(2024, 9, 4), 1, 1, 1, 1 });
+
+            migrationBuilder.InsertData(
                 table: "ProductionPlanPositions",
-                columns: new[] { "Id", "DocumentPositionId", "HeadsOfMetallurgicalTeamsId", "NumberOfHours", "ProductionPlanId", "Quantity" },
-                values: new object[] { 1, 2, 1, 8, 1, 50 });
+                columns: new[] { "Id", "DocumentPositionId", "NumberOfHours", "ProductionPlanId", "Quantity" },
+                values: new object[] { 1, 2, 8, 1, 50 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",
@@ -768,24 +793,29 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 column: "DocumentPositionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionPlanPositions_HeadsOfMetallurgicalTeamsId",
-                table: "ProductionPlanPositions",
-                column: "HeadsOfMetallurgicalTeamsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionPlanPositions_ProductionPlanId",
                 table: "ProductionPlanPositions",
                 column: "ProductionPlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionPlans_ShiftSupervisorId",
+                name: "IX_ProductionPlans_HeadsOfMetallurgicalTeamsId",
                 table: "ProductionPlans",
-                column: "ShiftSupervisorId");
+                column: "HeadsOfMetallurgicalTeamsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductionPlans_ShiftId",
+                table: "ProductionPlans",
+                column: "ShiftId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionPlans_StatusId",
                 table: "ProductionPlans",
                 column: "StatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Shifts_ShiftSupervisorId",
+                table: "Shifts",
+                column: "ShiftSupervisorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -884,6 +914,9 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductionPlans");
+
+            migrationBuilder.DropTable(
+                name: "Shifts");
 
             migrationBuilder.DropTable(
                 name: "Statuses");

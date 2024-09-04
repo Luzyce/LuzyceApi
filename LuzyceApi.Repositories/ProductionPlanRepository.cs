@@ -21,13 +21,19 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 {
                     Id = x.Id,
                     Date = x.Date,
-                    Change = x.Change,
-                    Team = x.Team,
-                    ShiftSupervisor = x.ShiftSupervisor == null ? null : new GetUserResponseDto
+                    Shift = (x.Shift == null ? null : new GetShift
                     {
-                        Id = x.ShiftSupervisor.Id,
-                        Name = x.ShiftSupervisor.Name
-                    },
+                        Id = x.Shift.Id,
+                        Date = x.Shift.Date,
+                        ShiftNumber = x.Shift.ShiftNumber,
+                        ShiftSupervisor = x.Shift.ShiftSupervisor == null ? null : new GetUserResponseDto
+                        {
+                            Id = x.Shift.ShiftSupervisor.Id,
+                            Name = x.Shift.ShiftSupervisor.Name,
+                            LastName = x.Shift.ShiftSupervisor.LastName
+                        }
+                    })!,
+                    Team = x.Team,
                     Status = x.Status == null ? null : new GetStatusResponseDto
                     {
                         Id = x.Status.Id,
@@ -43,15 +49,30 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         using var transaction = applicationDbContext.Database.BeginTransaction();
         try
         {
+            var shift = applicationDbContext.Shifts
+                .FirstOrDefault(x => x.Date == request.Date && x.ShiftNumber == request.Shift);
             var productionPlan = applicationDbContext.ProductionPlans
-                .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Change == request.Change);
+                .FirstOrDefault(x => x.Date == request.Date && x.Team == request.Team && x.Shift == shift);
                 
+            
             if (productionPlan == null)
             {
+                if (shift == null)
+                {
+                    shift = new Shift
+                    {
+                        Date = request.Date,
+                        ShiftNumber = request.Shift
+                    };
+                
+                    applicationDbContext.Shifts.Add(shift);
+                    applicationDbContext.SaveChanges();
+                }
+                
                 productionPlan = new ProductionPlan
                 {
                     Date = request.Date,
-                    Change = request.Change,
+                    ShiftId = shift.Id,
                     Team = request.Team,
                     StatusId = 1
                 };
@@ -142,9 +163,11 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public GetProductionPlan GetProductionPlan(GetProductionPlanPositionsRequest request)
     {
         var productionPlan = applicationDbContext.ProductionPlans
-            .Include(x => x.ShiftSupervisor)
+            .Include(x => x.Shift)
+                .ThenInclude(x => x!.ShiftSupervisor)
             .Include(x => x.Status)
-            .FirstOrDefault(x => x.Date == request.Date && x.Change == request.Change && x.Team == request.Team);
+            .Include(x => x.HeadsOfMetallurgicalTeams)
+            .FirstOrDefault(x => x.Date == request.Date && x.Shift!.ShiftNumber == request.Shift && x.Team == request.Team);
         
         if (productionPlan == null)
         {
@@ -155,18 +178,29 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         {
             Id = productionPlan.Id,
             Date = productionPlan.Date,
-            Change = productionPlan.Change,
-            Team = productionPlan.Team,
-            ShiftSupervisor = productionPlan.ShiftSupervisor == null ? null : new GetUserResponseDto
+            Shift = (productionPlan.Shift == null ? null : new GetShift
             {
-                Id = productionPlan.ShiftSupervisor.Id,
-                Name = productionPlan.ShiftSupervisor.Name,
-                LastName = productionPlan.ShiftSupervisor.LastName
-            },
+                Id = productionPlan.Shift.Id,
+                Date = productionPlan.Shift.Date,
+                ShiftNumber = productionPlan.Shift.ShiftNumber,
+                ShiftSupervisor = productionPlan.Shift.ShiftSupervisor == null ? null : new GetUserResponseDto
+                {
+                    Id = productionPlan.Shift.ShiftSupervisor.Id,
+                    Name = productionPlan.Shift.ShiftSupervisor.Name,
+                    LastName = productionPlan.Shift.ShiftSupervisor.LastName
+                }
+            })!,
+            Team = productionPlan.Team,
             Status = productionPlan.Status == null ? null : new GetStatusResponseDto
             {
                 Id = productionPlan.Status.Id,
                 Name = productionPlan.Status.Name
+            },
+            HeadsOfMetallurgicalTeams = productionPlan.HeadsOfMetallurgicalTeams == null ? null : new GetUserResponseDto
+            {
+                Id = productionPlan.HeadsOfMetallurgicalTeams.Id,
+                Name = productionPlan.HeadsOfMetallurgicalTeams.Name,
+                LastName = productionPlan.HeadsOfMetallurgicalTeams.LastName
             },
             ProductionPlanPositions = applicationDbContext.ProductionPlanPositions
                 .Where(x => x.ProductionPlan!.Id == productionPlan.Id)
@@ -185,7 +219,6 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         .ThenInclude(op => op!.Order)
                 .Include(x => x.Kwit)
                     .ThenInclude(k => k.DocumentPositions)
-                .Include(x => x.HeadsOfMetallurgicalTeams)
                 .ToList()
                 .Select(x => new GetProductionPlanPosition
                 {
@@ -232,13 +265,6 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         Client = x.DocumentPosition.OrderPositionForProduction.Order!.CustomerName,
                         Priority = x.DocumentPosition.Priority ?? 0
                     },
-                    HeadsOfMetallurgicalTeamsId = x.HeadsOfMetallurgicalTeamsId,
-                    HeadsOfMetallurgicalTeams = x.HeadsOfMetallurgicalTeams == null ? null : new GetUserResponseDto
-                    {
-                        Id = x.HeadsOfMetallurgicalTeams.Id,
-                        Name = x.HeadsOfMetallurgicalTeams.Name,
-                        LastName = x.HeadsOfMetallurgicalTeams.LastName
-                    },
                     NumberOfHours = x.NumberOfHours,
                     Kwit = x.Kwit.Count == 0 ? null : new GetDocumentWithPositions
                     {
@@ -261,7 +287,10 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     
     public void DeletePosition(int id)
     {
-        var position = applicationDbContext.ProductionPlanPositions.FirstOrDefault(x => x.Id == id);
+        var position = applicationDbContext.ProductionPlanPositions
+            .Include(productionPlanPositions => productionPlanPositions.Kwit)
+            .ThenInclude(kwit => kwit.DocumentPositions)
+            .FirstOrDefault(x => x.Id == id);
 
         if (position == null)
         {
@@ -275,16 +304,11 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             return;
         }
         
-        var document = applicationDbContext.Documents.FirstOrDefault(x => x.DocumentPositions.Any(dp => dp.Id == position.Kwit.First().Id));
+        var kwit = position.Kwit.FirstOrDefault();
         
-        if (document == null)
-        {
-            return;
-        }
+        var kwitPosition = kwit?.DocumentPositions.FirstOrDefault();
         
-        var documentPosition = applicationDbContext.DocumentPositions.FirstOrDefault(x => x.Id == document.DocumentPositions.First().Id);
-        
-        if (documentPosition == null)
+        if (kwitPosition == null || kwit == null)
         {
             return;
         }
@@ -295,8 +319,8 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         }
         
         applicationDbContext.ProductionPlanPositions.Remove(position);
-        applicationDbContext.DocumentPositions.Remove(documentPosition);
-        applicationDbContext.Documents.Remove(document);
+        applicationDbContext.DocumentPositions.Remove(kwitPosition);
+        applicationDbContext.Documents.Remove(kwit);
         applicationDbContext.SaveChanges();
     }
 
@@ -329,6 +353,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public void UpdateProductionPlan(UpdateProductionPlan request)
     {
         var productionPlan = applicationDbContext.ProductionPlans
+            .Include(productionPlan => productionPlan.Shift)
             .FirstOrDefault(x => x.Id == request.Id);
         
         if (productionPlan == null)
@@ -336,7 +361,8 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             return;
         }
         
-        productionPlan.ShiftSupervisorId = request.ShiftSupervisorId;
+        productionPlan.Shift!.ShiftSupervisorId = request.ShiftSupervisorId;
+        productionPlan.HeadsOfMetallurgicalTeamsId = request.HeadsOfMetallurgicalTeamsId;
         
         foreach (var position in request.ProductionPlanPositions)
         {
@@ -351,7 +377,6 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             }
             
             productionPlanPosition.Quantity = position.Quantity;
-            productionPlanPosition.HeadsOfMetallurgicalTeamsId = position.GetHeadsOfMetallurgicalTeamsId;
             productionPlanPosition.NumberOfHours = position.NumberOfHours;
             productionPlanPosition.DocumentPosition!.LampshadeNorm!.WeightNetto = position.WeightNetto;
             productionPlanPosition.DocumentPosition!.LampshadeNorm!.WeightBrutto = position.WeightBrutto;
@@ -388,7 +413,8 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public List<ProductionPlan> GetProductionPlanPdf(DateOnly data)
     {
         return applicationDbContext.ProductionPlans
-            .Include(x => x.ShiftSupervisor)
+            .Include(x => x.Shift)
+                .ThenInclude(x => x!.ShiftSupervisor)
             .Include(x => x.Status)
             .Include(x => x.Positions)
                 .ThenInclude(x => x.Kwit)

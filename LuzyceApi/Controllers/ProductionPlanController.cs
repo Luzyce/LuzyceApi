@@ -125,6 +125,42 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                             .Text(
                                 $"Ilość: {kwit.ProductionPlanPositions?.Quantity} {kwit.DocumentPositions[0].OrderPositionForProduction?.Unit}")
                             .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Nazwa klienta: {kwit.DocumentPositions[0].OrderPositionForProduction?.Order?.CustomerName}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Zmiana: {kwit.ProductionPlanPositions?.ProductionPlan?.Shift?.ShiftNumber}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Zespół: {kwit.ProductionPlanPositions?.ProductionPlan?.Team}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Hutmistrz: {kwit.ProductionPlanPositions?.ProductionPlan?.Shift?.ShiftSupervisor?.Name} {kwit.ProductionPlanPositions?.ProductionPlan?.Shift?.ShiftSupervisor?.LastName}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Hutnik: {kwit.ProductionPlanPositions?.ProductionPlan?.HeadsOfMetallurgicalTeams?.Name} {kwit.ProductionPlanPositions?.ProductionPlan?.HeadsOfMetallurgicalTeams?.LastName}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Norma: {kwit.DocumentPositions[0].LampshadeNorm?.QuantityPerChange} {kwit.DocumentPositions[0].OrderPositionForProduction?.Unit}")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Waga netto: {kwit.DocumentPositions[0].LampshadeNorm?.WeightNetto} kg")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Waga brutto: {kwit.DocumentPositions[0].LampshadeNorm?.WeightBrutto} kg")
+                            .FontSize(16);
+                        x.Item()
+                            .Text(
+                                $"Planowany wyciąg z wanny: {kwit.DocumentPositions[0].LampshadeNorm?.WeightBrutto * kwit.ProductionPlanPositions?.Quantity} kg")
+                            .FontSize(16);
                     });
             });
         });
@@ -138,6 +174,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     public IResult GetProductionPlanPdf(DateOnly data)
     {
         var productionPlans = productionPlanRepository.GetProductionPlanPdf(data);
+        var shiftsSupervisors = productionPlanRepository.GetShiftsSupervisors(data);
 
         var document = Document.Create(container =>
         {
@@ -169,9 +206,9 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                             table.Header(header =>
                             {
                                 header.Cell().Element(CellStyle).Padding(5).Text("").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 1").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 2").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text("Zmiana 3").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 1\nHutmistrz:\n{shiftsSupervisors[0]?.Name} {shiftsSupervisors[0]?.LastName}").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 2\nHutmistrz:\n{shiftsSupervisors[1]?.Name} {shiftsSupervisors[1]?.LastName}").FontSize(16);
+                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 3\nHutmistrz:\n{shiftsSupervisors[2]?.Name} {shiftsSupervisors[2]?.LastName}").FontSize(16);
                             });
 
                             for (var x = 1; x <= 3; x++)
@@ -185,7 +222,9 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
                                     if (plan != null)
                                     {
-                                        var cellText = "";
+                                        var cellText =
+                                            $"Hutnik: {plan.HeadsOfMetallurgicalTeams?.Name} {plan.HeadsOfMetallurgicalTeams?.LastName}\n";
+                                        
                                         for (var i = 0; i < plan.Positions.Count; i++)
                                         {
                                             if (i != 0)
@@ -199,7 +238,9 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                                         $"{position.Kwit.First().DocumentPositions.First().LampshadeNorm!.Variant!.Name} " +
                                                         $"{position.Kwit.First().DocumentPositions.First().LampshadeDekor}\n" +
                                                         $"Ilość: {position.Quantity}\n" +
-                                                        $"Kwit: {position.Kwit.First().Number}\n";
+                                                        $"Norma: {position.Kwit.First().DocumentPositions.First().LampshadeNorm?.QuantityPerChange}\n" +
+                                                        $"Kwit: {position.Kwit.First().Number}\n" +
+                                                        $"Firma: {position.Kwit.First().DocumentPositions.First().OrderPositionForProduction?.Order?.CustomerName}\n";
                                         }
 
                                         table.Cell()

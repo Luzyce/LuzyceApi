@@ -308,19 +308,14 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         
         var kwitPosition = kwit?.DocumentPositions.FirstOrDefault();
         
-        if (kwitPosition == null || kwit == null)
-        {
-            return;
-        }
-        
         if (applicationDbContext.ProductionPlanPositions.Count(x => x.ProductionPlanId == productionPlan.Id) == 1)
         {
             applicationDbContext.ProductionPlans.Remove(productionPlan);
         }
         
         applicationDbContext.ProductionPlanPositions.Remove(position);
-        applicationDbContext.DocumentPositions.Remove(kwitPosition);
-        applicationDbContext.Documents.Remove(kwit);
+        if (kwitPosition != null) applicationDbContext.DocumentPositions.Remove(kwitPosition);
+        if (kwit != null) applicationDbContext.Documents.Remove(kwit);
         applicationDbContext.SaveChanges();
     }
 
@@ -394,6 +389,9 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .Include(d => d.Status)
             .Include(d => d.DocumentsDefinition)
             .Include(d => d.ProductionPlanPositions)
+            .ThenInclude(ppp => ppp!.ProductionPlan)
+            .ThenInclude(pp => pp!.Shift)
+            .ThenInclude(s => s!.ShiftSupervisor)
             .Include(d => d.DocumentPositions)
             .ThenInclude(dp => dp.Lampshade)
             .Include(d => d.DocumentPositions)
@@ -404,6 +402,8 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .ThenInclude(ln => ln!.Lampshade)
             .Include(d => d.DocumentPositions)
             .ThenInclude(dp => dp.OrderPositionForProduction)
+            .ThenInclude(op => op!.Order)
+            
             .Where(x => x.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
             .FirstOrDefault(x => x.Id == id);
 
@@ -425,9 +425,33 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                     .ThenInclude(x => x.DocumentPositions)
                         .ThenInclude(x => x.LampshadeNorm)
                             .ThenInclude(x => x!.Variant)
+            .Include(x => x.Positions)
+                .ThenInclude(x => x.Kwit)
+                    .ThenInclude(x => x.DocumentPositions)
+                        .ThenInclude(x => x.OrderPositionForProduction)
+                            .ThenInclude(x => x!.Order)
+            .Include(x => x.HeadsOfMetallurgicalTeams)
             .Where(x => x.Date == data)
             .ToList();
     } 
+    
+    public List<User?> GetShiftsSupervisors(DateOnly date)
+    {
+        var shifts = applicationDbContext.Shifts
+            .Include(x => x.ShiftSupervisor)
+            .Where(x => x.Date == date)
+            .ToList();
+        
+        var shiftSupervisors = new List<User?>();
+
+        for (var i = 0; i < 3; i++)
+        {
+            var shift = shifts.FirstOrDefault(x => x.ShiftNumber == i + 1);
+            shiftSupervisors.Add(shift?.ShiftSupervisor);
+        }
+        
+        return shiftSupervisors;
+    }
     
     private static Domain.Models.Warehouse WarehouseDomainFromDb(Warehouse warehouse)
     {

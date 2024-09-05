@@ -49,24 +49,51 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             {
                 Id = 2,
                 Name = "User"
-            }
+            },
+            new()
+            {
+                Id = 3,
+                Name = "Hutmustrz"
+            },
+            new()
+            {
+                Id = 4,
+                Name = "Hutnik"
+            },
         };
 
         modelBuilder.Entity<Role>().HasData(roles);
 
-        var adminUser = new User
+        var users = new List<User>
         {
-            Id = 1,
-            Name = "Admin",
-            LastName = "Admin",
-            Email = "admin@gmail.com",
-            Login = "admin",
-            Password = BCrypt.Net.BCrypt.HashPassword("admin"),
-            Hash = "admin",
-            RoleId = 1
+            new()
+            {
+                Id = 1,
+                Name = "Admin",
+                LastName = "Admin",
+                Email = "admin@gmail.com",
+                Login = "admin",
+                Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Hash = "admin",
+                RoleId = 1
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Przykładowy",
+                LastName = "Hutmustrz",
+                RoleId = 3
+            },
+            new()
+            {
+                Id = 3,
+                Name = "Przykładowy",
+                LastName = "Hutnik",
+                RoleId = 4
+            }
         };
 
-        modelBuilder.Entity<User>().HasData(adminUser);
+        modelBuilder.Entity<User>().HasData(users);
         
         var documentsDefinitionsList = new List<DocumentsDefinition>
         {
@@ -144,10 +171,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Year = 2023,
                 Number = "M/0001/KW/2024",
                 DocumentsDefinitionId = 1,
-                OperatorId = adminUser.Id,
+                OperatorId = users[0].Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
-                StatusId = 1
+                StatusId = 1,
+                ProductionPlanPositionsId = 1
             },
             new()
             {
@@ -157,7 +185,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Year = 2024,
                 Number = "P/0001/ZP/2024",
                 DocumentsDefinitionId = 2,
-                OperatorId = adminUser.Id,
+                OperatorId = users[0].Id,
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
                 StatusId = 1
@@ -307,7 +335,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 QuantityLoss = 0,
                 QuantityToImprove = 0,
                 QuantityGross = 0,
-                OperatorId = adminUser.Id,
+                OperatorId = users[0].Id,
                 Operator = null!,
                 StartTime = DateTime.Now,
                 EndTime = null,
@@ -323,7 +351,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 QuantityLoss = 0,
                 QuantityToImprove = 0,
                 QuantityGross = 0,
-                OperatorId = adminUser.Id,
+                OperatorId = users[0].Id,
                 Operator = null!,
                 StartTime = DateTime.Now,
                 EndTime = null,
@@ -348,7 +376,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Id = 1,
             Date = DateOnly.FromDateTime(DateTime.Now),
             ShiftNumber = 1,
-            ShiftSupervisorId = adminUser.Id,
+            ShiftSupervisorId = users[0].Id,
             ShiftSupervisor = null!
         };
         

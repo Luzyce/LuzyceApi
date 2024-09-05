@@ -322,7 +322,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public IEnumerable<GetUserResponseDto> ShiftSupervisor()
     {
         return applicationDbContext.Users
-            // .Where(x => x.Role!.Name == "ShiftSupervisor")
+            .Where(x => x.Role!.Id == Dictionaries.UserRoles.SHIFT_SUPERVISOR_ID)
             .Select(x => new GetUserResponseDto
             {
                 Id = x.Id,
@@ -335,7 +335,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public IEnumerable<GetUserResponseDto> GetHeadsOfMetallurgicalTeams()
     {
         return applicationDbContext.Users
-            // .Where(x => x.Role!.Name == "HeadOfMetallurgicalTeam")
+            .Where(x => x.Role!.Id == Dictionaries.UserRoles.HEADS_OF_METALLURGICAL_TEAMS_ID)
             .Select(x => new GetUserResponseDto
             {
                 Id = x.Id,

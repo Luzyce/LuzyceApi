@@ -87,26 +87,27 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4201),
+                            CreatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8356),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
+                            ProductionPlanPositionsId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4256),
+                            UpdatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8380),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4262),
+                            CreatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8386),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4263),
+                            UpdatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8388),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -237,7 +238,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
                             Remarks = "",
-                            StartTime = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4498)
+                            StartTime = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8874)
                         },
                         new
                         {
@@ -253,7 +254,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
                             Remarks = "Test",
-                            StartTime = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4633),
+                            StartTime = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8883),
                             SubiektProductId = 2628,
                             po_NumberOfChanges = 1m,
                             po_QuantityMade = 0
@@ -575,7 +576,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             CustomerId = 1,
                             CustomerName = "Testowanie",
                             CustomerSymbol = "TEST",
-                            Date = new DateTime(2024, 9, 4, 14, 50, 28, 660, DateTimeKind.Local).AddTicks(4328),
+                            Date = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(8662),
                             Number = "1"
                         });
                 });
@@ -696,7 +697,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateOnly(2024, 9, 4),
+                            Date = new DateOnly(2024, 9, 5),
                             HeadsOfMetallurgicalTeamsId = 1,
                             ShiftId = 1,
                             StatusId = 1,
@@ -765,6 +766,16 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 2,
                             Name = "User"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Hutmustrz"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Hutnik"
                         });
                 });
 
@@ -796,7 +807,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateOnly(2024, 9, 4),
+                            Date = new DateOnly(2024, 9, 5),
                             ShiftNumber = 1,
                             ShiftSupervisorId = 1
                         });
@@ -891,14 +902,36 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 4, 14, 50, 28, 551, DateTimeKind.Local).AddTicks(501),
+                            CreatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 667, DateTimeKind.Local).AddTicks(8343),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$LO8.0JTvvQBDvADmpwCAc.estbRQR0ivty4/Vr.ypMHmixo0t1up.",
+                            Password = "$2a$11$0PRcWKtvszX.kigmW7G9EeVQJS2hbneWtm6JHqDd7o7ftbEC9dWdK",
                             RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(7828),
+                            Hash = "",
+                            LastName = "Hutmustrz",
+                            Login = "",
+                            Name = "Przykładowy",
+                            Password = "",
+                            RoleId = 3
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 9, 5, 17, 53, 24, 775, DateTimeKind.Local).AddTicks(7900),
+                            Hash = "",
+                            LastName = "Hutnik",
+                            Login = "",
+                            Name = "Przykładowy",
+                            Password = "",
+                            RoleId = 4
                         });
                 });
 

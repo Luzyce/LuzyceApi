@@ -11,38 +11,70 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
     public GetOrdersResponse GetOrders(int limit = 10, int offset = 0, OrdersFilters? ordersFilters = null)
     {
+        var statusMap = new Dictionary<int, int[]>
+        {
+            { 1, [3, 5, 6, 7] },
+            { 2, [1, 4, 8] },
+            { 3, [1, 3, 4, 5, 6, 7, 8] }
+        };
+
+        var status = ordersFilters?.Status != null && statusMap.TryGetValue(ordersFilters.Status.Value, out var value)
+            ? value
+            : new[] { 3, 5, 6, 7 };
+
         var query = subiektDbContext.DokDokuments
-            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2))
+            .AsNoTracking()
+            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2) && status.Contains(d.DokStatus))
             .Join(subiektDbContext.AdrHistoria,
-                  d => d.DokPlatnikAdreshId,
-                  o => o.AdrhId,
-                  (d, o) => new { d, o })
+                d => d.DokPlatnikAdreshId,
+                o => o.AdrhId,
+                (d, o) => new { d, o })
             .Join(subiektDbContext.KhKontrahents,
-                  temp => temp.d.DokPlatnikId,
-                  k => k.KhId,
-                  (temp, k) => new { temp.d, temp.o, k })
+                temp => temp.d.DokPlatnikId,
+                k => k.KhId,
+                (temp, k) => new { temp.d, temp.o, k })
             .GroupJoin(subiektDbContext.DokPozycjas,
-                       dok => dok.d.DokId,
-                       pozycja => pozycja.ObDokHanId,
-                       (dok, pozycje) => new { dok, pozycje })
+                dok => dok.d.DokId,
+                pozycja => pozycja.ObDokHanId,
+                (dok, pozycje) => new { dok, pozycje })
             .SelectMany(temp => temp.pozycje.DefaultIfEmpty(),
-                        (temp, pozycja) => new { temp.dok.d, temp.dok.o, temp.dok.k, pozycja })
+                (temp, pozycja) => new { temp.dok.d, temp.dok.o, temp.dok.k, pozycja })
             .GroupJoin(subiektDbContext.TwTowars,
-                       temp => temp.pozycja!.ObTowId,
-                       towar => towar.TwId,
-                       (temp, towary) => new { temp, towary })
+                temp => temp.pozycja!.ObTowId,
+                towar => towar.TwId,
+                (temp, towary) => new { temp, towary })
             .SelectMany(temp => temp.towary.DefaultIfEmpty(),
-                        (temp, towar) => new { temp.temp.d, temp.temp.o, temp.temp.k, temp.temp.pozycja, towar })
+                (temp, towar) => new { temp.temp.d, temp.temp.o, temp.temp.k, temp.temp.pozycja, towar });
+        
+        if (ordersFilters is { StartDate: { } startDate })
+            query = query.Where(x => x.d.DokDataWyst.Date >= startDate);
+
+        if (ordersFilters is { EndDate: { } endDate })
+            query = query.Where(x => x.d.DokDataWyst.Date <= endDate);
+
+        if (ordersFilters is { CustomerName: { } customerName })
+            query = query.Where(x => x.o.AdrhNazwaPelna.Contains(customerName));
+        
+        var totalOrders = query
+            .GroupBy(x => x.d.DokId)
+            .Count();
+
+        var orders = query
             .GroupBy(temp => new
             {
                 temp.d.DokId,
                 temp.d.DokDataWyst,
                 temp.d.DokNrPelny,
                 temp.d.DokTerminRealizacji,
+                temp.d.DokStatus,
                 temp.k.KhId,
                 temp.k.KhSymbol,
                 temp.o.AdrhNazwaPelna
             })
+            .OrderByDescending(g => g.Key.DokDataWyst)
+            .ThenByDescending(g => g.Key.DokId)
+            .Skip((offset - 1) * limit)
+            .Take(limit)
             .Select(group => new Order
             {
                 Id = group.Key.DokId,
@@ -52,72 +84,51 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 CustomerSymbol = group.Key.KhSymbol,
                 CustomerName = group.Key.AdrhNazwaPelna,
                 DeliveryDate = group.Key.DokTerminRealizacji,
+                Status = group.Key.DokStatus,
                 Positions = group.Where(x => x.pozycja != null && x.towar != null)
-                             .Select(x => new OrderPosition
-                             {
-                                 Id = x.pozycja!.ObId,
-                                 OrderId = x.pozycja.ObDokHanId,
-                                 OrderNumber = x.d.DokNrPelny,
-                                 Symbol = x.towar!.TwSymbol,
-                                 ProductId = x.towar.TwId,
-                                 Description = x.pozycja.ObOpis,
-                                 OrderPositionLp = x.pozycja.ObDokHanLp,
-                                 Quantity = x.pozycja.ObIlosc,
-                                 QuantityInStock = x.pozycja.ObIloscMag,
-                                 Unit = x.pozycja.ObJm,
-                                 SerialNumber = x.pozycja.ObNumerSeryjny,
-                                 ProductSymbol = x.towar.TwSymbol,
-                                 ProductName = x.towar.TwNazwa,
-                                 ProductDescription = x.towar.TwOpis
-                             })
-                             .OrderBy(x => x.OrderPositionLp)
-                             .ToList()
-            });
-
-        if (ordersFilters != null)
-        { 
-            if (ordersFilters.StartDate.HasValue)
-            {
-                query = query.Where(o => o.Date >= ordersFilters.StartDate.Value);
-            }
-
-            if (ordersFilters.EndDate.HasValue)
-            {
-                query = query.Where(o => o.Date <= ordersFilters.EndDate.Value);
-            }
-
-            if (!string.IsNullOrEmpty(ordersFilters.CustomerName))
-            {
-                query = query.Where(o => o.CustomerName.Contains(ordersFilters.CustomerName));
-            }
-        }
+                    .Select(x => new OrderPosition
+                    {
+                        Id = x.pozycja!.ObId,
+                        OrderId = x.pozycja.ObDokHanId,
+                        OrderNumber = x.d.DokNrPelny,
+                        Symbol = x.towar!.TwSymbol,
+                        ProductId = x.towar.TwId,
+                        Description = x.pozycja.ObOpis,
+                        OrderPositionLp = x.pozycja.ObDokHanLp,
+                        Quantity = x.pozycja.ObIlosc,
+                        QuantityInStock = x.pozycja.ObIloscMag,
+                        Unit = x.pozycja.ObJm,
+                        SerialNumber = x.pozycja.ObNumerSeryjny,
+                        ProductSymbol = x.towar.TwSymbol,
+                        ProductName = x.towar.TwNazwa,
+                        ProductDescription = x.towar.TwOpis
+                    })
+                    .OrderBy(x => x.OrderPositionLp)
+                    .ToList()
+            })
+            .ToList();
 
         return new GetOrdersResponse
         {
             CurrentPage = offset,
-            TotalPages = (int)Math.Ceiling(query.Count() / (double)limit),
-            TotalOrders = query.Count(),
-            Orders = query
-                .OrderByDescending(x => x.Date)
-                .ThenByDescending(x => x.Id)
-                .Skip((offset - 1) * limit)
-                .Take(limit)
-                .ToList()
+            TotalPages = (int)Math.Ceiling(totalOrders / (double)limit),
+            TotalOrders = totalOrders,
+            Orders = orders
         };
     }
-
+    
     public List<OrderPosition> GetOrderPositions(int dokId)
     {
         var orderPositions = subiektDbContext.DokPozycjas
             .Where(p => p.ObDokHanId == dokId)
             .Join(subiektDbContext.TwTowars,
-                  p => p.ObTowId,
-                  t => t.TwId,
-                  (p, t) => new { p, t })
+                p => p.ObTowId,
+                t => t.TwId,
+                (p, t) => new { p, t })
             .Join(subiektDbContext.DokDokuments,
-                  temp => temp.p.ObDokHanId,
-                  d => d.DokId,
-                  (temp, d) => new { temp, d })
+                temp => temp.p.ObDokHanId,
+                d => d.DokId,
+                (temp, d) => new { temp, d })
             .Select(x => new OrderPosition
             {
                 Id = x.temp.p.ObId,
@@ -144,7 +155,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
         var productIds = filters.ProductIds;
         var warehouseIds = filters.WarehouseIds;
 
-        var query = subiektDbContext.TwStans
+        var orders = subiektDbContext.TwStans
             .Where(x => productIds.Contains(x.StTowId) && warehouseIds.Contains(x.StMagId))
             .Include(x => x.StMag)
             .Select(x => new
@@ -183,7 +194,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
         {
             ProductWarehousesStocks = productIds.Select(productId =>
             {
-                if (query.TryGetValue(productId, out var productStock))
+                if (orders.TryGetValue(productId, out var productStock))
                 {
                     return productStock;
                 }
@@ -210,5 +221,4 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
         return response;
     }
-
 }

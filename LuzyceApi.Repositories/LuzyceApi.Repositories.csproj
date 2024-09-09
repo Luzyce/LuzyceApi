@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Luzyce.Core" Version="10.0.20" />
+    <PackageReference Include="Luzyce.Core" Version="10.0.21" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LuzyceApi.Domain\LuzyceApi.Domain.csproj" />

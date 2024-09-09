@@ -9,5 +9,6 @@ public class Order
     public string CustomerSymbol { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public DateTime? DeliveryDate { get; set; }
+    public int Status { get; set; }
     public List<OrderPosition> Positions { get; set; } = [];
 }

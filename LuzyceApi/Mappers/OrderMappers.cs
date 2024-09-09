@@ -11,7 +11,8 @@ public static class OrderMappers
         {
             StartDate = dto.StartDate,
             EndDate = dto.EndDate,
-            CustomerName = dto.CustomerName
+            CustomerName = dto.CustomerName,
+            Status = dto.Status
         };
     }
 }

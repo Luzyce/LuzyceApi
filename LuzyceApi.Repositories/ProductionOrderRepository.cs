@@ -29,7 +29,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 {
                     Id = d.Id,
                     OrderDate = d.CreatedAt,
-                    OrderNumber = d.Number,
+                    OrderNumber = d.Order!.Number,
                     CustomerName = d.Order!.CustomerName,
                     ProdOrderDate = d.CreatedAt,
                     ProdOrderNumber = d.Number,

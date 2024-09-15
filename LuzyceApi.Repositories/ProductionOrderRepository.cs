@@ -98,6 +98,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 },
                 LampshadeDekor = dp.LampshadeDekor,
                 Remarks = dp.Remarks,
+                CustomerLampshadeNumber = dp.CustomerLampshadeNumber,
                 NumberOfChanges = dp.po_NumberOfChanges,
                 QuantityMade = dp.po_QuantityMade,
                 ProductId = dp.SubiektProductId ?? 0,
@@ -474,6 +475,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 existingPosition.LampshadeNorm.QuantityPerPack = position.QuantityPerPack;
                 existingPosition.EndTime = position.ExecutionDate;
                 existingPosition.po_QuantityMade = position.QuantityMade;
+                existingPosition.CustomerLampshadeNumber = position.CustomerLampshadeNumber;
                 existingPosition.Remarks = position.Remarks;
             }
 

@@ -361,6 +361,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 LampshadeNorm = null!,
                 LampshadeDekor = "F",
                 Remarks = "Test",
+                CustomerLampshadeNumber = "xyz",
                 OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
                 OrderPositionForProduction = null!,
                 po_NumberOfChanges = 1,

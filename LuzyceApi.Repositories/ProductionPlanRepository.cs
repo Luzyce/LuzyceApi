@@ -380,7 +380,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         
         applicationDbContext.SaveChanges();
     }
-    
+
     public Document? GetKwit(int id)
     {
         var document = applicationDbContext.Documents
@@ -388,6 +388,9 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .Include(d => d.Operator)
             .Include(d => d.Status)
             .Include(d => d.DocumentsDefinition)
+            .Include(d => d.ProductionPlanPositions)
+            .ThenInclude(ppp => ppp!.ProductionPlan)
+            .ThenInclude(pp => pp!.HeadsOfMetallurgicalTeams)
             .Include(d => d.ProductionPlanPositions)
             .ThenInclude(ppp => ppp!.ProductionPlan)
             .ThenInclude(pp => pp!.Shift)
@@ -403,7 +406,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .Include(d => d.DocumentPositions)
             .ThenInclude(dp => dp.OrderPositionForProduction)
             .ThenInclude(op => op!.Order)
-            
+
             .Where(x => x.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
             .FirstOrDefault(x => x.Id == id);
 

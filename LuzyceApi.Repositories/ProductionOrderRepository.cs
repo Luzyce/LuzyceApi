@@ -522,20 +522,4 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         
         return norms;
     }
-    
-    public int UpdateRemark(int id, UpdateRemark updateRemark)
-    {
-        var position = applicationDbContext.DocumentPositions
-            .FirstOrDefault(dp => dp.Id == id);
-
-        if (position == null)
-        {
-            return 0;
-        }
-
-        position.Remarks = updateRemark.Remark;
-        applicationDbContext.SaveChanges();
-
-        return 1;
-    } 
 }

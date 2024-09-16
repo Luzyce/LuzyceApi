@@ -202,11 +202,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
 
         modelBuilder.Entity<Lampshade>().HasData(exampleLampshade);
         
-        var exampleOrderForProduction = new OrderForProduction()
+        var exampleOrderForProduction = new OrderForProduction
         {
             Id = 1,
             Date = DateTime.Now,
             Number = "1",
+            OriginalNumber = "1",
             CustomerId = 1,
             CustomerSymbol = "TEST",
             CustomerName = "Testowanie"

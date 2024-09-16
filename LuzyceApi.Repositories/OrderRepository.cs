@@ -13,18 +13,18 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
     {
         var statusMap = new Dictionary<int, int[]>
         {
-            { 1, [3, 5, 6, 7] },
-            { 2, [1, 4, 8] },
-            { 3, [1, 3, 4, 5, 6, 7, 8] }
+            { 1, [0] },
+            { 2, [1] },
+            { 3, [4, 8, 16, 2] }
         };
 
         var status = ordersFilters?.Status != null && statusMap.TryGetValue(ordersFilters.Status.Value, out var value)
             ? value
-            : new[] { 3, 5, 6, 7 };
+            : new[] { 0 };
 
         var query = subiektDbContext.DokDokuments
             .AsNoTracking()
-            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2) && status.Contains(d.DokStatus))
+            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2) && status.Contains(d.DokStatusEx ?? -1))
             .Join(subiektDbContext.AdrHistoria,
                 d => d.DokPlatnikAdreshId,
                 o => o.AdrhId,
@@ -65,6 +65,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 temp.d.DokId,
                 temp.d.DokDataWyst,
                 temp.d.DokNrPelny,
+                temp.d.DokNrPelnyOryg,
                 temp.d.DokTerminRealizacji,
                 temp.d.DokStatus,
                 temp.d.DokUwagi,
@@ -81,6 +82,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
                 Id = group.Key.DokId,
                 Date = group.Key.DokDataWyst.Date,
                 Number = group.Key.DokNrPelny,
+                OriginalNumber = group.Key.DokNrPelnyOryg,
                 CustomerId = group.Key.KhId,
                 CustomerSymbol = group.Key.KhSymbol,
                 CustomerName = group.Key.AdrhNazwaPelna,

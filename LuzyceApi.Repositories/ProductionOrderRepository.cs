@@ -307,6 +307,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 Id = order.Id,
                 Date = order.Date,
                 Number = order.Number,
+                OriginalNumber = order.OriginalNumber,
                 CustomerId = order.CustomerId,
                 CustomerSymbol = order.CustomerSymbol,
                 CustomerName = order.CustomerName,

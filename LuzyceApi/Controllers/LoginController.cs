@@ -33,7 +33,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
             issuer: config["Jwt:Issuer"],
             audience: config["Jwt:Audience"],
             claims: claims,
-            expires: (isHashLogin) ? DateTime.Now.AddHours(13) : DateTime.Now.AddHours(1),
+            expires: isHashLogin ? DateTime.Now.AddHours(13) : DateTime.Now.AddHours(1),
             notBefore: DateTime.Now,
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:SigningKey"] ?? "")),

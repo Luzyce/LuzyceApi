@@ -27,6 +27,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
                 Id = x.Id,
                 Date = x.Date,
                 Number = x.Number,
+                OriginalNumber = x.OriginalNumber,
                 CustomerId = x.CustomerId,
                 CustomerSymbol = x.CustomerSymbol,
                 CustomerName = x.CustomerName,

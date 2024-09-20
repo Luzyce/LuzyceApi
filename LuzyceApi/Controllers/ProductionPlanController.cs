@@ -127,7 +127,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                             .FontSize(16);
                         x.Item()
                             .Text(
-                                $"Nazwa klienta: {kwit.DocumentPositions[0].OrderPositionForProduction?.Order?.CustomerName}")
+                                $"Nazwa klienta: {kwit.DocumentPositions[0].OrderPositionForProduction?.Order?.Customer?.Name}")
                             .FontSize(16);
                         x.Item()
                             .Text(
@@ -240,7 +240,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                                         $"Ilość: {position.Quantity}\n" +
                                                         $"Norma: {position.Kwit.First().DocumentPositions.First().LampshadeNorm?.QuantityPerChange}\n" +
                                                         $"Kwit: {position.Kwit.First().Number}\n" +
-                                                        $"Firma: {position.Kwit.First().DocumentPositions.First().OrderPositionForProduction?.Order?.CustomerName}\n";
+                                                        $"Firma: {position.Kwit.First().DocumentPositions.First().OrderPositionForProduction?.Order?.Customer?.Name}\n";
                                         }
 
                                         table.Cell()

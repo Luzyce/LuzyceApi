@@ -205,20 +205,21 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             ProductionPlanPositions = applicationDbContext.ProductionPlanPositions
                 .Where(x => x.ProductionPlan!.Id == productionPlan.Id)
                 .Include(x => x.DocumentPosition)
-                    .ThenInclude(dp => dp!.Document)
+                .ThenInclude(dp => dp!.Document)
                 .Include(x => x.DocumentPosition)
-                    .ThenInclude(dp => dp!.Lampshade)
+                .ThenInclude(dp => dp!.Lampshade)
                 .Include(x => x.DocumentPosition)
-                    .ThenInclude(dp => dp!.LampshadeNorm)
-                        .ThenInclude(ln => ln!.Variant)
+                .ThenInclude(dp => dp!.LampshadeNorm)
+                .ThenInclude(ln => ln!.Variant)
                 .Include(x => x.DocumentPosition)
-                    .ThenInclude(dp => dp!.LampshadeNorm)
-                        .ThenInclude(ln => ln!.Lampshade)
+                .ThenInclude(dp => dp!.LampshadeNorm)
+                .ThenInclude(ln => ln!.Lampshade)
                 .Include(x => x.DocumentPosition)
-                    .ThenInclude(dp => dp!.OrderPositionForProduction)
-                        .ThenInclude(op => op!.Order)
+                .ThenInclude(dp => dp!.OrderPositionForProduction)
+                .ThenInclude(op => op!.Order)
+                .ThenInclude(orderForProduction => orderForProduction!.Customer!)
                 .Include(x => x.Kwit)
-                    .ThenInclude(k => k.DocumentPositions)
+                .ThenInclude(k => k.DocumentPositions)
                 .ToList()
                 .Select(x => new GetProductionPlanPosition
                 {
@@ -262,7 +263,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                         ProductId = x.DocumentPosition.SubiektProductId ?? 0,
                         Unit = x.DocumentPosition.OrderPositionForProduction!.Unit!,
                         ProductionOrderNumber = x.DocumentPosition.Document!.Number,
-                        Client = x.DocumentPosition.OrderPositionForProduction.Order!.CustomerName,
+                        Client = x.DocumentPosition.OrderPositionForProduction.Order!.Customer!.Name,
                         Priority = x.DocumentPosition.Priority ?? 0
                     },
                     NumberOfHours = x.NumberOfHours,

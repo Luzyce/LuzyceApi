@@ -9,12 +9,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     /// <inheritdoc />
-    public partial class addOriginalNumber : Migration
+    public partial class addCustomer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Symbol = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -87,30 +104,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "OrdersForProduction",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Number = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    OriginalNumber = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    CustomerSymbol = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CustomerName = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrdersForProduction", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -160,6 +153,32 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "OrdersForProduction",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Number = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    OriginalNumber = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    DeliveryDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrdersForProduction", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrdersForProduction_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "LampshadeNorms",
                 columns: table => new
                 {
@@ -187,6 +206,39 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         name: "FK_LampshadeNorms_Lampshades_LampshadeId",
                         column: x => x.LampshadeId,
                         principalTable: "Lampshades",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    LastName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Login = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Password = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Hash = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -238,33 +290,38 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "CustomerLampshades",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    LampshadeId = table.Column<int>(type: "int", nullable: false),
+                    LampshadeNormId = table.Column<int>(type: "int", nullable: false),
+                    LampshadeDekor = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastName = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Login = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Password = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Hash = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    CustomerSymbol = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_CustomerLampshades", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
+                        name: "FK_CustomerLampshades_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerLampshades_LampshadeNorms_LampshadeNormId",
+                        column: x => x.LampshadeNormId,
+                        principalTable: "LampshadeNorms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerLampshades_Lampshades_LampshadeId",
+                        column: x => x.LampshadeId,
+                        principalTable: "Lampshades",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -365,8 +422,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     LampshadeDekor = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Remarks = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CustomerLampshadeNumber = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     OrderPositionForProductionId = table.Column<int>(type: "int", nullable: true),
                     po_NumberOfChanges = table.Column<decimal>(type: "decimal(65,30)", nullable: true),
@@ -558,6 +613,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Name", "Symbol" },
+                values: new object[] { 1, "Test", "TST" });
+
+            migrationBuilder.InsertData(
                 table: "DocumentsDefinitions",
                 columns: new[] { "Id", "Code", "Name" },
                 values: new object[,]
@@ -588,11 +648,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 table: "Lampshades",
                 columns: new[] { "Id", "Code" },
                 values: new object[] { 1, "KL4124" });
-
-            migrationBuilder.InsertData(
-                table: "OrdersForProduction",
-                columns: new[] { "Id", "CustomerId", "CustomerName", "CustomerSymbol", "Date", "DeliveryDate", "Number", "OriginalNumber" },
-                values: new object[] { 1, 1, "Testowanie", "TEST", new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(8141), null, "1", "1" });
 
             migrationBuilder.InsertData(
                 table: "Roles",
@@ -631,39 +686,44 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 values: new object[] { 1, 1, "300x300x110", 50, 16, 1, 3.0, 0.45000000000000001 });
 
             migrationBuilder.InsertData(
-                table: "OrderPositionsForProduction",
-                columns: new[] { "Id", "Description", "OrderId", "OrderNumber", "OrderPositionLp", "ProductDescription", "ProductId", "ProductName", "ProductSymbol", "Quantity", "QuantityInStock", "SerialNumber", "Symbol", "Unit" },
-                values: new object[] { 1, "Test", 1, "1", 1, "Test", 1, "KL4124", "KL4124", 1m, 1m, "1", "TEST", "szt" });
+                table: "OrdersForProduction",
+                columns: new[] { "Id", "CustomerId", "Date", "DeliveryDate", "Number", "OriginalNumber" },
+                values: new object[] { 1, 1, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5829), null, "1", "1" });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "Hash", "LastName", "Login", "Name", "Password", "RoleId" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 9, 15, 19, 20, 5, 834, DateTimeKind.Local).AddTicks(7938), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$5safgQcmEfyIk79rv.XFzuzIWQJKUTqTHroTSmrA683AaPXwDMvJW", 1 },
-                    { 2, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7308), null, "", "Hutmustrz", "", "Przykładowy", "", 3 },
-                    { 3, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7373), null, "", "Hutnik", "", "Przykładowy", "", 4 }
+                    { 1, new DateTime(2024, 9, 20, 14, 13, 1, 93, DateTimeKind.Local).AddTicks(8662), "admin@gmail.com", "admin", "Admin", "admin", "Admin", "$2a$11$sDZvEQDOdOvN4BvFF9W6O.sKZTohMv//LcS9dBAGfX2OKtL6SnVOq", 1 },
+                    { 2, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(4923), null, "", "Hutmustrz", "", "Przykładowy", "", 3 },
+                    { 3, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(4987), null, "", "Hutnik", "", "Przykładowy", "", 4 }
                 });
 
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "po_OrderId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
-                values: new object[] { 2, null, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7857), 1, 2, null, "P/0001/ZP/2024", 1, null, null, 1, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7858), 2, 2024 });
+                values: new object[] { 2, null, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5514), 1, 2, null, "P/0001/ZP/2024", 1, null, null, 1, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5516), 2, 2024 });
+
+            migrationBuilder.InsertData(
+                table: "OrderPositionsForProduction",
+                columns: new[] { "Id", "Description", "OrderId", "OrderNumber", "OrderPositionLp", "ProductDescription", "ProductId", "ProductName", "ProductSymbol", "Quantity", "QuantityInStock", "SerialNumber", "Symbol", "Unit" },
+                values: new object[] { 1, "Test", 1, "1", 1, "Test", 1, "KL4124", "KL4124", 1m, 1m, "1", "TEST", "szt" });
 
             migrationBuilder.InsertData(
                 table: "Shifts",
                 columns: new[] { "Id", "Date", "ShiftNumber", "ShiftSupervisorId" },
-                values: new object[] { 1, new DateOnly(2024, 9, 15), 1, 1 });
+                values: new object[] { 1, new DateOnly(2024, 9, 20), 1, 1 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "CustomerLampshadeNumber", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
-                values: new object[] { 2, "xyz", 2, null, "F", 1, 1, 1, 1, null, 0, 0, 0, 0, "Test", new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(8428), 2628, 1m, 0 });
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
+                values: new object[] { 2, 2, null, "F", 1, 1, 1, 1, null, 0, 0, 0, 0, "Test", new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(6059), 2628, 1m, 0 });
 
             migrationBuilder.InsertData(
                 table: "ProductionPlans",
                 columns: new[] { "Id", "Date", "HeadsOfMetallurgicalTeamsId", "ShiftId", "StatusId", "Team" },
-                values: new object[] { 1, new DateOnly(2024, 9, 15), 1, 1, 1, 1 });
+                values: new object[] { 1, new DateOnly(2024, 9, 20), 1, 1, 1, 1 });
 
             migrationBuilder.InsertData(
                 table: "ProductionPlanPositions",
@@ -673,12 +733,27 @@ namespace LuzyceApi.Db.AppDb.Migrations
             migrationBuilder.InsertData(
                 table: "Documents",
                 columns: new[] { "Id", "ClosedAt", "CreatedAt", "DocNumber", "DocumentsDefinitionId", "LockedBy", "Number", "OperatorId", "po_OrderId", "kw_ProductionPlanPositionsId", "StatusId", "UpdatedAt", "WarehouseId", "Year" },
-                values: new object[] { 1, null, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7818), 1, 1, null, "M/0001/KW/2024", 1, null, 1, 1, new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(7852), 1, 2023 });
+                values: new object[] { 1, null, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5477), 1, 1, null, "M/0001/KW/2024", 1, null, 1, 1, new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5509), 1, 2023 });
 
             migrationBuilder.InsertData(
                 table: "DocumentPositions",
-                columns: new[] { "Id", "CustomerLampshadeNumber", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
-                values: new object[] { 1, null, 1, null, "", 1, null, 1, null, null, 0, 0, 0, 0, "", new DateTime(2024, 9, 15, 19, 20, 5, 944, DateTimeKind.Local).AddTicks(8421), null, null, null });
+                columns: new[] { "Id", "DocumentId", "EndTime", "LampshadeDekor", "LampshadeId", "LampshadeNormId", "OperatorId", "OrderPositionForProductionId", "po_Priority", "QuantityGross", "QuantityLoss", "QuantityNetto", "QuantityToImprove", "Remarks", "StartTime", "po_SubiektProductId", "po_NumberOfChanges", "po_QuantityMade" },
+                values: new object[] { 1, 1, null, "", 1, null, 1, null, null, 0, 0, 0, 0, "", new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(6053), null, null, null });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerLampshades_CustomerId",
+                table: "CustomerLampshades",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerLampshades_LampshadeId",
+                table: "CustomerLampshades",
+                column: "LampshadeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerLampshades_LampshadeNormId",
+                table: "CustomerLampshades",
+                column: "LampshadeNormId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentItemRelationships_ParentDocumentId",
@@ -801,6 +876,11 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrdersForProduction_CustomerId",
+                table: "OrdersForProduction",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProductionPlanPositions_DocumentPositionId",
                 table: "ProductionPlanPositions",
                 column: "DocumentPositionId");
@@ -880,8 +960,27 @@ namespace LuzyceApi.Db.AppDb.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
+                name: "FK_OrdersForProduction_Customers_CustomerId",
+                table: "OrdersForProduction");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_DocumentPositions_LampshadeNorms_LampshadeNormId",
+                table: "DocumentPositions");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_DocumentPositions_Lampshades_LampshadeId",
+                table: "DocumentPositions");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_OrderPositionsForProduction_Lampshades_ProductId",
+                table: "OrderPositionsForProduction");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_ProductionPlanPositions_DocumentPositions_DocumentPositionId",
                 table: "ProductionPlanPositions");
+
+            migrationBuilder.DropTable(
+                name: "CustomerLampshades");
 
             migrationBuilder.DropTable(
                 name: "DocumentItemRelationships");
@@ -896,13 +995,22 @@ namespace LuzyceApi.Db.AppDb.Migrations
                 name: "Errors");
 
             migrationBuilder.DropTable(
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "LampshadeNorms");
+
+            migrationBuilder.DropTable(
+                name: "LampshadeVariants");
+
+            migrationBuilder.DropTable(
+                name: "Lampshades");
+
+            migrationBuilder.DropTable(
                 name: "DocumentPositions");
 
             migrationBuilder.DropTable(
                 name: "Documents");
-
-            migrationBuilder.DropTable(
-                name: "LampshadeNorms");
 
             migrationBuilder.DropTable(
                 name: "OrderPositionsForProduction");
@@ -915,12 +1023,6 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
             migrationBuilder.DropTable(
                 name: "Warehouses");
-
-            migrationBuilder.DropTable(
-                name: "LampshadeVariants");
-
-            migrationBuilder.DropTable(
-                name: "Lampshades");
 
             migrationBuilder.DropTable(
                 name: "OrdersForProduction");

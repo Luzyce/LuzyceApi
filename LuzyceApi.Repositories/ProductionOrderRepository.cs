@@ -25,12 +25,13 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(d => d.Operator)
                 .Include(d => d.Status)
                 .Include(d => d.Order)
+                .Include(d => d.Order!.Customer)
                 .Select(d => new GetProductionOrderForList
                 {
                     Id = d.Id,
                     OrderDate = d.CreatedAt,
                     OrderNumber = d.Order!.Number,
-                    CustomerName = d.Order!.CustomerName,
+                    CustomerName = d.Order!.Customer!.Name,
                     ProdOrderDate = d.CreatedAt,
                     ProdOrderNumber = d.Number,
                     DeliveryDate = d.Order!.DeliveryDate,
@@ -98,7 +99,14 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 },
                 LampshadeDekor = dp.LampshadeDekor,
                 Remarks = dp.Remarks,
-                CustomerLampshadeNumber = dp.CustomerLampshadeNumber,
+                CustomerLampshadeNumber =
+                    applicationDbContext
+                        .CustomerLampshades
+                        .FirstOrDefault(cl =>
+                            cl.Customer == dp.OrderPositionForProduction!.Order!.Customer &&
+                            cl.Lampshade == dp.Lampshade &&
+                            cl.LampshadeNorm == dp.LampshadeNorm &&
+                            cl.LampshadeDekor == dp.LampshadeDekor)!.CustomerSymbol,
                 NumberOfChanges = dp.po_NumberOfChanges,
                 QuantityMade = dp.po_QuantityMade,
                 ProductId = dp.SubiektProductId ?? 0,
@@ -150,6 +158,8 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(dp => dp.LampshadeNorm)
                     .ThenInclude(ln => ln!.Variant)
                 .Include(dp => dp.OrderPositionForProduction)
+                .Include(dp => dp.OrderPositionForProduction!.Order)
+                .Include(dp => dp.OrderPositionForProduction!.Order!.Customer)
                 .Where(dp => dp.Document!.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && dp.Document.StatusId == 1)
                 .Select(dp => new GetProductionOrderPosition
                 {
@@ -188,7 +198,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     ProductId = dp.SubiektProductId ?? 0,
                     Unit = dp.OrderPositionForProduction!.Unit!,
                     ProductionOrderNumber = dp.Document!.Number,
-                    Client = dp.OrderPositionForProduction.Order!.CustomerName,
+                    Client = dp.OrderPositionForProduction.Order!.Customer!.Name,
                     Priority = dp.Priority ?? 0
                 })
                 .ToList()
@@ -302,15 +312,28 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 return CreateProdOrder(productionOrder, order.Id, transaction);
             }
 
+            var customer = applicationDbContext.Customers
+                .FirstOrDefault(c => c.Id == order.CustomerId);
+
+            if (customer == null)
+            {
+                customer = new Customer
+                {
+                    Id = order.CustomerId,
+                    Name = order.CustomerName,
+                    Symbol = order.CustomerSymbol
+                };
+
+                applicationDbContext.Customers.Add(customer);
+            }
+
             var orderForProduction = new OrderForProduction
             {
                 Id = order.Id,
                 Date = order.Date,
                 Number = order.Number,
                 OriginalNumber = order.OriginalNumber,
-                CustomerId = order.CustomerId,
-                CustomerSymbol = order.CustomerSymbol,
-                CustomerName = order.CustomerName,
+                CustomerId = customer.Id,
                 DeliveryDate = order.DeliveryDate
             };
             applicationDbContext.OrdersForProduction.Add(orderForProduction);
@@ -460,6 +483,10 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             {
                 var existingPosition = applicationDbContext.DocumentPositions
                     .Include(dp => dp.LampshadeNorm)
+                    .Include(documentPositions => documentPositions.OrderPositionForProduction!)
+                    .ThenInclude(orderPositionForProduction => orderPositionForProduction.Order!)
+                    .ThenInclude(orderForProduction => orderForProduction.Customer!)
+                    .Include(documentPositions => documentPositions.Lampshade!)
                     .Where(dp => dp.DocumentId == id)
                     .FirstOrDefault(dp => dp.Id == position.Id);
             
@@ -467,6 +494,53 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 {
                     transaction.Rollback();
                     return 0;
+                }
+
+                // CustomerLampshadeNumber =
+                //     applicationDbContext
+                //         .CustomerLampshades
+                //         .FirstOrDefault(cl =>
+                //             cl.Customer == dp.OrderPositionForProduction!.Order!.Customer &&
+                //             cl.Lampshade == dp.Lampshade &&
+                //             cl.LampshadeNorm == dp.LampshadeNorm &&
+                //             cl.LampshadeDekor == dp.LampshadeDekor)!.CustomerSymbol,
+
+                var customerLampshade = applicationDbContext
+                    .CustomerLampshades
+                    .FirstOrDefault(cl =>
+                        cl.Customer == existingPosition.OrderPositionForProduction!.Order!.Customer &&
+                        cl.Lampshade == existingPosition.Lampshade &&
+                        cl.LampshadeNorm == existingPosition.LampshadeNorm &&
+                        cl.LampshadeDekor == existingPosition.LampshadeDekor);
+
+                if (position.CustomerLampshadeNumber is not null or "" &&
+                    customerLampshade is not null &&
+                    customerLampshade.CustomerSymbol != position.CustomerLampshadeNumber)
+                {
+                    customerLampshade.CustomerSymbol = position.CustomerLampshadeNumber;
+                    applicationDbContext.SaveChanges();
+                }
+
+                if (position.CustomerLampshadeNumber is not null or "" &&
+                    customerLampshade is null)
+                {
+                    customerLampshade = new CustomerLampshade
+                    {
+                        CustomerId = existingPosition.OrderPositionForProduction!.Order!.Customer!.Id,
+                        LampshadeId = existingPosition.Lampshade!.Id,
+                        LampshadeNormId = existingPosition.LampshadeNorm!.Id,
+                        LampshadeDekor = existingPosition.LampshadeDekor,
+                        CustomerSymbol = position.CustomerLampshadeNumber
+                    };
+                    applicationDbContext.CustomerLampshades.Add(customerLampshade);
+                    applicationDbContext.SaveChanges();
+                }
+
+                if (position.CustomerLampshadeNumber is null or "" &&
+                    customerLampshade is not null)
+                {
+                    applicationDbContext.CustomerLampshades.Remove(customerLampshade);
+                    applicationDbContext.SaveChanges();
                 }
             
                 existingPosition.QuantityNetto = position.QuantityNetto;
@@ -476,7 +550,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 existingPosition.LampshadeNorm.QuantityPerPack = position.QuantityPerPack;
                 existingPosition.EndTime = position.ExecutionDate;
                 existingPosition.po_QuantityMade = position.QuantityMade;
-                existingPosition.CustomerLampshadeNumber = position.CustomerLampshadeNumber;
+                // existingPosition.CustomerLampshadeNumber = position.CustomerLampshadeNumber;
                 existingPosition.Remarks = position.Remarks;
             }
 

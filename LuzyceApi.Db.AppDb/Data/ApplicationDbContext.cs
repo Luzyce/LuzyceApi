@@ -26,6 +26,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
     public DbSet<ProductionPlan> ProductionPlans { get; set; }
     public DbSet<ProductionPlanPositions> ProductionPlanPositions { get; set; }
     public DbSet<Shift> Shifts { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<CustomerLampshade> CustomerLampshades { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -201,6 +203,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<Lampshade>().HasData(exampleLampshade);
+
+        var exampleCustomer = new Customer
+        {
+            Id = 1,
+            Name = "Test",
+            Symbol = "TST"
+        };
+
+        modelBuilder.Entity<Customer>().HasData(exampleCustomer);
         
         var exampleOrderForProduction = new OrderForProduction
         {
@@ -209,8 +220,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Number = "1",
             OriginalNumber = "1",
             CustomerId = 1,
-            CustomerSymbol = "TEST",
-            CustomerName = "Testowanie"
         };
         
         modelBuilder.Entity<OrderForProduction>().HasData(exampleOrderForProduction);
@@ -362,7 +371,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 LampshadeNorm = null!,
                 LampshadeDekor = "F",
                 Remarks = "Test",
-                CustomerLampshadeNumber = "xyz",
                 OrderPositionForProductionId = exampleOrderPositionForProduction.Id,
                 OrderPositionForProduction = null!,
                 po_NumberOfChanges = 1,

@@ -238,6 +238,8 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                                         $"{position.Kwit.First().DocumentPositions.First().LampshadeNorm!.Variant!.Name} " +
                                                         $"{position.Kwit.First().DocumentPositions.First().LampshadeDekor}\n" +
                                                         $"Ilość: {position.Quantity}\n" +
+                                                        $"Waga Netto: {position.Kwit.First().DocumentPositions.First().LampshadeNorm?.WeightNetto}\n" +
+                                                        $"Waga Brutto: {position.Kwit.First().DocumentPositions.First().LampshadeNorm?.WeightBrutto}\n" +
                                                         $"Norma: {position.Kwit.First().DocumentPositions.First().LampshadeNorm?.QuantityPerChange}\n" +
                                                         $"Kwit: {position.Kwit.First().Number}\n" +
                                                         $"Firma: {position.Kwit.First().DocumentPositions.First().OrderPositionForProduction?.Order?.Customer?.Name}\n";

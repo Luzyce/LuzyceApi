@@ -39,6 +39,8 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
             return NotFound();
         }
 
+        var isUserLocked = usersRepository.IsUserLocked(user.Id);
+
         return Ok(
             new GetUserForUpdateDto
             {
@@ -48,7 +50,8 @@ public class UserController(UsersRepository usersRepository) : ControllerBase
                 Email = user.Email ?? "",
                 Login = user.Login,
                 Hash = user.Hash,
-                RoleId = user.Role!.Id
+                RoleId = user.Role!.Id,
+                IsLocked = isUserLocked
             });
     }
 

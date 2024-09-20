@@ -112,6 +112,17 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
             .FirstOrDefault(x => x.Id == id);
     }
 
+    public bool IsUserLocked(int id)
+    {
+        logger.LogInformation($"Checking if user is locked: {id}");
+        // is this user in any document
+        return
+            applicationDbContext.Documents.Any(x => x.OperatorId == id) ||
+            applicationDbContext.ProductionPlans.Any(x => x.HeadsOfMetallurgicalTeamsId == id) ||
+            applicationDbContext.Operations.Any(x => x.OperatorId == id) ||
+            applicationDbContext.Shifts.Any(x => x.ShiftSupervisorId == id);
+    }
+
     public void AddUser(Domain.Models.User user)
     {
         logger.LogInformation($"Adding user: {user.Login}");

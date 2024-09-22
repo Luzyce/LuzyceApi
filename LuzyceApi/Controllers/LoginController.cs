@@ -1,22 +1,27 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using Luzyce.Core.Models.User;
-using LuzyceApi.Domain.Models;
+using LuzyceApi.Db.AppDb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Client = LuzyceApi.Domain.Models.Client;
+using User = LuzyceApi.Domain.Models.User;
 
 namespace LuzyceApi.Controllers;
 [Route("api/login")]
 [ApiController]
-public class LoginController(IConfiguration config, UsersRepository usersRepository) : Controller
+public class LoginController(IConfiguration config, UsersRepository usersRepository, LogRepository logRepository) : Controller
 {
     private readonly IConfiguration config = config;
     private readonly UsersRepository usersRepository = usersRepository;
+    private readonly LogRepository logRepository = logRepository;
 
-    private string generateJSONWebToken(User user, string ipaddress, bool isHashLogin)
+    private string generateJSONWebToken(User user, bool isHashLogin, Client client)
     {
         var claims = new[]
         {
@@ -25,7 +30,8 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
                 new Claim(ClaimTypes.Role, usersRepository.GetRole(user.RoleId)?.Name ?? ""),
                 new Claim(ClaimTypes.GivenName, user.Name),
                 new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Sid, ipaddress),
+                new Claim(ClaimTypes.PrimarySid, client.Id.ToString()),
+                new Claim(ClaimTypes.Hash, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash),
                 new Claim(ClaimTypes.SerialNumber, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash)
         };
 
@@ -51,12 +57,25 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         var user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
 
+        var ipAddr = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+        var name = Dns.GetHostEntry(ipAddr)?.HostName;
+        var clientType = isHashLogin ? "Terminal" : "Web";
+        var client = usersRepository.GetClientByIp(ipAddr, clientType) ??
+                     usersRepository.AddClient(new Client { Name = name, IpAddress = ipAddr, Type = clientType });
+
+        dto.Password = "";
+
         if (user == null)
         {
+            logRepository.AddLog(client.Id, dto.Hash, JsonSerializer.Serialize(dto));
+
             return Unauthorized();
         }
 
-        var tokenString = generateJSONWebToken(user, dto.IpAddress, isHashLogin);
+        var tokenString = generateJSONWebToken(user, isHashLogin, client);
+
+        logRepository.AddLog(User, "Successful login", JsonSerializer.Serialize(dto));
+
         return Ok(
             new LoginResponseDto
             {
@@ -70,14 +89,18 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
     public IActionResult RefreshToken()
     {
         var user = usersRepository.GetUserById(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"));
-        var ipAddr = User.FindFirstValue(ClaimTypes.Sid);
+        var client = usersRepository.GetClientById(int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "0"));
         
-        if (user == null || string.IsNullOrEmpty(ipAddr))
+        if (user == null || client == null)
         {
+            logRepository.AddLog(User, "Failed refresh token", null);
             return Unauthorized();
         }
         
-        var tokenString = generateJSONWebToken(user, ipAddr, false);
+        var tokenString = generateJSONWebToken(user, false, client);
+
+        logRepository.AddLog(User, "Successful refresh token", null);
+
         return Ok(
             new LoginResponseDto
             {

@@ -28,6 +28,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
     public DbSet<Shift> Shifts { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<CustomerLampshade> CustomerLampshades { get; set; }
+    public DbSet<Client> Clients { get; set; }
+    public DbSet<Log> Logs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

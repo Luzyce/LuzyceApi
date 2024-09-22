@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LuzyceApi.Db.AppDb.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240920121301_addCustomer")]
-    partial class addCustomer
+    [Migration("20240922111512_addLogs")]
+    partial class addLogs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,28 @@ namespace LuzyceApi.Db.AppDb.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Client", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clients");
+                });
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Customer", b =>
                 {
@@ -101,8 +123,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Property<int>("DocumentsDefinitionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("LockedBy")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("LockedById")
+                        .HasColumnType("int");
 
                     b.Property<string>("Number")
                         .IsRequired()
@@ -135,6 +157,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
 
                     b.HasIndex("DocumentsDefinitionId");
 
+                    b.HasIndex("LockedById");
+
                     b.HasIndex("OperatorId");
 
                     b.HasIndex("OrderId");
@@ -151,27 +175,27 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5477),
+                            CreatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3517),
                             DocNumber = 1,
                             DocumentsDefinitionId = 1,
                             Number = "M/0001/KW/2024",
                             OperatorId = 1,
                             ProductionPlanPositionsId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5509),
+                            UpdatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3559),
                             WarehouseId = 1,
                             Year = 2023
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5514),
+                            CreatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3564),
                             DocNumber = 1,
                             DocumentsDefinitionId = 2,
                             Number = "P/0001/ZP/2024",
                             OperatorId = 1,
                             StatusId = 1,
-                            UpdatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5516),
+                            UpdatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3566),
                             WarehouseId = 2,
                             Year = 2024
                         });
@@ -302,7 +326,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
                             Remarks = "",
-                            StartTime = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(6053)
+                            StartTime = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3921)
                         },
                         new
                         {
@@ -318,7 +342,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                             QuantityNetto = 0,
                             QuantityToImprove = 0,
                             Remarks = "Test",
-                            StartTime = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(6059),
+                            StartTime = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3926),
                             SubiektProductId = 2628,
                             po_NumberOfChanges = 1m,
                             po_QuantityMade = 0
@@ -564,6 +588,40 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Log", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Data")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Logs");
+                });
+
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Operation", b =>
                 {
                     b.Property<int>("Id")
@@ -635,7 +693,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         {
                             Id = 1,
                             CustomerId = 1,
-                            Date = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(5829),
+                            Date = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(3759),
                             Number = "1",
                             OriginalNumber = "1"
                         });
@@ -757,7 +815,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateOnly(2024, 9, 20),
+                            Date = new DateOnly(2024, 9, 22),
                             HeadsOfMetallurgicalTeamsId = 1,
                             ShiftId = 1,
                             StatusId = 1,
@@ -867,7 +925,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            Date = new DateOnly(2024, 9, 20),
+                            Date = new DateOnly(2024, 9, 22),
                             ShiftNumber = 1,
                             ShiftSupervisorId = 1
                         });
@@ -962,19 +1020,19 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 93, DateTimeKind.Local).AddTicks(8662),
+                            CreatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 11, DateTimeKind.Local).AddTicks(7744),
                             Email = "admin@gmail.com",
                             Hash = "admin",
                             LastName = "Admin",
                             Login = "admin",
                             Name = "Admin",
-                            Password = "$2a$11$sDZvEQDOdOvN4BvFF9W6O.sKZTohMv//LcS9dBAGfX2OKtL6SnVOq",
+                            Password = "$2a$11$kga8cb95dNTGYGrikfcb5OFQ0dNL1SuL/VIyKsw1Eq/xyarU7zbCG",
                             RoleId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(4923),
+                            CreatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(2862),
                             Hash = "",
                             LastName = "Hutmustrz",
                             Login = "",
@@ -985,7 +1043,7 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2024, 9, 20, 14, 13, 1, 203, DateTimeKind.Local).AddTicks(4987),
+                            CreatedAt = new DateTime(2024, 9, 22, 13, 15, 12, 120, DateTimeKind.Local).AddTicks(2915),
                             Hash = "",
                             LastName = "Hutnik",
                             Login = "",
@@ -1067,6 +1125,10 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Client", "LockedBy")
+                        .WithMany()
+                        .HasForeignKey("LockedById");
+
                     b.HasOne("LuzyceApi.Db.AppDb.Models.User", "Operator")
                         .WithMany()
                         .HasForeignKey("OperatorId")
@@ -1094,6 +1156,8 @@ namespace LuzyceApi.Db.AppDb.Migrations
                         .IsRequired();
 
                     b.Navigation("DocumentsDefinition");
+
+                    b.Navigation("LockedBy");
 
                     b.Navigation("Operator");
 
@@ -1216,6 +1280,21 @@ namespace LuzyceApi.Db.AppDb.Migrations
                     b.Navigation("Lampshade");
 
                     b.Navigation("Variant");
+                });
+
+            modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Log", b =>
+                {
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId");
+
+                    b.HasOne("LuzyceApi.Db.AppDb.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Client");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("LuzyceApi.Db.AppDb.Models.Operation", b =>

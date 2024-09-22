@@ -4,15 +4,18 @@ using LuzyceApi.Mappers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using Luzyce.Core.Models.User;
+using LuzyceApi.Db.AppDb.Models;
 
 namespace LuzyceApi.Controllers;
 [Route("api/document")]
 [ApiController]
-public class DocumentController(DocumentRepository documentRepository) : Controller
+public class DocumentController(DocumentRepository documentRepository, LogRepository logRepository) : Controller
 {
     private readonly DocumentRepository documentRepository = documentRepository;
+    private readonly LogRepository logRepository = logRepository;
 
     [HttpGet]
     [Authorize]
@@ -168,17 +171,21 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     {
         var document = documentRepository
             .GetDocument(Int32.Parse(Regex.Match(dto.Number, "(kwit-(\\d+))").Groups[2].Value));
-        
+
         if (document == null)
         {
+            logRepository.AddLog(User, "Failed to get document by qr code - document not found", JsonSerializer.Serialize(dto));
             return NotFound();
         }
         if (documentRepository.IsDocumentLocked(document.Id))
         {
+            logRepository.AddLog(User, "Failed to get document by qr code - document is locked", JsonSerializer.Serialize(dto));
             return Conflict();
         }
 
-        documentRepository.LockDocument(document.Id, User.FindFirstValue(ClaimTypes.Sid) ?? "0");
+        documentRepository.LockDocument(document.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? ""));
+
+        logRepository.AddLog(User, "Get document by qr code", JsonSerializer.Serialize(dto));
 
         return Ok(new GetDocumentByQrCodeResponseDto
         {
@@ -330,14 +337,16 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     public IActionResult UpdateDocumentPositionOnKwit(int id, [FromBody] UpdateDocumentPositionOnKwitDto dto)
     {
         var document = documentRepository.GetDocument(id);
-        
+
         if (document?.DocumentsDefinition is not { Code: "KW" } || (dto.Type.Equals("+") && dto.Type.Equals("-")))
         {
+            logRepository.AddLog(User, "Failed to update document position on kwit - invalid request", JsonSerializer.Serialize(dto));
             return BadRequest("Invalid request");
         }
-        
-        if (!documentRepository.IsDocumentLockedByUser(id, User.FindFirstValue(ClaimTypes.Sid)))
+
+        if (!documentRepository.IsDocumentLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
+            logRepository.AddLog(User, "Failed to update document position on kwit - document is not locked or locked by another user", JsonSerializer.Serialize(dto));
             return BadRequest("Document is locked by another user or not locked");
         }
 
@@ -346,6 +355,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
 
         if (documentPosition == null)
         {
+            logRepository.AddLog(User, "Failed to update document position on kwit - document position not found", JsonSerializer.Serialize(dto));
             return NotFound();
         }
 
@@ -380,6 +390,7 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         }
         else
         {
+            logRepository.AddLog(User, "Failed to update document position on kwit - invalid field", JsonSerializer.Serialize(dto));
             return BadRequest("Invalid field");
         }
 
@@ -399,6 +410,8 @@ public class DocumentController(DocumentRepository documentRepository) : Control
         documentRepository.AddOperation(newOperation);
         documentRepository.UpdateDocumentPosition(documentPosition);
 
+        logRepository.AddLog(User, "Update document position on kwit", JsonSerializer.Serialize(dto));
+
         return Ok(new GetDocumentPositionResponseDto
         {
             Id = documentPosition.Id,
@@ -412,12 +425,16 @@ public class DocumentController(DocumentRepository documentRepository) : Control
     [Authorize]
     public IActionResult CloseDocument(int id)
     {
-        if (!documentRepository.IsDocumentLockedByUser(id, User.FindFirstValue(ClaimTypes.Sid)))
+        if (!documentRepository.IsDocumentLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
+            logRepository.AddLog(User, "Failed to close document - document is not locked or locked by another user", JsonSerializer.Serialize(id));
             return BadRequest("Document is not locked or locked by another user");
         }
 
         documentRepository.UnlockDocument(id);
+
+        logRepository.AddLog(User, "Close document", JsonSerializer.Serialize(id));
+
         return Ok();
     }
 }

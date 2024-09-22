@@ -223,7 +223,57 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
         }
         return RoleDomainFromDb(role);
     }
-    public static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
+
+    public Domain.Models.Client? GetClientByIp(string ip, string type)
+    {
+        var client = applicationDbContext.Clients.FirstOrDefault(x => x.IpAddress == ip && x.Type == type);
+
+        if (client == null)
+        {
+            return null;
+        }
+
+        return new Domain.Models.Client
+        {
+            Id = client.Id,
+            Name = client.Name,
+            IpAddress = client.IpAddress
+        };
+    }
+
+    public Domain.Models.Client? GetClientById(int id)
+    {
+        var client = applicationDbContext.Clients.FirstOrDefault(x => x.Id == id);
+
+        if (client == null)
+        {
+            return null;
+        }
+
+        return new Domain.Models.Client
+        {
+            Id = client.Id,
+            Name = client.Name,
+            IpAddress = client.IpAddress
+        };
+    }
+    public Domain.Models.Client AddClient(Domain.Models.Client client)
+    {
+        var dbClient = new Client
+        {
+            Name = client.Name,
+            IpAddress = client.IpAddress,
+            Type = client.Type
+        };
+
+        applicationDbContext.Clients.Add(dbClient);
+        applicationDbContext.SaveChanges();
+
+        client.Id = dbClient.Id;
+        return client;
+    }
+
+    private static Domain.Models.Role RoleDomainFromDb(Db.AppDb.Models.Role role)
     {
         return new Domain.Models.Role
         {

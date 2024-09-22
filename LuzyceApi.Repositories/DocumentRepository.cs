@@ -36,11 +36,11 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
     {
         logger.LogInformation("Getting document by id");
         var document = applicationDbContext.Documents
-                        .Include(d => d.Warehouse)
-                        .Include(d => d.Operator)
-                        .Include(d => d.Status)
-                        .Include(d => d.DocumentsDefinition)
-                        .FirstOrDefault(x => x.Id == id);
+            .Include(d => d.Warehouse)
+            .Include(d => d.Operator)
+            .Include(d => d.Status)
+            .Include(d => d.DocumentsDefinition).Include(document => document.LockedBy)
+            .FirstOrDefault(x => x.Id == id);
 
         if (document == null)
         {
@@ -59,7 +59,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             UpdatedAt = document.UpdatedAt,
             ClosedAt = document.ClosedAt,
             Status = StatusDomainFromDb(document.Status!),
-            LockedBy = document.LockedBy
+            LockedBy = ClientDomainFromDb(document.LockedBy)
         };
     }
     public Domain.Models.Document? GetDocumentByNumber(string number)
@@ -138,7 +138,7 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         applicationDbContext.SaveChanges();
         return document;
     }
-    public bool LockDocument(int id, string ip)
+    public bool LockDocument(int id, int clientId)
     {
         logger.LogInformation("Updating document");
         var dbDocument = applicationDbContext.Documents.Find(id);
@@ -146,11 +146,13 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         {
             return false;
         }
-        dbDocument.LockedBy = ip;
+
+        dbDocument.LockedById = clientId;
         dbDocument.UpdatedAt = DateTime.Now;
         applicationDbContext.SaveChanges();
         return true;
     }
+
     public bool UnlockDocument(int id)
     {
         logger.LogInformation("Updating document");
@@ -171,11 +173,13 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
         var dbDocument = applicationDbContext.Documents.Find(id);
         return dbDocument?.LockedBy != null;
     }
-    public bool IsDocumentLockedByUser(int id, string? userId)
+    public bool IsDocumentLockedByUser(int id, int clientId)
     {
         logger.LogInformation("Checking if document is locked");
-        var dbDocument = applicationDbContext.Documents.Find(id);
-        return dbDocument?.LockedBy == userId;
+        var dbDocument = applicationDbContext.Documents
+            .Include(x => x.LockedBy)
+            .FirstOrDefault(x => x.Id == id);
+        return dbDocument?.LockedById == clientId;
     }
     public Domain.Models.DocumentPositions AddDocumentPosition(Domain.Models.DocumentPositions documentPosition)
     {
@@ -415,6 +419,21 @@ public class DocumentRepository(ApplicationDbContext applicationDbContext, ILogg
             UpdatedAt = document.UpdatedAt,
             ClosedAt = document.ClosedAt,
             Status = StatusDomainFromDb(document.Status!)
+        };
+    }
+
+    private static Domain.Models.Client? ClientDomainFromDb(Client? client)
+    {
+        if (client == null)
+        {
+            return null;
+        }
+
+        return new Domain.Models.Client
+        {
+            Id = client.Id,
+            Name = client.Name,
+            IpAddress = client.IpAddress
         };
     }
 }

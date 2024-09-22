@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using Luzyce.Core.Models.User;
-using LuzyceApi.Db.AppDb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using LuzyceApi.Repositories;
@@ -74,7 +73,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
 
         var tokenString = generateJSONWebToken(user, isHashLogin, client);
 
-        logRepository.AddLog(User, "Successful login", JsonSerializer.Serialize(dto));
+        logRepository.AddLog(User, "Zalogowano pomyślnie", JsonSerializer.Serialize(dto));
 
         return Ok(
             new LoginResponseDto
@@ -93,13 +92,10 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         
         if (user == null || client == null)
         {
-            logRepository.AddLog(User, "Failed refresh token", null);
             return Unauthorized();
         }
         
         var tokenString = generateJSONWebToken(user, false, client);
-
-        logRepository.AddLog(User, "Successful refresh token", null);
 
         return Ok(
             new LoginResponseDto

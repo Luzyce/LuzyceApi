@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Text.Json;
 using Luzyce.Core.Models.ProductionOrder;
 using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
@@ -9,14 +10,16 @@ namespace LuzyceApi.Controllers;
 
 [ApiController]
 [Route("api/productionOrder")]
-public class ProductionOrderController(ProductionOrderRepository productionOrderRepository) : Controller
+public class ProductionOrderController(ProductionOrderRepository productionOrderRepository, LogRepository logRepository) : Controller
 {
     private readonly ProductionOrderRepository productionOrderRepository = productionOrderRepository;
+    private readonly LogRepository logRepository = logRepository;
     
     [HttpGet]
     [Authorize]
     public IActionResult Get()
     {
+        logRepository.AddLog(User, "Pobrano zlecenia produkcji", null);
         return Ok(productionOrderRepository.GetProductionOrders());
     }
     
@@ -24,6 +27,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     [Authorize]
     public IActionResult Get(int id)
     {
+        logRepository.AddLog(User, "Pobrano zlecenie produkcji", JsonSerializer.Serialize(new {id}));
         return Ok(productionOrderRepository.GetProductionOrder(id));
     }
     
@@ -31,6 +35,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     [Authorize]
     public IActionResult GetPositions()
     {
+        logRepository.AddLog(User, "Pobrano pozycje zlecenia produkcji", null);
         return Ok(productionOrderRepository.GetPositions());
     }
     
@@ -42,6 +47,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         if (operatorId == 0)
         {
+            logRepository.AddLog(User, "Nie udało się utworzyć zlecenia produkcyjnego – nieautoryzowany użytkownik", JsonSerializer.Serialize(createProductionOrderDto));
             return Unauthorized();
         }
         
@@ -54,9 +60,12 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         if (status == null)
         {
+            logRepository.AddLog(User, "Nie udało się utworzyć zlecenia produkcyjnego - wystąpił błąd podczas zapisu", JsonSerializer.Serialize(createProductionOrderDto));
             return Conflict();
         }
-        
+
+        logRepository.AddLog(User, "Utworzono zlecenie produkcji", JsonSerializer.Serialize(createProductionOrderDto));
+
         return Ok(status);
     }
     
@@ -68,9 +77,12 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
         
         if (resp == 0)
         {
+            logRepository.AddLog(User, "Nie udało się zaktualizować zlecenia produkcyjnego", JsonSerializer.Serialize(updateProductionOrderDto));
             return Conflict();
         }
-        
+
+        logRepository.AddLog(User, "Zaktualizowano zlecenie produkcji", JsonSerializer.Serialize(updateProductionOrderDto));
+
         return Ok();
     }
     
@@ -78,6 +90,7 @@ public class ProductionOrderController(ProductionOrderRepository productionOrder
     [Authorize]
     public IActionResult GetNorms(GetNorms getNorms)
     {
+        logRepository.AddLog(User, "Pobrano normy", JsonSerializer.Serialize(getNorms));
         return Ok(productionOrderRepository.GetNorms(getNorms));
     }
     

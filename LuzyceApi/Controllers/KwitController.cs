@@ -23,18 +23,18 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Failed to get document by qr code - document not found", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(dto));
             return NotFound();
         }
-        if (kwitRepository.IsKwitLocked(kwit.Id))
+        if (kwitRepository.IsKwitLocked(kwit.Id) && !kwitRepository.IsKwitLockedByUser(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Failed to get document by qr code - document is locked", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zablokowany", JsonSerializer.Serialize(dto));
             return Conflict();
         }
 
         kwitRepository.LockKwit(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? ""));
 
-        logRepository.AddLog(User, "Get document by qr code", JsonSerializer.Serialize(dto));
+        logRepository.AddLog(User, "Pobrano kwit na terminalu", JsonSerializer.Serialize(dto));
 
         return Ok(new GetDocumentByQrCodeResponseDto
         {
@@ -56,15 +56,15 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     {
         var kwit = kwitRepository.GetKwit(id);
 
-        if (kwit?.DocumentsDefinition is not { Code: "KW" } || dto.Type != '+' || dto.Type != '-')
+        if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-'))
         {
-            logRepository.AddLog(User, "Failed to update document position on kwit - invalid request", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe żądanie", JsonSerializer.Serialize(dto));
             return BadRequest("Invalid request");
         }
 
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Failed to update document position on kwit - document is not locked or locked by another user", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu – kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(dto));
             return BadRequest("Document is locked by another user or not locked");
         }
 
@@ -73,7 +73,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (documentPosition == null)
         {
-            logRepository.AddLog(User, "Failed to update document position on kwit - document position not found", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona", JsonSerializer.Serialize(dto));
             return NotFound();
         }
 
@@ -108,7 +108,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         }
         else
         {
-            logRepository.AddLog(User, "Failed to update document position on kwit - invalid field", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe pole", JsonSerializer.Serialize(dto));
             return BadRequest("Invalid field");
         }
 
@@ -128,7 +128,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         kwitRepository.AddOperation(newOperation);
         kwitRepository.UpdateKwitPosition(documentPosition);
 
-        logRepository.AddLog(User, "Update document position on kwit", JsonSerializer.Serialize(dto));
+        logRepository.AddLog(User, "Zaktualizowano Kwit przez Terminal", JsonSerializer.Serialize(dto));
 
         return Ok(new GetDocumentPositionResponseDto
         {
@@ -139,19 +139,19 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         });
     }
 
-    [HttpGet("closeDocument/{id}")]
+    [HttpGet("terminal/closeKwit/{id:int}")]
     [Authorize]
-    public IActionResult CloseDocument(int id)
+    public IActionResult CloseKwit(int id)
     {
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Failed to close document - document is not locked or locked by another user", JsonSerializer.Serialize(id));
-            return BadRequest("Document is not locked or locked by another user");
+            logRepository.AddLog(User, "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(id));
+            return BadRequest("Kwit is not locked or locked by another user");
         }
 
         kwitRepository.UnlockKwit(id);
 
-        logRepository.AddLog(User, "Close document", JsonSerializer.Serialize(id));
+        logRepository.AddLog(User, "Zamknięto Kwit", JsonSerializer.Serialize(id));
 
         return Ok();
     }

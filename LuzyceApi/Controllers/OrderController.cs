@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Luzyce.Core.Models.Order;
 using LuzyceApi.Mappers;
 using LuzyceApi.Repositories;
@@ -8,14 +9,16 @@ namespace LuzyceApi.Controllers;
 
 [ApiController]
 [Route("api/order")]
-public class OrderController(OrderRepository orderRepository) : Controller
+public class OrderController(OrderRepository orderRepository, LogRepository logRepository) : Controller
 {
     private readonly OrderRepository orderRepository = orderRepository;
+    private readonly LogRepository logRepository = logRepository;
 
     [HttpPost("{offset}")]
     [Authorize]
     public IActionResult Get(int offset, GetOrdersDto getOrdersDto)
     {
+        logRepository.AddLog(User, "Pobrano zamówienia z Subiekta", JsonSerializer.Serialize(new {offset, getOrdersDto}));
         var response = orderRepository.GetOrders(offset: offset, ordersFilters: getOrdersDto.ToOrdersFiltersFromDto());
         return Ok(new GetOrdersResponseDto
         {
@@ -60,13 +63,15 @@ public class OrderController(OrderRepository orderRepository) : Controller
     [Authorize]
     public IActionResult Get(int offset, int limit)
     {
+        logRepository.AddLog(User, "Pobrano zamówienia z Subiekta", JsonSerializer.Serialize(new {offset, limit}));
         return Ok(orderRepository.GetOrders(offset: offset, limit: limit));
     }
 
     [HttpGet("positions/{orderId}")]
     [Authorize]
-    public IActionResult GetItems(int orderId)
+    public IActionResult GetPositions(int orderId)
     {
+        logRepository.AddLog(User, "Pobrano pozycje zamówienia z Subiekta", JsonSerializer.Serialize(orderId));
         return Ok(orderRepository.GetOrderPositions(orderId));
     }
     
@@ -74,6 +79,7 @@ public class OrderController(OrderRepository orderRepository) : Controller
     [Authorize]
     public IActionResult GetWarehousesLevels(StockRequest stockRequest)
     {
+        logRepository.AddLog(User, "Pobrano stany magazynowe", JsonSerializer.Serialize(stockRequest));
         var response = orderRepository.GetWarehousesLevels(stockRequest);
         return Ok(response);
     }

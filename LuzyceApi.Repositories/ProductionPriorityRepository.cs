@@ -8,7 +8,7 @@ public class ProductionPriorityRepository(ApplicationDbContext applicationDbCont
 {
     private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
     
-    public int SavePriorities(CreateProductionPriorityRequest createProductionPriorityRequest)
+    public int UpdatePriorities(UpdateProductionPrioritiesRequest createProductionPriorityRequest)
     {
         using var transaction = applicationDbContext.Database.BeginTransaction();
 

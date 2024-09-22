@@ -8,20 +8,13 @@ public class LogRepository(ApplicationDbContext applicationDbContext)
 {
     private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
 
-    public void AddLog(Log log)
-    {
-
-        applicationDbContext.Logs.Add(log);
-        applicationDbContext.SaveChanges();
-    }
-
     public void AddLog(int clientId, string hash, string data)
     {
         applicationDbContext.Logs.Add(new Log
         {
             Timestamp = DateTime.Now,
             ClientId = clientId,
-            Operation = "Failed login",
+            Operation = "Nieudane logowanie",
             Hash = hash,
             Data = data
         });

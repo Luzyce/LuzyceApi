@@ -1,4 +1,5 @@
-﻿using Luzyce.Core.Models.ProductionPlan;
+﻿using System.Text.Json;
+using Luzyce.Core.Models.ProductionPlan;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,13 @@ namespace LuzyceApi.Controllers;
 
 [ApiController]
 [Route("api/productionPlan")]
-public class ProductionPlanController(ProductionPlanRepository productionPlanRepository) : Controller
+public class ProductionPlanController(ProductionPlanRepository productionPlanRepository, LogRepository logRepository) : Controller
 {
     [HttpPost]
     [Authorize]
     public IActionResult GetProductionPlans(GetMonthProductionPlanRequest request)
     {
+        logRepository.AddLog(User, "Pobrano plany produkcji", JsonSerializer.Serialize(request));
         return Ok(productionPlanRepository.GetProductionPlans(request));
     }
 
@@ -28,8 +30,11 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
         if (resp == 0)
         {
+            logRepository.AddLog(User, "Nie udało się dodać pozycji do planu produkcji", JsonSerializer.Serialize(request));
             return Conflict();
         }
+
+        logRepository.AddLog(User, "Dodano pozycje do planu produkcji", JsonSerializer.Serialize(request));
 
         return Ok();
     }
@@ -38,6 +43,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     [Authorize]
     public IActionResult GetProductionPlan(GetProductionPlanPositionsRequest request)
     {
+        logRepository.AddLog(User, "Pobrano plan produkcji", JsonSerializer.Serialize(request));
         return Ok(productionPlanRepository.GetProductionPlan(request));
     }
 
@@ -45,6 +51,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     [Authorize]
     public IActionResult DeletePosition(int id)
     {
+        logRepository.AddLog(User, "Usunięto pozycję z planu produkcji", JsonSerializer.Serialize(new {id}));
         productionPlanRepository.DeletePosition(id);
         return Ok();
     }
@@ -53,6 +60,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     [Authorize]
     public IActionResult getShiftSupervisor()
     {
+        logRepository.AddLog(User, "Pobrano Kierowników Zmian", null);
         return Ok(productionPlanRepository.ShiftSupervisor());
     }
 
@@ -60,6 +68,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     [Authorize]
     public IActionResult GetHeadsOfMetallurgicalTeams()
     {
+        logRepository.AddLog(User, "Pobrano Hutników", null);
         return Ok(productionPlanRepository.GetHeadsOfMetallurgicalTeams());
     }
 
@@ -68,6 +77,9 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
     public IActionResult UpdatePositions(UpdateProductionPlan request)
     {
         productionPlanRepository.UpdateProductionPlan(request);
+
+        logRepository.AddLog(User, "Zaktualizowano pozycje w planie produkcji", JsonSerializer.Serialize(request));
+
         return Ok();
     }
 
@@ -78,15 +90,15 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
         if (kwit == null)
         {
+            logRepository.AddLog(User, "Nie udało się pobrać pliku pdf kwitu - kwit nie został znaleziony", JsonSerializer.Serialize(new {id}));
             return Results.File(Array.Empty<byte>(), "application/pdf");
         }
 
         var url = $"http://localhost:5132/api/productionPlan/kwit-{id}.pdf";
-        var qrSVGString = "";
         using var qrGenerator = new QRCodeGenerator();
         using var qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
         using var qrSVG = new SvgQRCode(qrCodeData);
-        qrSVGString = qrSVG.GetGraphic(100);
+        var qrSVGString = qrSVG.GetGraphic(100);
 
         var document = Document.Create(container =>
         {
@@ -167,6 +179,8 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
         var pdf = document.GeneratePdf();
 
+        logRepository.AddLog(User, "Pobrano pdf kwitu", JsonSerializer.Serialize(new {id}));
+
         return Results.File(pdf, "application/pdf");
     }
 
@@ -213,7 +227,7 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
                             for (var x = 1; x <= 3; x++)
                             {
-                                table.Cell().Element(CellStyle).Padding(5).AlignCenter().RotateLeft().Width(90).Text("Zespół " + x).AlignCenter().FontSize(16);;
+                                table.Cell().Element(CellStyle).Padding(5).AlignCenter().RotateLeft().Width(90).Text("Zespół " + x).AlignCenter().FontSize(16);
                                 
                                 for (var y = 1; y <= 3; y++)
                                 {
@@ -260,6 +274,8 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
         });
 
         var pdf = document.GeneratePdf();
+
+        logRepository.AddLog(User, "Pobrano pdf planu produkcji", JsonSerializer.Serialize(new {data}));
 
         return Results.File(pdf, "application/pdf");
     }

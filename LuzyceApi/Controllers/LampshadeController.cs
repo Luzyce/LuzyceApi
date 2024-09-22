@@ -1,4 +1,5 @@
-﻿using Luzyce.Core.Models.Lampshade;
+﻿using System.Text.Json;
+using Luzyce.Core.Models.Lampshade;
 using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,14 +8,16 @@ namespace LuzyceApi.Controllers;
 
 [ApiController]
 [Route("api/lampshade")]
-public class LampshadeController(LampshadeRepository lampshadeRepository) : Controller
+public class LampshadeController(LampshadeRepository lampshadeRepository, LogRepository logRepository) : Controller
 {
     private readonly LampshadeRepository lampshadeRepository = lampshadeRepository;
+    private readonly LogRepository logRepository = logRepository;
     
     [HttpGet("variants")]
     [Authorize]
     public IActionResult GetLampshadeVariants()
     {
+        logRepository.AddLog(User, "Pobrano warianty kloszy", null);
         return Ok(new GetVariantsResponseDto
         {
             Variants = lampshadeRepository.GetLampshadeVariants().Select(x => new GetVariantResponseDto
@@ -34,9 +37,12 @@ public class LampshadeController(LampshadeRepository lampshadeRepository) : Cont
         
         if (variant == null)
         {
+            logRepository.AddLog(User, "Nie udało się uzyskać wariantu klosza – wariant nie został znaleziony", JsonSerializer.Serialize(new {shortName}));
             return NotFound();
         }
-        
+
+        logRepository.AddLog(User, "Pobrano wariant klosza", JsonSerializer.Serialize(new {shortName}));
+
         return Ok(new GetVariantResponseDto()
         {
             Id = variant.Id,

@@ -179,8 +179,6 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
         var pdf = document.GeneratePdf();
 
-        logRepository.AddLog(User, "Pobrano pdf kwitu", JsonSerializer.Serialize(new {id}));
-
         return Results.File(pdf, "application/pdf");
     }
 
@@ -274,8 +272,6 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
         });
 
         var pdf = document.GeneratePdf();
-
-        logRepository.AddLog(User, "Pobrano pdf planu produkcji", JsonSerializer.Serialize(new {data}));
 
         return Results.File(pdf, "application/pdf");
     }

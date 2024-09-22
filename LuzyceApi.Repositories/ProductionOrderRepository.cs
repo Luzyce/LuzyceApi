@@ -79,7 +79,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     Id = dp.Lampshade!.Id,
                     Code = dp.Lampshade.Code
                 },
-                LampshadeNorm = new GetLampshadeNorm()
+                LampshadeNorm = new GetLampshadeNorm
                 {
                     Id = dp.LampshadeNorm!.Id,
                     Lampshade = new GetLampshade
@@ -238,7 +238,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     Id = dp.Lampshade!.Id,
                     Code = dp.Lampshade.Code
                 },
-                LampshadeNorm = new GetLampshadeNorm()
+                LampshadeNorm = new GetLampshadeNorm
                 {
                     Id = dp.LampshadeNorm!.Id,
                     Lampshade = new GetLampshade

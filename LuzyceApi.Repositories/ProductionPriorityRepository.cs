@@ -14,10 +14,10 @@ public class ProductionPriorityRepository(ApplicationDbContext applicationDbCont
 
         try
         {
-            for (var i = 0; i < createProductionPriorityRequest.positions.Count; i++)
+            for (var i = 0; i < createProductionPriorityRequest.Positions.Count; i++)
             {
                 var documentPosition = applicationDbContext.DocumentPositions
-                    .FirstOrDefault(x => x.Id == createProductionPriorityRequest.positions[i].Id);
+                    .FirstOrDefault(x => x.Id == createProductionPriorityRequest.Positions[i].Id);
                 
                 if (documentPosition == null)
                 {

@@ -163,6 +163,14 @@ public class UsersRepository(ApplicationDbContext applicationDbContext, ILogger<
             return;
         }
 
+        if (userToUpdate.Hash != user.Hash)
+        {
+            applicationDbContext.Logs
+                .Where(x => x.Hash == userToUpdate.Hash)
+                .ToList()
+                .ForEach(x => x.Hash = user.Hash);
+        }
+
         userToUpdate.Name = user.Name;
         userToUpdate.LastName = user.LastName;
         userToUpdate.Email = user.Email;

@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Net.Sockets;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -57,7 +58,16 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
 
         var ipAddr = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
-        var name = Dns.GetHostEntry(ipAddr)?.HostName;
+        var name = "";
+        try
+        {
+            var hostEntry = Dns.GetHostEntry(ipAddr);
+            name = hostEntry.HostName;
+        }
+        catch (SocketException)
+        {
+            name = null;
+        }
         var clientType = isHashLogin ? "Terminal" : "Web";
         var client = usersRepository.GetClientByIp(ipAddr, clientType) ??
                      usersRepository.AddClient(new Client { Name = name, IpAddress = ipAddr, Type = clientType });
@@ -73,7 +83,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
 
         var tokenString = generateJSONWebToken(user, isHashLogin, client);
 
-        logRepository.AddLog(User, "Zalogowano pomyślnie", JsonSerializer.Serialize(dto));
+        logRepository.AddLog(client.Id, user.Id,"Zalogowano pomyślnie", user.Hash, JsonSerializer.Serialize(dto));
 
         return Ok(
             new LoginResponseDto

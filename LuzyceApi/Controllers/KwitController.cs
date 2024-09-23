@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Luzyce.Core.Models.Kwit;
+using Luzyce.Core.Models.Log;
+using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Controllers;
 [Route("api/document")]
@@ -14,12 +17,114 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     private readonly KwitRepository kwitRepository = kwitRepository;
     private readonly LogRepository logRepository = logRepository;
 
+    [HttpGet("{id:int}")]
+    [Authorize]
+    public IActionResult GetKwit(int id)
+    {
+        var kwit = kwitRepository.GetKwit(id);
+
+        if (kwit == null)
+        {
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            return NotFound();
+        }
+
+        logRepository.AddLog(User, "Pobrano kwit", JsonSerializer.Serialize(id));
+
+        return Ok(kwit);
+    }
+
+    [HttpGet("{id:int}/revert")]
+    [Authorize]
+    public IActionResult RevertKwit(int id)
+    {
+        var kwit = kwitRepository.GetKwit(id);
+
+        if (kwit == null)
+        {
+            logRepository.AddLog(User, "Nie udało się cofnąć kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            return NotFound();
+        }
+
+        kwitRepository.RevertKwit(id);
+
+        logRepository.AddLog(User, "Cofnięto kwit", JsonSerializer.Serialize(id));
+
+        return Ok();
+    }
+
+    [HttpGet("{id:int}/close")]
+    [Authorize]
+    public IActionResult CloseKwit(int id)
+    {
+        var kwit = kwitRepository.GetKwit(id);
+
+        if (kwit == null)
+        {
+            logRepository.AddLog(User, "Nie udało się zamknąć kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            return NotFound();
+        }
+
+        kwitRepository.CloseKwit(id);
+
+        logRepository.AddLog(User, "Zamknięto kwit", JsonSerializer.Serialize(id));
+
+        return Ok();
+    }
+
+    [HttpGet("{id:int}/unlock")]
+    [Authorize]
+    public IActionResult UnlockKwit(int id)
+    {
+        var kwit = kwitRepository.GetKwit(id);
+
+        if (kwit == null)
+        {
+            logRepository.AddLog(User, "Nie udało się odblokować kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            return NotFound();
+        }
+
+        kwitRepository.UnlockKwit(id);
+
+        logRepository.AddLog(User, "Odblokowano kwit", JsonSerializer.Serialize(id));
+
+        return Ok();
+    }
+
+    [HttpPut("updateKwit")]
+    [Authorize]
+    public IActionResult UpdateKwit([FromBody] UpdateKwit updateKwit)
+    {
+        var kwit = kwitRepository.GetKwitForOperation(updateKwit.Id);
+
+        if (kwit == null)
+        {
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(updateKwit));
+            return NotFound();
+        }
+
+        kwitRepository.AddOperation(new Operation
+        {
+            DocumentId = updateKwit.Id,
+            OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
+            QuantityNetDelta = updateKwit.QuantityNetto - kwit.DocumentPositions.First().QuantityNetto,
+            QuantityLossDelta = updateKwit.QuantityLoss - kwit.DocumentPositions.First().QuantityLoss,
+            QuantityToImproveDelta = updateKwit.QuantityToImprove - kwit.DocumentPositions.First().QuantityToImprove
+        });
+
+        kwitRepository.UpdateKwit(updateKwit);
+
+        logRepository.AddLog(User, "Zaktualizowano kwit", JsonSerializer.Serialize(updateKwit));
+
+        return Ok();
+    }
+
     [HttpPost("terminal/getKwit")]
     [Authorize]
     public IActionResult TerminalGetKwit([FromBody] GetDocumentByQrCodeDto dto)
     {
         var kwit = kwitRepository
-            .GetKwit(Int32.Parse(Regex.Match(dto.Number, "(kwit-(\\d+))").Groups[2].Value));
+            .TerminalGetKwit(Int32.Parse(Regex.Match(dto.Number, "(kwit-(\\d+))").Groups[2].Value));
 
         if (kwit == null)
         {
@@ -54,7 +159,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     [Authorize]
     public IActionResult TerminalUpdateKwit(int id, [FromBody] UpdateDocumentPositionOnKwitDto dto)
     {
-        var kwit = kwitRepository.GetKwit(id);
+        var kwit = kwitRepository.TerminalGetKwit(id);
 
         if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-'))
         {
@@ -69,7 +174,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         }
 
         var documentPosition = kwitRepository.GetKwitPositions(id).FirstOrDefault();
-        var documentPositionBefore = documentPosition;
+        var documentPositionBefore = kwitRepository.GetKwitPositions(id).FirstOrDefault();
 
         if (documentPosition == null)
         {
@@ -114,7 +219,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss + documentPosition.QuantityToImprove;
 
-        var newOperation = new Domain.Models.Operation
+        var newOperation = new Operation
         {
             DocumentId = id,
             Operator = kwit.Operator,
@@ -141,7 +246,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
     [HttpGet("terminal/closeKwit/{id:int}")]
     [Authorize]
-    public IActionResult CloseKwit(int id)
+    public IActionResult TerminalCloseKwit(int id)
     {
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {

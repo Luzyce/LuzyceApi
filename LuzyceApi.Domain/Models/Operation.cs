@@ -7,10 +7,10 @@ public class Operation
     public int DocumentId { get; set; }
     public Document? Document { get; set; }
     public int OperatorId { get; set; }
-    public required User? Operator { get; set; }
-    public required int QuantityNetDelta { get; set; }
-    public required int QuantityLossDelta { get; set; }
-    public required int QuantityToImproveDelta { get; set; }
+    public User? Operator { get; set; }
+    public int QuantityNetDelta { get; set; }
+    public int QuantityLossDelta { get; set; }
+    public int QuantityToImproveDelta { get; set; }
     public int? ErrorCodeId { get; set; }
     public Error? ErrorCode { get; set; }
 }

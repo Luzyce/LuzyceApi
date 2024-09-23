@@ -1,3 +1,6 @@
+using Luzyce.Core.Models.Document;
+using Luzyce.Core.Models.Kwit;
+using Luzyce.Core.Models.Log;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +12,132 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
 {
     private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
 
-    public Domain.Models.Document? GetKwit(int id)
+    public GetKwit? GetKwit(int id)
     {
         var kwit = applicationDbContext.Documents
             .Include(d => d.Warehouse)
             .Include(d => d.Operator)
             .Include(d => d.Status)
-            .Include(d => d.DocumentsDefinition).Include(document => document.LockedBy)
+            .Include(d => d.DocumentsDefinition)
+            .Include(d => d.LockedBy)
+            .Include(d => d.ProductionPlanPositions)
+            .Include(d => d.DocumentPositions)
+            .FirstOrDefault(x => x.Id == id);
+
+        if (kwit == null)
+        {
+            return null;
+        }
+
+        return new GetKwit
+        {
+            Id = kwit.Id,
+            DocNumber = kwit.DocNumber,
+            Warehouse = kwit.Warehouse == null
+                ? null
+                : new GetWarehouseResponseDto
+                {
+                    Id = kwit.Warehouse.Id,
+                    Name = kwit.Warehouse.Name,
+                    Code = kwit.Warehouse.Code
+                },
+            Year = kwit.Year,
+            Number = kwit.Number,
+            DocumentsDefinition = kwit.DocumentsDefinition == null
+                ? null
+                : new GetDocumentsDefinitionResponseDto
+                {
+                    Id = kwit.DocumentsDefinition.Id,
+                    Code = kwit.DocumentsDefinition.Code,
+                    Name = kwit.DocumentsDefinition.Name
+                },
+            CreatedAt = kwit.CreatedAt,
+            UpdatedAt = kwit.UpdatedAt,
+            ClosedAt = kwit.ClosedAt,
+            Status = kwit.Status == null
+                ? null
+                : new GetStatusResponseDto
+                {
+                    Id = kwit.Status.Id,
+                    Name = kwit.Status.Name,
+                    Priority = kwit.Status.Priority
+                },
+            LockedBy = kwit.LockedBy == null
+                ? null
+                : new GetClient
+                {
+                    Id = kwit.LockedBy.Id,
+                    Name = kwit.LockedBy.Name,
+                    IpAddress = kwit.LockedBy.IpAddress
+                },
+            Quantity = kwit.ProductionPlanPositions?.Quantity ?? 0,
+            QuantityNetto = kwit.DocumentPositions.First().QuantityNetto,
+            QuantityGross = kwit.DocumentPositions.First().QuantityGross,
+            QuantityLoss = kwit.DocumentPositions.First().QuantityLoss,
+            QuantityToImprove = kwit.DocumentPositions.First().QuantityToImprove
+        };
+    }
+
+    public void RevertKwit(int id)
+    {
+        var kwit = applicationDbContext.Documents.Find(id);
+        if (kwit == null)
+        {
+            return;
+        }
+
+        kwit.ClosedAt = null;
+        kwit.StatusId = 1;
+        kwit.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+    }
+
+    public void CloseKwit(int id)
+    {
+        var kwit = applicationDbContext.Documents.Find(id);
+        if (kwit == null)
+        {
+            return;
+        }
+
+        kwit.ClosedAt = DateTime.Now;
+        kwit.StatusId = 3;
+        kwit.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+    }
+
+    public void UpdateKwit(UpdateKwit updateKwit)
+    {
+        var kwit = applicationDbContext.Documents
+            .Include(d => d.DocumentPositions)
+            .FirstOrDefault(x => x.Id == updateKwit.Id);
+        if (kwit == null)
+        {
+            return;
+        }
+
+        kwit.DocumentPositions.First().QuantityNetto = updateKwit.QuantityNetto;
+        kwit.DocumentPositions.First().QuantityLoss = updateKwit.QuantityLoss;
+        kwit.DocumentPositions.First().QuantityToImprove = updateKwit.QuantityToImprove;
+        kwit.UpdatedAt = DateTime.Now;
+        applicationDbContext.SaveChanges();
+    }
+
+    public Document? GetKwitForOperation(int id)
+    {
+        return applicationDbContext.Documents
+            .Include(d => d.DocumentPositions)
+            .FirstOrDefault(x => x.Id == id);
+    }
+
+    public Domain.Models.Document? TerminalGetKwit(int id)
+    {
+        var kwit = applicationDbContext.Documents
+            .Include(d => d.Warehouse)
+            .Include(d => d.Operator)
+            .Include(d => d.Status)
+            .Include(d => d.DocumentsDefinition)
+            .Include(d => d.LockedBy)
             .FirstOrDefault(x => x.Id == id);
 
         if (kwit == null)

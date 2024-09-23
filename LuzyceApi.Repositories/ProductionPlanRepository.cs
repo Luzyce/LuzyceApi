@@ -437,6 +437,9 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .ThenInclude(x => x!.Order)
             .ThenInclude(x => x!.Customer)
             .Include(x => x.HeadsOfMetallurgicalTeams)
+            .Include(x => x.Positions)
+            .ThenInclude(x => x.DocumentPosition)
+            .ThenInclude(x => x!.LampshadeNorm)
             .Where(x => x.Date == data)
             .ToList();
     } 

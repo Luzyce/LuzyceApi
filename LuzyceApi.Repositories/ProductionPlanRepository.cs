@@ -202,6 +202,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 Name = productionPlan.HeadsOfMetallurgicalTeams.Name,
                 LastName = productionPlan.HeadsOfMetallurgicalTeams.LastName
             },
+            Remarks = productionPlan.Remarks,
             ProductionPlanPositions = applicationDbContext.ProductionPlanPositions
                 .Where(x => x.ProductionPlan!.Id == productionPlan.Id)
                 .Include(x => x.DocumentPosition)
@@ -359,6 +360,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
         
         productionPlan.Shift!.ShiftSupervisorId = request.ShiftSupervisorId;
         productionPlan.HeadsOfMetallurgicalTeamsId = request.HeadsOfMetallurgicalTeamsId;
+        productionPlan.Remarks = request.Remarks;
         
         foreach (var position in request.ProductionPlanPositions)
         {

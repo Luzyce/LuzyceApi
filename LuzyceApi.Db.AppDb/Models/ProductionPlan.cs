@@ -14,6 +14,7 @@ public class ProductionPlan
     public Status? Status { get; set; }
     public int? HeadsOfMetallurgicalTeamsId { get; set; }
     public User? HeadsOfMetallurgicalTeams { get; set; }
+    public string? Remarks { get; set; }
     
     public List<ProductionPlanPositions> Positions { get; set; } = [];
 }

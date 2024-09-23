@@ -223,7 +223,6 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                                 header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 3\nHutmistrz:\n{shiftsSupervisors[2]?.Name} {shiftsSupervisors[2]?.LastName}").FontSize(16);
                             });
 
-                            string? cellText;
                             for (var x = 1; x <= 3; x++)
                             {
                                 table.Cell().Element(CellStyle).Padding(5).AlignCenter().RotateLeft().Width(90).Text("Zespół " + x).AlignCenter().FontSize(16);
@@ -235,7 +234,8 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
                                     if (plan != null)
                                     {
-                                        cellText = $"Hutnik: {plan.HeadsOfMetallurgicalTeams?.Name} {plan.HeadsOfMetallurgicalTeams?.LastName}\n";
+                                        var cellText = $"Hutnik: {plan.HeadsOfMetallurgicalTeams?.Name} {plan.HeadsOfMetallurgicalTeams?.LastName}\n";
+                                        cellText += $"Uwagi: {plan.Remarks}\n";
                                         
                                         for (var i = 0; i < plan.Positions.Count; i++)
                                         {

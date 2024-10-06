@@ -56,13 +56,20 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         var isHashLogin = !string.IsNullOrEmpty(dto.Hash);
         var user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
-
-        var ipAddr = dto.IpAddress ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+        var clientType = isHashLogin ? "Terminal" : "Web";
+        var ipAddr = dto.IpAddress;
         var name = "";
 
         if (string.IsNullOrEmpty(ipAddr))
         {
-            return Unauthorized();
+            if (clientType == "Web")
+            {
+                ipAddr = Request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+            }
+            else
+            {
+                return Unauthorized("Brak adresu IP");
+            }
         }
 
         try
@@ -75,7 +82,6 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
             name = null;
         }
 
-        var clientType = isHashLogin ? "Terminal" : "Web";
         var client = usersRepository.GetClientByIp(ipAddr, clientType) ??
                      usersRepository.AddClient(new Client { Name = name, IpAddress = ipAddr, Type = clientType });
 

@@ -57,8 +57,14 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         var user = isHashLogin ? usersRepository.GetUserByHash(dto.Hash)
             : usersRepository.GetUserByLoginAndPassword(dto.Login, dto.Password);
 
-        var ipAddr = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "";
+        var ipAddr = dto.IpAddress ?? HttpContext.Connection.RemoteIpAddress?.ToString();
         var name = "";
+
+        if (string.IsNullOrEmpty(ipAddr))
+        {
+            return Unauthorized();
+        }
+
         try
         {
             var hostEntry = Dns.GetHostEntry(ipAddr);
@@ -68,6 +74,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
         {
             name = null;
         }
+
         var clientType = isHashLogin ? "Terminal" : "Web";
         var client = usersRepository.GetClientByIp(ipAddr, clientType) ??
                      usersRepository.AddClient(new Client { Name = name, IpAddress = ipAddr, Type = clientType });

@@ -9,4 +9,7 @@ public class OrderForProduction
     public int CustomerId { get; set; }
     public Customer? Customer { get; set; }
     public DateTime? DeliveryDate { get; set; }
+
+    public List<Document> Documents { get; set; } = [];
+    public List<OrderPositionForProduction> OrderPosition { get; set; } = [];
 }

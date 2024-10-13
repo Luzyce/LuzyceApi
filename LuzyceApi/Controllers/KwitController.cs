@@ -126,12 +126,12 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         var kwit = kwitRepository
             .TerminalGetKwit(Int32.Parse(Regex.Match(dto.Number, "(kwit-(\\d+))").Groups[2].Value));
 
-        if (kwit == null)
+        if (kwit == null || kwit.DocumentsDefinition is not { Code: "KW" })
         {
-            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony lub nie jest kwitem", JsonSerializer.Serialize(dto));
             return NotFound(new
             {
-                ErrorCode = "Nie udało się pobrać kwitu — kwit nie został znaleziony"
+                ErrorCode = "Nie udało się pobrać kwitu — kwit nie został znaleziony lub nie jest kwitem"
             });
         }
         if (kwitRepository.IsKwitLocked(kwit.Id) && !kwitRepository.IsKwitLockedByUser(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
@@ -175,7 +175,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     {
         var kwit = kwitRepository.TerminalGetKwit(id);
 
-        if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-'))
+        if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-') || kwit.LockedBy is null)
         {
             logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe żądanie", JsonSerializer.Serialize(dto));
             return Conflict(new
@@ -255,6 +255,11 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
             });
         }
 
+        if (dto.Type == '-')
+        {
+            kwitRepository.CancelPreviousOperation(dto.Field);
+        }
+
         documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss + documentPosition.QuantityToImprove;
 
         var newOperation = new Operation
@@ -265,7 +270,9 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
             QuantityNetDelta = documentPosition.QuantityNetto - (documentPositionBefore?.QuantityNetto ?? 0),
             QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
             QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
-            ErrorCodeId = kwitRepository.GetError(dto.ErrorCode ?? "0")?.Id
+            ErrorCodeId = kwitRepository.GetError(dto.ErrorCode ?? "0")?.Id,
+            IsCancelled = false,
+            ClientId = kwit.LockedBy.Id,
         };
 
         kwitRepository.AddOperation(newOperation);

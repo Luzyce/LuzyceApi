@@ -34,14 +34,15 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder
-            .UseMySql(config.GetConnectionString("AppDbConnection"), ServerVersion.AutoDetect(config.GetConnectionString("AppDbConnection")))
+            .UseMySql(config.GetConnectionString("AppDbConnection"),
+                ServerVersion.AutoDetect(config.GetConnectionString("AppDbConnection")))
             .UseValidationCheckConstraints(options => options.UseRegex(false));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
+
         var roles = new List<Role>
         {
             new()
@@ -98,7 +99,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<User>().HasData(users);
-        
+
         var documentsDefinitionsList = new List<DocumentsDefinition>
         {
             new()
@@ -114,9 +115,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Name = "Zlecenie Produkcji"
             }
         };
-        
+
         modelBuilder.Entity<DocumentsDefinition>().HasData(documentsDefinitionsList);
-        
+
         var statusList = new List<Status>
         {
             new()
@@ -144,7 +145,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Priority = 40
             }
         };
-        
+
         modelBuilder.Entity<Status>().HasData(statusList);
 
         var warehouseList = new List<Warehouse>
@@ -162,9 +163,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Name = "Produkcja"
             }
         };
-        
+
         modelBuilder.Entity<Warehouse>().HasData(warehouseList);
-        
+
         var exampleDocumentList = new List<Document>
         {
             new()
@@ -195,7 +196,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 StatusId = 1
             }
         };
-        
+
         modelBuilder.Entity<Document>().HasData(exampleDocumentList);
 
         var exampleLampshade = new Lampshade
@@ -214,7 +215,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<Customer>().HasData(exampleCustomer);
-        
+
         var exampleOrderForProduction = new OrderForProduction
         {
             Id = 1,
@@ -223,9 +224,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             OriginalNumber = "1",
             CustomerId = 1,
         };
-        
+
         modelBuilder.Entity<OrderForProduction>().HasData(exampleOrderForProduction);
-        
+
         var exampleOrderPositionForProduction = new OrderPositionForProduction
         {
             Id = 1,
@@ -245,7 +246,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             ProductName = "KL4124",
             ProductDescription = "Test"
         };
-        
+
         modelBuilder.Entity<OrderPositionForProduction>().HasData(exampleOrderPositionForProduction);
 
         var lampshadeVariants = new List<LampshadeVariant>
@@ -319,7 +320,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         };
 
         modelBuilder.Entity<LampshadeVariant>().HasData(lampshadeVariants);
-        
+
         var exampleLampshadeNorm = new LampshadeNorm
         {
             Id = 1,
@@ -333,7 +334,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             MethodOfPackaging = "300x300x110",
             QuantityPerPack = 16
         };
-        
+
         modelBuilder.Entity<LampshadeNorm>().HasData(exampleLampshadeNorm);
 
         var exampleDocumentPositionList = new List<DocumentPositions>
@@ -380,9 +381,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 SubiektProductId = 2628
             }
         };
-        
+
         modelBuilder.Entity<DocumentPositions>().HasData(exampleDocumentPositionList);
-        
+
         var exampleShift = new Shift
         {
             Id = 1,
@@ -391,9 +392,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             ShiftSupervisorId = users[0].Id,
             ShiftSupervisor = null!
         };
-        
+
         modelBuilder.Entity<Shift>().HasData(exampleShift);
-        
+
         var exampleProductionPlan = new ProductionPlan
         {
             Id = 1,
@@ -404,9 +405,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             HeadsOfMetallurgicalTeamsId = 1,
             HeadsOfMetallurgicalTeams = null!
         };
-        
+
         modelBuilder.Entity<ProductionPlan>().HasData(exampleProductionPlan);
-        
+
         var exampleProductionPlanPosition = new ProductionPlanPositions
         {
             Id = 1,
@@ -417,7 +418,251 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             DocumentPosition = null!,
             NumberOfHours = 8
         };
-        
+
         modelBuilder.Entity<ProductionPlanPositions>().HasData(exampleProductionPlanPosition);
+
+        var errorList = new List<Error>
+        {
+            new()
+            {
+                Id = 1,
+                Code = "00",
+                Name = "INNE",
+                ShortName = "INN"
+            },
+            new()
+            {
+                Id = 2,
+                Code = "01",
+                Name = "KAMIENIE",
+                ShortName = "KAM"
+            },
+            new()
+            {
+                Id = 3,
+                Code = "02",
+                Name = "KRĘTE",
+                ShortName = "KR"
+            },
+            new()
+            {
+                Id = 4,
+                Code = "03",
+                Name = "GISZPA",
+                ShortName = "GIS"
+            },
+            new()
+            {
+                Id = 5,
+                Code = "04",
+                Name = "PLADRY W SZKLE",
+                ShortName = "PLS"
+            },
+            new()
+            {
+                Id = 6,
+                Code = "05",
+                Name = "PLADRY Z NABIERANIA",
+                ShortName = "PLN"
+            },
+            new()
+            {
+                Id = 7,
+                Code = "06",
+                Name = "PLADRY PĘKAJĄCE",
+                ShortName = "PLP"
+            },
+            new()
+            {
+                Id = 8,
+                Code = "07",
+                Name = "PLADRY OPALOWE",
+                ShortName = "PLO"
+            },
+            new()
+            {
+                Id = 9,
+                Code = "08",
+                Name = "SMUGI",
+                ShortName = "SMU"
+            },
+            new()
+            {
+                Id = 10,
+                Code = "09",
+                Name = "PASY",
+                ShortName = "PAS"
+            },
+            new()
+            {
+                Id = 11,
+                Code = "10",
+                Name = "JASNE",
+                ShortName = "JAS"
+            },
+            new()
+            {
+                Id = 12,
+                Code = "11",
+                Name = "RAUCH",
+                ShortName = "RAU"
+            },
+            new()
+            {
+                Id = 13,
+                Code = "12",
+                Name = "NAGAR",
+                ShortName = "NAG"
+            },
+            new()
+            {
+                Id = 14,
+                Code = "13",
+                Name = "POPĘKANE",
+                ShortName = "POP"
+            },
+            new()
+            {
+                Id = 15,
+                Code = "14",
+                Name = "ZIMNA FORMA",
+                ShortName = "ZFO"
+            },
+            new()
+            {
+                Id = 16,
+                Code = "15",
+                Name = "BRUDNA FORMA",
+                ShortName = "BFO"
+            },
+            new()
+            {
+                Id = 17,
+                Code = "16",
+                Name = "BRUDNY BURGULEC",
+                ShortName = "BBU"
+            },
+            new()
+            {
+                Id = 18,
+                Code = "17",
+                Name = "ZENDRA",
+                ShortName = "ZEN"
+            },
+            new()
+            {
+                Id = 19,
+                Code = "18",
+                Name = "PRZERWANE SZKŁO",
+                ShortName = "PRS"
+            },
+            new()
+            {
+                Id = 20,
+                Code = "19",
+                Name = "POMARSZCZONE",
+                ShortName = "POM"
+            },
+            new()
+            {
+                Id = 21,
+                Code = "20",
+                Name = "SKALECZONE",
+                ShortName = "SKA"
+            },
+            new()
+            {
+                Id = 22,
+                Code = "21",
+                Name = "ROZBERNA BAŃKA",
+                ShortName = "RBA"
+            },
+            new()
+            {
+                Id = 23,
+                Code = "22",
+                Name = "CIENKIE",
+                ShortName = "CIE"
+            },
+            new()
+            {
+                Id = 24,
+                Code = "23",
+                Name = "GRUBE",
+                ShortName = "GRU"
+            },
+            new()
+            {
+                Id = 25,
+                Code = "24",
+                Name = "PŁASKIE",
+                ShortName = "PŁA"
+            },
+            new()
+            {
+                Id = 26,
+                Code = "25",
+                Name = "PRZEDMUCHANE",
+                ShortName = "PRZ"
+            },
+            new()
+            {
+                Id = 27,
+                Code = "26",
+                Name = "NIEDODMUCHANE",
+                ShortName = "NDO"
+            },
+            new()
+            {
+                Id = 28,
+                Code = "27",
+                Name = "WYCIĄGNIĘTE",
+                ShortName = "WYC"
+            },
+            new()
+            {
+                Id = 29,
+                Code = "28",
+                Name = "ZAPCHANE",
+                ShortName = "ZAP"
+            },
+            new()
+            {
+                Id = 30,
+                Code = "29",
+                Name = "FRETY",
+                ShortName = "FRE"
+            },
+            new()
+            {
+                Id = 31,
+                Code = "30",
+                Name = "RYGLE",
+                ShortName = "RYG"
+            },
+            new()
+            {
+                Id = 32,
+                Code = "31",
+                Name = "ZATARTE",
+                ShortName = "ZAT"
+            },
+            new()
+            {
+                Id = 33,
+                Code = "32",
+                Name = "PRZYPALONE",
+                ShortName = "PRZ"
+            },
+            new()
+            {
+                Id = 34,
+                Code = "33",
+                Name = "POPĘKANE NA PALNIKU",
+                ShortName = "PNP"
+            }
+        };
+
+        modelBuilder.Entity<Error>().HasData(errorList);
     }
 }

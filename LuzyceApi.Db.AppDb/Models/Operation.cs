@@ -13,4 +13,7 @@ public class Operation
     public int QuantityToImproveDelta { get; set; }
     public int? ErrorCodeId { get; set; }
     public Error? ErrorCode { get; set; }
+    public bool IsCancelled { get; set; }
+    public int ClientId { get; set; }
+    public Client? Client { get; set; }
 }

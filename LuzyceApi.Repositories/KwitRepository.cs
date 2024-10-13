@@ -29,6 +29,32 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             return null;
         }
 
+        var errorsInKwit = applicationDbContext.Operations
+            .Include(x => x.ErrorCode)
+            .Where(x => x.DocumentId == id &&
+                        x.QuantityLossDelta == 1 &&
+                        x.Client != null &&
+                        x.Client.Type == "Terminal" &&
+                        x.IsCancelled == false)
+            .Select(x => x.ErrorCode)
+            .ToList();
+
+        var lacks = new List<GetLacks>();
+        foreach (var error in errorsInKwit)
+        {
+            if (error == null || lacks.Any(x => x.ErrorName == error.Name))
+            {
+                continue;
+            }
+
+            lacks.Add(new GetLacks
+            {
+                Quantity = errorsInKwit.Count(x => x?.Code == error.Code),
+                ErrorName = error.Name,
+                ErrorShortName = error.ShortName
+            });
+        }
+
         return new GetKwit
         {
             Id = kwit.Id,
@@ -74,7 +100,8 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             QuantityNetto = kwit.DocumentPositions.First().QuantityNetto,
             QuantityGross = kwit.DocumentPositions.First().QuantityGross,
             QuantityLoss = kwit.DocumentPositions.First().QuantityLoss,
-            QuantityToImprove = kwit.DocumentPositions.First().QuantityToImprove
+            QuantityToImprove = kwit.DocumentPositions.First().QuantityToImprove,
+            Lacks = lacks
         };
     }
 
@@ -246,6 +273,8 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             QuantityNetDelta = operation.QuantityNetDelta,
             QuantityLossDelta = operation.QuantityLossDelta,
             QuantityToImproveDelta = operation.QuantityToImproveDelta,
+            ErrorCodeId = operation.ErrorCodeId,
+            ClientId = operation.ClientId
         };
         applicationDbContext.Operations.Add(dbOperation);
         applicationDbContext.SaveChanges();
@@ -265,6 +294,36 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         dbDocumentPosition.QuantityGross = documentPosition.QuantityGross;
         applicationDbContext.SaveChanges();
     }
+
+    public void CancelPreviousOperation(string field)
+    {
+        Func<Operation, bool>? predicate = field switch
+        {
+            "Dobrych" => x => x.QuantityNetDelta == 1,
+            "Zlych" => x => x.QuantityLossDelta == 1,
+            "DoPoprawy" => x => x.QuantityToImproveDelta == 1,
+            _ => null
+        };
+
+        if (predicate == null)
+        {
+            return;
+        }
+
+        var lastOperation = applicationDbContext.Operations
+            .OrderByDescending(x => x.Time)
+            .Where(x => x.IsCancelled == false)
+            .FirstOrDefault(predicate);
+
+        if (lastOperation == null)
+        {
+            return;
+        }
+
+        lastOperation.IsCancelled = true;
+        applicationDbContext.SaveChanges();
+    }
+
     public Domain.Models.Error? GetError(string code)
     {
         var error = applicationDbContext.Errors

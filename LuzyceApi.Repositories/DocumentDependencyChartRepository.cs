@@ -10,8 +10,39 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
 {
     private readonly ApplicationDbContext applicationDbContext = applicationDbContext;
 
-    public GetDocumentDependencyChart? GetDocumentDependencyChart(int id)
+    public GetDocumentDependencyChart? GetDocumentDependencyChart(GetDocumentDependencyChartRequest getDocumentDependencyChartRequest)
     {
+        var documentId = getDocumentDependencyChartRequest.DocumentId;
+        int? orderId = 0;
+
+        switch (getDocumentDependencyChartRequest.DocumentType)
+        {
+            case "Zamówienie":
+                orderId = documentId;
+                break;
+            case "Zlecenie produkcji":
+                orderId = applicationDbContext.OrdersForProduction
+                    .FirstOrDefault(x => x.Documents.Any(y => y.Id == documentId))?.Id;
+                break;
+            case "Plan produkcji":
+                orderId = applicationDbContext.ProductionPlans
+                    .Include(productionPlan => productionPlan.Positions)
+                    .ThenInclude(ppp => ppp.DocumentPosition)
+                    .ThenInclude(dp => dp!.Document)
+                    .FirstOrDefault(x => x.Id == documentId)?.Positions.First().DocumentPosition?.Document?.OrderId;
+                break;
+            case "Kwit":
+                orderId = applicationDbContext.Documents
+                    .Include(document => document.ProductionPlanPositions)
+                    .ThenInclude(ppp => ppp!.DocumentPosition)
+                    .ThenInclude(dp => dp!.Document)
+                    .FirstOrDefault(x => x.Id == documentId)?
+                    .ProductionPlanPositions?.DocumentPosition?.Document?.OrderId;
+                break;
+            default:
+                return null;
+        }
+
         var order = applicationDbContext.OrdersForProduction
             .Include(doc => doc.Documents)
             .ThenInclude(doc => doc.DocumentPositions)
@@ -45,7 +76,7 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
             .ThenInclude(documentPositions => documentPositions.LampshadeNorm)
             .ThenInclude(lampshadeNorm => lampshadeNorm!.Variant)
             .Include(o => o.OrderPosition)
-            .FirstOrDefault(x => x.Id == id);
+            .FirstOrDefault(x => x.Id == orderId);
 
         if (order == null)
         {
@@ -85,6 +116,7 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
         Id = order.Id,
         DocumentType = "Zamówienie",
         Name = order.Number,
+        AddrToRedirect = string.Empty,
         Positions = order.OrderPosition.Select(x => (int)x.Quantity + " " + x.ProductName).ToList(),
         Derivatives = []
     };
@@ -97,6 +129,7 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
             Id = document.Id,
             DocumentType = "Zlecenie produkcji",
             Name = document.Number,
+            AddrToRedirect = "/productionOrder/edit/" + document.Id,
             Positions = document.DocumentPositions.Select(
                 x => x.QuantityNetto + " " +
                      x.Lampshade?.Code + " " + x.LampshadeNorm?.Variant?.Name +
@@ -112,6 +145,9 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
         Name = $"PP {productionPlan.Date:dd.MM.yyyy} " +
                $"Zmiana: {productionPlan.Shift?.ShiftNumber} " +
                $"Zespół: {productionPlan.Team}",
+        AddrToRedirect = $"/productionPlan?date={productionPlan.Date.ToString("MM/dd/yyyy")}&" +
+                         $"shift={productionPlan.Shift?.ShiftNumber}&" +
+                         $"team={productionPlan.Team}",
         Positions = productionPlan.Positions.Select(
                 x => x.Quantity + " " +
                      x.DocumentPosition?.Lampshade?.Code + " " +
@@ -126,6 +162,10 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
         Id = productionPlanPosition.Kwit.First().Id,
         DocumentType = "Kwit",
         Name = productionPlanPosition.Kwit.First().Number,
+        AddrToRedirect = $"/productionPlan/editKwit?date={productionPlanPosition.ProductionPlan?.Date.ToString("MM/dd/yyyy")}&" +
+                         $"shift={productionPlanPosition.ProductionPlan?.Shift?.ShiftNumber}&" +
+                         $"team={productionPlanPosition.ProductionPlan?.Team}&" +
+                         $"kwitId={productionPlanPosition.Kwit.First().Id}",
         Positions = productionPlanPosition.Kwit.First().DocumentPositions.Select(
                 x => x.QuantityNetto + " " +
                      x.Lampshade?.Code + " " +

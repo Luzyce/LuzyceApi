@@ -1,4 +1,5 @@
-﻿using LuzyceApi.Repositories;
+﻿using Luzyce.Core.Models.DocumentDependencyChart;
+using LuzyceApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +9,11 @@ namespace LuzyceApi.Controllers;
 [Route("api/documentDependencyChart")]
 public class DocumentDependencyChart(DocumentDependencyChartRepository documentDependencyChartRepository) : Controller
 {
-    [HttpGet("{id:int}")]
-    public IActionResult Get(int id)
+    [HttpPost]
+    [Authorize]
+    public IActionResult Get([FromBody] GetDocumentDependencyChartRequest getDocumentDependencyChartRequest)
     {
-        var documentDependencyChart = documentDependencyChartRepository.GetDocumentDependencyChart(id);
+        var documentDependencyChart = documentDependencyChartRepository.GetDocumentDependencyChart(getDocumentDependencyChartRequest);
         return Ok(documentDependencyChart);
     }
 }

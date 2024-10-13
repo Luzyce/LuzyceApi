@@ -10,6 +10,7 @@ using Luzyce.Core.Models.Log;
 using LuzyceApi.Domain.Models;
 
 namespace LuzyceApi.Controllers;
+
 [Route("api/document")]
 [ApiController]
 public class KwitController(KwitRepository kwitRepository, LogRepository logRepository) : Controller
@@ -25,7 +26,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony",
+                JsonSerializer.Serialize(id));
             return NotFound();
         }
 
@@ -42,7 +44,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Nie udało się cofnąć kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            logRepository.AddLog(User, "Nie udało się cofnąć kwitu — kwit nie został znaleziony",
+                JsonSerializer.Serialize(id));
             return NotFound();
         }
 
@@ -61,7 +64,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Nie udało się zamknąć kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            logRepository.AddLog(User, "Nie udało się zamknąć kwitu — kwit nie został znaleziony",
+                JsonSerializer.Serialize(id));
             return NotFound();
         }
 
@@ -80,7 +84,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Nie udało się odblokować kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(id));
+            logRepository.AddLog(User, "Nie udało się odblokować kwitu — kwit nie został znaleziony",
+                JsonSerializer.Serialize(id));
             return NotFound();
         }
 
@@ -99,8 +104,18 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null)
         {
-            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(updateKwit));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu — kwit nie został znaleziony",
+                JsonSerializer.Serialize(updateKwit));
             return NotFound();
+        }
+
+        if (kwit.DocumentPositions.First().QuantityNetto - updateKwit.QuantityNetto > 0 ||
+            kwit.DocumentPositions.First().QuantityLoss - updateKwit.QuantityLoss > 0 ||
+            kwit.DocumentPositions.First().QuantityToImprove - updateKwit.QuantityToImprove > 0)
+        {
+            kwitRepository.CancelPreviousOperations(kwit.DocumentPositions.First().QuantityNetto - updateKwit.QuantityNetto,
+                kwit.DocumentPositions.First().QuantityLoss - updateKwit.QuantityLoss,
+                kwit.DocumentPositions.First().QuantityToImprove - updateKwit.QuantityToImprove, updateKwit.Id);
         }
 
         kwitRepository.AddOperation(new Operation
@@ -109,7 +124,9 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
             OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
             QuantityNetDelta = updateKwit.QuantityNetto - kwit.DocumentPositions.First().QuantityNetto,
             QuantityLossDelta = updateKwit.QuantityLoss - kwit.DocumentPositions.First().QuantityLoss,
-            QuantityToImproveDelta = updateKwit.QuantityToImprove - kwit.DocumentPositions.First().QuantityToImprove
+            QuantityToImproveDelta = updateKwit.QuantityToImprove - kwit.DocumentPositions.First().QuantityToImprove,
+            ClientId = int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "0"),
+            ErrorCodeId = 1
         });
 
         kwitRepository.UpdateKwit(updateKwit);
@@ -128,23 +145,29 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (kwit == null || kwit.DocumentsDefinition is not { Code: "KW" })
         {
-            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony lub nie jest kwitem", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony lub nie jest kwitem",
+                JsonSerializer.Serialize(dto));
             return NotFound(new
             {
                 ErrorCode = "Nie udało się pobrać kwitu — kwit nie został znaleziony lub nie jest kwitem"
             });
         }
-        if (kwitRepository.IsKwitLocked(kwit.Id) && !kwitRepository.IsKwitLockedByUser(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
+
+        if (kwitRepository.IsKwitLocked(kwit.Id) &&
+            !kwitRepository.IsKwitLockedByUser(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zablokowany", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zablokowany",
+                JsonSerializer.Serialize(dto));
             return Conflict(new
             {
                 ErrorCode = "Nie udało się pobrać kwitu — kwit jest zablokowany"
             });
         }
+
         if (kwitRepository.IsKwitClosed(kwit.Id))
         {
-            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zamknięty", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zamknięty",
+                JsonSerializer.Serialize(dto));
             return Conflict(new
             {
                 ErrorCode = "Nie udało się pobrać kwitu — kwit jest zamknięty"
@@ -175,9 +198,11 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     {
         var kwit = kwitRepository.TerminalGetKwit(id);
 
-        if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-') || kwit.LockedBy is null)
+        if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-') ||
+            kwit.LockedBy is null)
         {
-            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe żądanie", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe żądanie",
+                JsonSerializer.Serialize(dto));
             return Conflict(new
             {
                 ErrorCode = "Invalid request"
@@ -186,7 +211,9 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu – kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User,
+                "Nie udało się zaktualizować kwitu – kwit nie jest zablokowany lub został zablokowany przez innego użytkownika",
+                JsonSerializer.Serialize(dto));
             return Conflict(new
             {
                 ErrorCode = "Document is locked by another user or not locked"
@@ -198,7 +225,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
 
         if (documentPosition == null)
         {
-            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona",
+                JsonSerializer.Serialize(dto));
             return NotFound(new
             {
                 ErrorCode = "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona"
@@ -214,7 +242,9 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
                     ErrorCode = "Invalid request"
                 });
             }
-            documentPosition.QuantityNetto = dto.Type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
+
+            documentPosition.QuantityNetto =
+                dto.Type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
         }
         else if (dto.Field == "DoPoprawy")
         {
@@ -225,7 +255,10 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
                     ErrorCode = "Invalid request"
                 });
             }
-            documentPosition.QuantityToImprove = dto.Type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
+
+            documentPosition.QuantityToImprove = dto.Type == '+'
+                ? documentPosition.QuantityToImprove + 1
+                : documentPosition.QuantityToImprove - 1;
         }
         else if (dto.Field == "Zlych")
         {
@@ -236,6 +269,7 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
                     ErrorCode = "Invalid request"
                 });
             }
+
             if ((dto.ErrorCode == null || kwitRepository.GetError(dto.ErrorCode ?? "0") == null) && dto.Type == '+')
             {
                 return Conflict(new
@@ -244,11 +278,13 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
                 });
             }
 
-            documentPosition.QuantityLoss = dto.Type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
+            documentPosition.QuantityLoss =
+                dto.Type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
         }
         else
         {
-            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe pole", JsonSerializer.Serialize(dto));
+            logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe pole",
+                JsonSerializer.Serialize(dto));
             return Conflict(new
             {
                 ErrorCode = "Invalid request"
@@ -260,7 +296,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
             kwitRepository.CancelPreviousOperation(dto.Field);
         }
 
-        documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss + documentPosition.QuantityToImprove;
+        documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss +
+                                         documentPosition.QuantityToImprove;
 
         var newOperation = new Operation
         {
@@ -269,7 +306,8 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
             OperatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
             QuantityNetDelta = documentPosition.QuantityNetto - (documentPositionBefore?.QuantityNetto ?? 0),
             QuantityLossDelta = documentPosition.QuantityLoss - (documentPositionBefore?.QuantityLoss ?? 0),
-            QuantityToImproveDelta = documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
+            QuantityToImproveDelta =
+                documentPosition.QuantityToImprove - (documentPositionBefore?.QuantityToImprove ?? 0),
             ErrorCodeId = kwitRepository.GetError(dto.ErrorCode ?? "0")?.Id,
             IsCancelled = false,
             ClientId = kwit.LockedBy.Id,
@@ -295,10 +333,13 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
     {
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
-            logRepository.AddLog(User, "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(id));
+            logRepository.AddLog(User,
+                "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika",
+                JsonSerializer.Serialize(id));
             return Conflict(new
             {
-                ErrorCode = "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika"
+                ErrorCode =
+                    "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika"
             });
         }
 

@@ -32,7 +32,7 @@ public class LoginController(IConfiguration config, UsersRepository usersReposit
                 new Claim(ClaimTypes.Surname, user.LastName),
                 new Claim(ClaimTypes.PrimarySid, client.Id.ToString()),
                 new Claim(ClaimTypes.Hash, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash),
-                new Claim(ClaimTypes.SerialNumber, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash)
+                new Claim(ClaimTypes.SerialNumber, string.IsNullOrEmpty(user.Hash) ? "" : user.Hash),
         };
 
         var token = new JwtSecurityToken(

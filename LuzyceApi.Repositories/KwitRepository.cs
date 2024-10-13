@@ -29,31 +29,34 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             return null;
         }
 
-        var errorsInKwit = applicationDbContext.Operations
+        var operationWithErrorsInKwit = applicationDbContext.Operations
             .Include(x => x.ErrorCode)
             .Where(x => x.DocumentId == id &&
-                        x.QuantityLossDelta == 1 &&
-                        x.Client != null &&
-                        x.Client.Type == "Terminal" &&
+                        x.QuantityLossDelta > 0 &&
                         x.IsCancelled == false)
-            .Select(x => x.ErrorCode)
             .ToList();
 
         var lacks = new List<GetLacks>();
-        foreach (var error in errorsInKwit)
+        foreach (var operation in operationWithErrorsInKwit)
         {
-            if (error == null || lacks.Any(x => x.ErrorName == error.Name))
+            if (operation.ErrorCode == null || lacks.Any(x => x.ErrorName == operation.ErrorCode.Name))
             {
                 continue;
             }
 
             lacks.Add(new GetLacks
             {
-                Quantity = errorsInKwit.Count(x => x?.Code == error.Code),
-                ErrorName = error.Name,
-                ErrorShortName = error.ShortName
+                Quantity = operationWithErrorsInKwit
+                    .Where(x => x.ErrorCodeId == operation.ErrorCodeId)
+                    .Sum(x => x.QuantityLossDelta),
+                ErrorName = operation.ErrorCode.Name,
+                ErrorShortName = operation.ErrorCode.ShortName
             });
         }
+
+        lacks = lacks.OrderBy(x =>
+            operationWithErrorsInKwit.FirstOrDefault(o => o.ErrorCode?.Name == x.ErrorName)?.ErrorCodeId
+        ).ToList();
 
         return new GetKwit
         {
@@ -209,13 +212,14 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         {
             return;
         }
+
         kwit.ClosedAt = DateTime.Now;
         kwit.LockedBy = null;
         kwit.StatusId = 3;
         kwit.UpdatedAt = DateTime.Now;
         applicationDbContext.SaveChanges();
     }
-    
+
     public bool IsKwitLocked(int id)
     {
         var kwit = applicationDbContext.Documents
@@ -231,6 +235,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             .FirstOrDefault(x => x.Id == id);
         return kwit?.StatusId == 3;
     }
+
     public bool IsKwitLockedByUser(int id, int clientId)
     {
         var kwit = applicationDbContext.Documents
@@ -263,6 +268,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             )
             .ToList();
     }
+
     public void AddOperation(Domain.Models.Operation operation)
     {
         var dbOperation = new Operation
@@ -280,6 +286,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         applicationDbContext.SaveChanges();
         operation.Id = dbOperation.Id;
     }
+
     public void UpdateKwitPosition(DocumentPositions documentPosition)
     {
         var dbDocumentPosition = applicationDbContext.DocumentPositions.Find(documentPosition.Id);
@@ -287,6 +294,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         {
             return;
         }
+
         dbDocumentPosition.EndTime = documentPosition.EndTime;
         dbDocumentPosition.QuantityNetto = documentPosition.QuantityNetto;
         dbDocumentPosition.QuantityLoss = documentPosition.QuantityLoss;
@@ -324,10 +332,39 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         applicationDbContext.SaveChanges();
     }
 
+    public void CancelPreviousOperations(int netto, int loss, int toImprove, int documentId)
+    {
+        CancelOperations(netto, "NetDelta", documentId);
+        CancelOperations(loss, "LossDelta", documentId);
+        CancelOperations(toImprove, "ToImproveDelta", documentId);
+
+        applicationDbContext.SaveChanges();
+    }
+
+    private void CancelOperations(int quantity, string deltaType, int documentId)
+    {
+        var operationsToCancel = applicationDbContext.Operations
+            .Where(x => !x.IsCancelled &&
+                        x.DocumentId == documentId &&
+                        x.Client != null &&
+                        x.Client.Type == "Terminal" &&
+                        (deltaType == "NetDelta" && x.QuantityNetDelta == quantity ||
+                         deltaType == "LossDelta" && x.QuantityLossDelta == quantity ||
+                         deltaType == "ToImproveDelta" && x.QuantityToImproveDelta == quantity))
+            .OrderByDescending(x => x.Time)
+            .Take(quantity)
+            .ToList();
+
+        foreach (var operation in operationsToCancel)
+        {
+            operation.IsCancelled = true;
+        }
+    }
+
     public Domain.Models.Error? GetError(string code)
     {
         var error = applicationDbContext.Errors
-                        .FirstOrDefault(x => x.Code == code);
+            .FirstOrDefault(x => x.Code == code);
 
         if (error == null)
         {
@@ -385,7 +422,8 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         };
     }
 
-    private static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(DocumentsDefinition documentsDefinition)
+    private static Domain.Models.DocumentsDefinition DocumentsDefinitionDomainFromDb(
+        DocumentsDefinition documentsDefinition)
     {
         ArgumentNullException.ThrowIfNull(documentsDefinition);
 

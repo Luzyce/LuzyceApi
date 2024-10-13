@@ -329,7 +329,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
             Variant = null!,
             QuantityPerChange = 50,
             WeightBrutto = 3,
-            WeightNetto = 0.45,
+            WeightNetto = (decimal)0.45,
             MethodOfPackaging = "300x300x110",
             QuantityPerPack = 16
         };

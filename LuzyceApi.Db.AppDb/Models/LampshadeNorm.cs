@@ -1,4 +1,6 @@
-﻿namespace LuzyceApi.Db.AppDb.Models;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace LuzyceApi.Db.AppDb.Models;
 
 public class LampshadeNorm
 {
@@ -8,8 +10,10 @@ public class LampshadeNorm
     public int VariantId { get; set; }
     public LampshadeVariant? Variant { get; set; }
     public int? QuantityPerChange { get; set; }
-    public double? WeightBrutto { get; set; }
-    public double? WeightNetto { get; set; }
+    [Precision(8, 2)]
+    public decimal? WeightBrutto { get; set; }
+    [Precision(8, 2)]
+    public decimal? WeightNetto { get; set; }
     public string? MethodOfPackaging { get; set; }
     public int? QuantityPerPack { get; set; }
 }

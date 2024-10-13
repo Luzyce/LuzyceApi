@@ -182,7 +182,9 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         {
             return;
         }
+        kwit.ClosedAt = DateTime.Now;
         kwit.LockedBy = null;
+        kwit.StatusId = 3;
         kwit.UpdatedAt = DateTime.Now;
         applicationDbContext.SaveChanges();
     }
@@ -193,6 +195,14 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             .Include(x => x.LockedBy)
             .FirstOrDefault(x => x.Id == id);
         return kwit?.LockedBy != null;
+    }
+
+    public bool IsKwitClosed(int id)
+    {
+        var kwit = applicationDbContext.Documents
+            .Include(x => x.Status)
+            .FirstOrDefault(x => x.Id == id);
+        return kwit?.StatusId == 3;
     }
     public bool IsKwitLockedByUser(int id, int clientId)
     {

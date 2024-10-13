@@ -129,12 +129,26 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         if (kwit == null)
         {
             logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit nie został znaleziony", JsonSerializer.Serialize(dto));
-            return NotFound();
+            return NotFound(new
+            {
+                ErrorCode = "Nie udało się pobrać kwitu — kwit nie został znaleziony"
+            });
         }
         if (kwitRepository.IsKwitLocked(kwit.Id) && !kwitRepository.IsKwitLockedByUser(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
             logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zablokowany", JsonSerializer.Serialize(dto));
-            return Conflict();
+            return Conflict(new
+            {
+                ErrorCode = "Nie udało się pobrać kwitu — kwit jest zablokowany"
+            });
+        }
+        if (kwitRepository.IsKwitClosed(kwit.Id))
+        {
+            logRepository.AddLog(User, "Nie udało się pobrać kwitu — kwit jest zamknięty", JsonSerializer.Serialize(dto));
+            return Conflict(new
+            {
+                ErrorCode = "Nie udało się pobrać kwitu — kwit jest zamknięty"
+            });
         }
 
         kwitRepository.LockKwit(kwit.Id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? ""));
@@ -164,13 +178,19 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         if (kwit?.DocumentsDefinition is not { Code: "KW" } || (dto.Type != '+' && dto.Type != '-'))
         {
             logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe żądanie", JsonSerializer.Serialize(dto));
-            return BadRequest("Invalid request");
+            return Conflict(new
+            {
+                ErrorCode = "Invalid request"
+            });
         }
 
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
             logRepository.AddLog(User, "Nie udało się zaktualizować kwitu – kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(dto));
-            return BadRequest("Document is locked by another user or not locked");
+            return Conflict(new
+            {
+                ErrorCode = "Document is locked by another user or not locked"
+            });
         }
 
         var documentPosition = kwitRepository.GetKwitPositions(id).FirstOrDefault();
@@ -179,14 +199,20 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         if (documentPosition == null)
         {
             logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona", JsonSerializer.Serialize(dto));
-            return NotFound();
+            return NotFound(new
+            {
+                ErrorCode = "Nie udało się zaktualizować kwitu - pozycja dokumentu nie została znaleziona"
+            });
         }
 
         if (dto.Field == "Dobrych")
         {
             if (documentPosition.QuantityNetto == 0 && dto.Type == '-')
             {
-                return BadRequest("NetQuantity is 0");
+                return Conflict(new
+                {
+                    ErrorCode = "Invalid request"
+                });
             }
             documentPosition.QuantityNetto = dto.Type == '+' ? documentPosition.QuantityNetto + 1 : documentPosition.QuantityNetto - 1;
         }
@@ -194,7 +220,10 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         {
             if (documentPosition.QuantityToImprove == 0 && dto.Type == '-')
             {
-                return BadRequest("QuantityToImprove is 0");
+                return Conflict(new
+                {
+                    ErrorCode = "Invalid request"
+                });
             }
             documentPosition.QuantityToImprove = dto.Type == '+' ? documentPosition.QuantityToImprove + 1 : documentPosition.QuantityToImprove - 1;
         }
@@ -202,11 +231,17 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         {
             if (documentPosition.QuantityLoss == 0 && dto.Type == '-')
             {
-                return BadRequest("QuantityLoss is 0");
+                return Conflict(new
+                {
+                    ErrorCode = "Invalid request"
+                });
             }
             if ((dto.ErrorCode == null || kwitRepository.GetError(dto.ErrorCode ?? "0") == null) && dto.Type == '+')
             {
-                return BadRequest(dto.ErrorCode);
+                return Conflict(new
+                {
+                    ErrorCode = "Invalid request"
+                });
             }
 
             documentPosition.QuantityLoss = dto.Type == '+' ? documentPosition.QuantityLoss + 1 : documentPosition.QuantityLoss - 1;
@@ -214,7 +249,10 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         else
         {
             logRepository.AddLog(User, "Nie udało się zaktualizować kwitu - nieprawidłowe pole", JsonSerializer.Serialize(dto));
-            return BadRequest("Invalid field");
+            return Conflict(new
+            {
+                ErrorCode = "Invalid request"
+            });
         }
 
         documentPosition.QuantityGross = documentPosition.QuantityNetto + documentPosition.QuantityLoss + documentPosition.QuantityToImprove;
@@ -251,7 +289,10 @@ public class KwitController(KwitRepository kwitRepository, LogRepository logRepo
         if (!kwitRepository.IsKwitLockedByUser(id, int.Parse(User.FindFirstValue(ClaimTypes.PrimarySid) ?? "")))
         {
             logRepository.AddLog(User, "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika", JsonSerializer.Serialize(id));
-            return BadRequest("Kwit is not locked or locked by another user");
+            return Conflict(new
+            {
+                ErrorCode = "Nie udało się zamknąć kwitu - kwit nie jest zablokowany lub został zablokowany przez innego użytkownika"
+            });
         }
 
         kwitRepository.UnlockKwit(id);

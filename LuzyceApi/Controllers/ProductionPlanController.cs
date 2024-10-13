@@ -210,25 +210,56 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
                             table.ColumnsDefinition(columns =>
                             {
                                 columns.RelativeColumn(0.2f);
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
-                                columns.RelativeColumn();
+
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 1))
+                                {
+                                    columns.RelativeColumn();
+                                }
+
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 2))
+                                {
+                                    columns.RelativeColumn();
+                                }
+
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 3))
+                                {
+                                    columns.RelativeColumn();
+                                }
                             });
 
                             table.Header(header =>
                             {
                                 header.Cell().Element(CellStyle).Padding(5).Text("").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 1\nHutmistrz:\n{shiftsSupervisors[0]?.Name} {shiftsSupervisors[0]?.LastName}").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 2\nHutmistrz:\n{shiftsSupervisors[1]?.Name} {shiftsSupervisors[1]?.LastName}").FontSize(16);
-                                header.Cell().Element(CellStyle).Padding(5).Text($"Zmiana 3\nHutmistrz:\n{shiftsSupervisors[2]?.Name} {shiftsSupervisors[2]?.LastName}").FontSize(16);
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 1))
+                                {
+                                    header.Cell().Element(CellStyle).Padding(5)
+                                        .Text($"Zmiana 1\nHutmistrz:\n{shiftsSupervisors[0]?.Name} {shiftsSupervisors[0]?.LastName}").FontSize(16);
+                                }
+
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 2))
+                                {
+                                    header.Cell().Element(CellStyle).Padding(5)
+                                        .Text($"Zmiana 2\nHutmistrz:\n{shiftsSupervisors[1]?.Name} {shiftsSupervisors[1]?.LastName}").FontSize(16);
+                                }
+
+                                if (productionPlans.Any(p => p.Shift!.ShiftNumber == 3))
+                                {
+                                    header.Cell().Element(CellStyle).Padding(5)
+                                        .Text($"Zmiana 3\nHutmistrz:\n{shiftsSupervisors[2]?.Name} {shiftsSupervisors[2]?.LastName}").FontSize(16);
+                                }
                             });
 
                             for (var x = 1; x <= 3; x++)
                             {
                                 table.Cell().Element(CellStyle).Padding(5).AlignCenter().RotateLeft().Width(90).Text("Zespół " + x).AlignCenter().FontSize(16);
-                                
+
                                 for (var y = 1; y <= 3; y++)
                                 {
+                                    if (productionPlans.All(p => p.Shift!.ShiftNumber != y))
+                                    {
+                                        continue;
+                                    }
+
                                     var plan = productionPlans
                                         .Find(p => p.Team == x && p.Shift!.ShiftNumber == y);
 
@@ -269,6 +300,11 @@ public class ProductionPlanController(ProductionPlanRepository productionPlanRep
 
                             for (var y = 1; y <= 3; y++)
                             {
+                                if (productionPlans.All(p => p.Shift!.ShiftNumber != y))
+                                {
+                                    continue;
+                                }
+
                                 var sum = productionPlans
                                     .Where(p => p.Shift!.ShiftNumber == y)
                                     .Sum(p => p.Positions.Sum(x => x.Quantity * x.DocumentPosition?.LampshadeNorm?.WeightBrutto));

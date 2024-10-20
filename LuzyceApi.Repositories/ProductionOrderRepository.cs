@@ -81,6 +81,21 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 QuantityNetto = dp.QuantityNetto,
                 QuantityGross = dp.QuantityGross,
                 QuantityOnPlans = dp.ProductionPlanPositions.Sum(pp => pp.Quantity),
+                QuantitiesOnPlans = dp.ProductionPlanPositions
+                    .Select(pp => new GetQuantityOnPlan
+                    {
+                        Quantity = pp.Quantity,
+                        QuantityNetto = pp.Kwit.First().DocumentPositions.First().QuantityNetto,
+                        QuantityLoss = pp.Kwit.First().DocumentPositions.First().QuantityLoss,
+                        QuantityToImprove = pp.Kwit.First().DocumentPositions.First().QuantityToImprove,
+                        Date = pp.ProductionPlan!.Date,
+                        Shift = pp.ProductionPlan.Shift!.ShiftNumber,
+                        Team = pp.ProductionPlan.Team,
+                        KwitId = pp.Kwit.First().Id.ToString(),
+                        KwitName = pp.Kwit.First().Number,
+                        KwitNumber = pp.Kwit.First().DocNumber.ToString()
+                    })
+                    .ToList(),
                 ExecutionDate = dp.EndTime,
                 Lampshade = new GetLampshade
                 {
@@ -175,6 +190,21 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     QuantityNetto = dp.QuantityNetto,
                     QuantityGross = dp.QuantityGross,
                     QuantityOnPlans = dp.ProductionPlanPositions.Sum(pp => pp.Quantity),
+                    QuantitiesOnPlans = dp.ProductionPlanPositions
+                        .Select(pp => new GetQuantityOnPlan
+                        {
+                            Quantity = pp.Quantity,
+                            QuantityNetto = pp.Kwit.First().DocumentPositions.First().QuantityNetto,
+                            QuantityLoss = pp.Kwit.First().DocumentPositions.First().QuantityLoss,
+                            QuantityToImprove = pp.Kwit.First().DocumentPositions.First().QuantityToImprove,
+                            Date = pp.ProductionPlan!.Date,
+                            Shift = pp.ProductionPlan.Shift!.ShiftNumber,
+                            Team = pp.ProductionPlan.Team,
+                            KwitId = pp.Kwit.First().Id.ToString(),
+                            KwitName = pp.Kwit.First().Number,
+                            KwitNumber = pp.Kwit.First().DocNumber.ToString()
+                        })
+                        .ToList(),
                     ExecutionDate = dp.EndTime,
                     Lampshade = new GetLampshade
                     {
@@ -189,7 +219,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                             Id = dp.Lampshade.Id,
                             Code = dp.Lampshade.Code
                         },
-                        Variant = new GetVariantResponseDto 
+                        Variant = new GetVariantResponseDto
                         {
                             Id = dp.LampshadeNorm.Variant!.Id,
                             Name = dp.LampshadeNorm.Variant.Name,

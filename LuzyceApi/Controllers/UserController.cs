@@ -64,7 +64,7 @@ public class UserController(UsersRepository usersRepository, LogRepository logRe
     [Authorize]
     public IActionResult Post([FromBody] CreateUserDto dto)
     {
-        var user = UserMappers.ToUserFromCreateDto(dto);
+        var user = dto.ToUserFromCreateDto();
         usersRepository.AddUser(user);
 
         dto.Password = "";

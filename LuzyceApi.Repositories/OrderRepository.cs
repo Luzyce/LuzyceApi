@@ -25,7 +25,7 @@ public class OrderRepository(SubiektDbContext subiektDbContext)
 
         var query = subiektDbContext.DokDokuments
             .AsNoTracking()
-            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.ConvertToEuropeWarsaw().AddYears(-2) && status.Contains(d.DokStatusEx ?? -1))
+            .Where(d => d.DokTyp == 16 && d.DokDataWyst > DateTime.Now.AddYears(-2) && status.Contains(d.DokStatusEx ?? -1))
             .Join(subiektDbContext.AdrHistoria,
                 d => d.DokPlatnikAdreshId,
                 o => o.AdrhId,

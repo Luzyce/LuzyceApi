@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LuzyceApi.Core.Dictionaries;
+﻿namespace LuzyceApi.Core.Dictionaries;
 
 public static class ActualTime
 {

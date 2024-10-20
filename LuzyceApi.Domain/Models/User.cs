@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using LuzyceApi.Core.Dictionaries;
 
 namespace LuzyceApi.Domain.Models;
 
@@ -13,7 +14,7 @@ public class User
     public string Login { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string Hash { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; } = DateTime.Now.ConvertToEuropeWarsaw();
     public int RoleId { get; set; }
     public Role? Role { get; set; }
 }

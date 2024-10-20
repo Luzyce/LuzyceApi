@@ -13,7 +13,7 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
     public GetDocumentDependencyChart? GetDocumentDependencyChart(GetDocumentDependencyChartRequest getDocumentDependencyChartRequest)
     {
         var documentId = getDocumentDependencyChartRequest.DocumentId;
-        int? orderId = 0;
+        int? orderId;
 
         switch (getDocumentDependencyChartRequest.DocumentType)
         {
@@ -152,8 +152,8 @@ public class DocumentDependencyChartRepository(ApplicationDbContext applicationD
                 x => x.Quantity + " " +
                      x.DocumentPosition?.Lampshade?.Code + " " +
                      x.DocumentPosition?.LampshadeNorm?.Variant?.Name +
-                     (!(bool)x.DocumentPosition?.LampshadeDekor.IsNullOrEmpty() ? " " +
-                         x.DocumentPosition?.LampshadeDekor : null)).ToList(),
+                     (!string.IsNullOrEmpty(x.DocumentPosition?.LampshadeDekor) ? " " +
+                         x.DocumentPosition?.LampshadeDekor : string.Empty)).ToList(),
         Derivatives = []
     };
 

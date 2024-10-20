@@ -1,3 +1,4 @@
+using LuzyceApi.Core.Dictionaries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using LuzyceApi.Db.AppDb.Models;
@@ -177,8 +178,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Number = "M/0001/KW/2024",
                 DocumentsDefinitionId = 1,
                 OperatorId = users[0].Id,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
+                UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
                 StatusId = 1,
                 ProductionPlanPositionsId = 1
             },
@@ -191,8 +192,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 Number = "P/0001/ZP/2024",
                 DocumentsDefinitionId = 2,
                 OperatorId = users[0].Id,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
+                UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
                 StatusId = 1
             }
         };
@@ -219,7 +220,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
         var exampleOrderForProduction = new OrderForProduction
         {
             Id = 1,
-            Date = DateTime.Now,
+            Date = DateTime.Now.ConvertToEuropeWarsaw(),
             Number = "1",
             OriginalNumber = "1",
             CustomerId = 1,
@@ -350,7 +351,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 QuantityGross = 0,
                 OperatorId = users[0].Id,
                 Operator = null!,
-                StartTime = DateTime.Now,
+                StartTime = DateTime.Now.ConvertToEuropeWarsaw(),
                 EndTime = null,
                 LampshadeId = 1,
                 Lampshade = null!
@@ -366,7 +367,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbConte
                 QuantityGross = 0,
                 OperatorId = users[0].Id,
                 Operator = null!,
-                StartTime = DateTime.Now,
+                StartTime = DateTime.Now.ConvertToEuropeWarsaw(),
                 EndTime = null,
                 LampshadeId = exampleLampshade.Id,
                 Lampshade = null!,

@@ -1,6 +1,7 @@
 using Luzyce.Core.Models.Document;
 using Luzyce.Core.Models.Kwit;
 using Luzyce.Core.Models.Log;
+using LuzyceApi.Core.Dictionaries;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
@@ -118,7 +119,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
 
         kwit.ClosedAt = null;
         kwit.StatusId = 1;
-        kwit.UpdatedAt = DateTime.Now;
+        kwit.UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw();
         applicationDbContext.SaveChanges();
     }
 
@@ -130,9 +131,9 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             return;
         }
 
-        kwit.ClosedAt = DateTime.Now;
+        kwit.ClosedAt = DateTime.Now.ConvertToEuropeWarsaw();
         kwit.StatusId = 3;
-        kwit.UpdatedAt = DateTime.Now;
+        kwit.UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw();
         applicationDbContext.SaveChanges();
     }
 
@@ -149,7 +150,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         kwit.DocumentPositions.First().QuantityNetto = updateKwit.QuantityNetto;
         kwit.DocumentPositions.First().QuantityLoss = updateKwit.QuantityLoss;
         kwit.DocumentPositions.First().QuantityToImprove = updateKwit.QuantityToImprove;
-        kwit.UpdatedAt = DateTime.Now;
+        kwit.UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw();
         applicationDbContext.SaveChanges();
     }
 
@@ -201,7 +202,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
         }
 
         kwit.LockedById = clientId;
-        kwit.UpdatedAt = DateTime.Now;
+        kwit.UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw();
         applicationDbContext.SaveChanges();
     }
 
@@ -213,10 +214,10 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
             return;
         }
 
-        kwit.ClosedAt = DateTime.Now;
+        kwit.ClosedAt = DateTime.Now.ConvertToEuropeWarsaw();
         kwit.LockedBy = null;
         kwit.StatusId = 3;
-        kwit.UpdatedAt = DateTime.Now;
+        kwit.UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw();
         applicationDbContext.SaveChanges();
     }
 
@@ -273,7 +274,7 @@ public class KwitRepository(ApplicationDbContext applicationDbContext)
     {
         var dbOperation = new Operation
         {
-            Time = DateTime.Now,
+            Time = DateTime.Now.ConvertToEuropeWarsaw(),
             DocumentId = operation.DocumentId,
             OperatorId = operation.OperatorId,
             QuantityNetDelta = operation.QuantityNetDelta,

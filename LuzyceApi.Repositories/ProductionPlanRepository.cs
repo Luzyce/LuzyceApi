@@ -3,6 +3,7 @@ using Luzyce.Core.Models.Lampshade;
 using Luzyce.Core.Models.ProductionOrder;
 using Luzyce.Core.Models.ProductionPlan;
 using Luzyce.Core.Models.User;
+using LuzyceApi.Core.Dictionaries;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
@@ -92,11 +93,11 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 applicationDbContext.ProductionPlanPositions.Add(productionPlanPositions);
                 applicationDbContext.SaveChanges();
                     
-                var currentYear = DateTime.Now.Year;
+                var currentYear = DateTime.Now.ConvertToEuropeWarsaw().Year;
                 var docNumber = applicationDbContext.Documents
-                    .Where(d => d.WarehouseId == Dictionaries.Warehouses.MAG_ID
+                    .Where(d => d.WarehouseId == Warehouses.MAG_ID
                                 && d.Year == currentYear
-                                && d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
+                                && d.DocumentsDefinitionId == DocumentsDefinitions.KW_ID)
                     .Select(d => d.DocNumber)
                     .ToList()
                     .DefaultIfEmpty(0)
@@ -105,13 +106,13 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 var kwit = new Document
                 {
                     DocNumber = docNumber,
-                    WarehouseId = Dictionaries.Warehouses.MAG_ID,
+                    WarehouseId = Warehouses.MAG_ID,
                     Year = currentYear,
-                    Number = $"{Dictionaries.Warehouses.MAG_CODE}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.KW_CODE}/{currentYear}",
-                    DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.KW_ID,
+                    Number = $"{Warehouses.MAG_CODE}/{docNumber:D4}/{DocumentsDefinitions.KW_CODE}/{currentYear}",
+                    DocumentsDefinitionId = DocumentsDefinitions.KW_ID,
                     OperatorId = 1,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
+                    UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
                     ClosedAt = null,
                     StatusId = 1,
                     ProductionPlanPositionsId = productionPlanPositions.Id
@@ -138,7 +139,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
                 {
                     DocumentId = kwit.Id,
                     OperatorId = documentPosition.OperatorId,
-                    StartTime = DateTime.Now,
+                    StartTime = DateTime.Now.ConvertToEuropeWarsaw(),
                     LampshadeId = documentPosition.LampshadeId,
                     LampshadeNormId = documentPosition.LampshadeNormId,
                     Remarks = documentPosition.Remarks,
@@ -324,7 +325,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public IEnumerable<GetUserResponseDto> ShiftSupervisor()
     {
         return applicationDbContext.Users
-            .Where(x => x.Role!.Id == Dictionaries.UserRoles.SHIFT_SUPERVISOR_ID)
+            .Where(x => x.Role!.Id == UserRoles.SHIFT_SUPERVISOR_ID)
             .Select(x => new GetUserResponseDto
             {
                 Id = x.Id,
@@ -337,7 +338,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
     public IEnumerable<GetUserResponseDto> GetHeadsOfMetallurgicalTeams()
     {
         return applicationDbContext.Users
-            .Where(x => x.Role!.Id == Dictionaries.UserRoles.HEADS_OF_METALLURGICAL_TEAMS_ID)
+            .Where(x => x.Role!.Id == UserRoles.HEADS_OF_METALLURGICAL_TEAMS_ID)
             .Select(x => new GetUserResponseDto
             {
                 Id = x.Id,
@@ -411,7 +412,7 @@ public class ProductionPlanRepository(ApplicationDbContext applicationDbContext)
             .ThenInclude(op => op!.Order)
             .ThenInclude(order => order!.Customer)
 
-            .Where(x => x.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.KW_ID)
+            .Where(x => x.DocumentsDefinitionId == DocumentsDefinitions.KW_ID)
             .FirstOrDefault(x => x.Id == id);
 
         return document ?? null;

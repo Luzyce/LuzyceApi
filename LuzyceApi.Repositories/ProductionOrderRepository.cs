@@ -3,10 +3,18 @@ using Luzyce.Core.Models.Document;
 using Luzyce.Core.Models.Lampshade;
 using Luzyce.Core.Models.ProductionOrder;
 using Luzyce.Core.Models.User;
+using LuzyceApi.Core.Dictionaries;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Models;
+using LuzyceApi.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Document = LuzyceApi.Db.AppDb.Models.Document;
+using DocumentPositions = LuzyceApi.Db.AppDb.Models.DocumentPositions;
+using Lampshade = LuzyceApi.Db.AppDb.Models.Lampshade;
+using LampshadeNorm = LuzyceApi.Db.AppDb.Models.LampshadeNorm;
+using OrderForProduction = LuzyceApi.Db.AppDb.Models.OrderForProduction;
+using OrderPositionForProduction = LuzyceApi.Db.AppDb.Models.OrderPositionForProduction;
 
 namespace LuzyceApi.Repositories;
 
@@ -19,7 +27,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         return new GetProductionOrdersResponse
         {
             ProductionOrders = applicationDbContext.Documents
-                .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID)
+                .Where(d => d.DocumentsDefinitionId == DocumentsDefinitions.ZP_ID)
                 .Include(d => d.Warehouse)
                 .Include(d => d.DocumentsDefinition)
                 .Include(d => d.Operator)
@@ -49,7 +57,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
     public GetProductionOrder? GetProductionOrder(int Id)
     {
         var document = applicationDbContext.Documents
-            .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && d.Id == Id)
+            .Where(d => d.DocumentsDefinitionId == DocumentsDefinitions.ZP_ID && d.Id == Id)
             .Include(d => d.Warehouse)
             .Include(d => d.DocumentsDefinition)
             .Include(d => d.Operator)
@@ -160,7 +168,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                 .Include(dp => dp.OrderPositionForProduction)
                 .Include(dp => dp.OrderPositionForProduction!.Order)
                 .Include(dp => dp.OrderPositionForProduction!.Order!.Customer)
-                .Where(dp => dp.Document!.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && dp.Document.StatusId == 1)
+                .Where(dp => dp.Document!.DocumentsDefinitionId == DocumentsDefinitions.ZP_ID && dp.Document.StatusId == 1)
                 .Select(dp => new GetProductionOrderPosition
                 {
                     Id = dp.Id,
@@ -209,7 +217,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
     public GetProductionOrder? GetProductionOrderByNumber(string number)
     {
         var document = applicationDbContext.Documents
-            .Where(d => d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID && d.Number == number)
+            .Where(d => d.DocumentsDefinitionId == DocumentsDefinitions.ZP_ID && d.Number == number)
             .Include(d => d.Warehouse)
             .Include(d => d.DocumentsDefinition)
             .Include(d => d.Operator)
@@ -298,7 +306,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             Positions = positions
         }; 
     }
-    public int? SaveProdOrder(Domain.Models.Order order, Domain.Models.ProductionOrder productionOrder)
+    public int? SaveProdOrder(Order order, ProductionOrder productionOrder)
     {
         using var transaction = applicationDbContext.Database.BeginTransaction();
 
@@ -386,15 +394,15 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
         }
     }
 
-    private int? CreateProdOrder(Domain.Models.ProductionOrder productionOrder, int OrderId, IDbContextTransaction transaction)
+    private int? CreateProdOrder(ProductionOrder productionOrder, int OrderId, IDbContextTransaction transaction)
     {
         try
         {
-            var currentYear = DateTime.Now.Year;
+            var currentYear = DateTime.Now.ConvertToEuropeWarsaw().Year;
             var docNumber = applicationDbContext.Documents
-                .Where(d => d.WarehouseId == Dictionaries.Warehouses.PROD_ID
+                .Where(d => d.WarehouseId == Warehouses.PROD_ID
                             && d.Year == currentYear
-                            && d.DocumentsDefinitionId == Dictionaries.DocumentsDefinitions.ZP_ID)
+                            && d.DocumentsDefinitionId == DocumentsDefinitions.ZP_ID)
                 .Select(d => d.DocNumber)
                 .ToList()
                 .DefaultIfEmpty(0)
@@ -403,13 +411,13 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
             var document = new Document
             {
                 DocNumber = docNumber,
-                WarehouseId = Dictionaries.Warehouses.PROD_ID,
+                WarehouseId = Warehouses.PROD_ID,
                 Year = currentYear,
-                Number = $"{Dictionaries.Warehouses.PROD_CODE}/{docNumber:D4}/{Dictionaries.DocumentsDefinitions.ZP_CODE}/{currentYear}",
-                DocumentsDefinitionId = Dictionaries.DocumentsDefinitions.ZP_ID,
+                Number = $"{Warehouses.PROD_CODE}/{docNumber:D4}/{DocumentsDefinitions.ZP_CODE}/{currentYear}",
+                DocumentsDefinitionId = DocumentsDefinitions.ZP_ID,
                 OperatorId = productionOrder.OperatorId,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
+                UpdatedAt = DateTime.Now.ConvertToEuropeWarsaw(),
                 ClosedAt = null,
                 StatusId = 1,
                 OrderId = OrderId
@@ -452,7 +460,7 @@ public class ProductionOrderRepository(ApplicationDbContext applicationDbContext
                     QuantityNetto = position.Net,
                     QuantityGross = position.Gross,
                     OperatorId = productionOrder.OperatorId,
-                    StartTime = DateTime.Now,
+                    StartTime = DateTime.Now.ConvertToEuropeWarsaw(),
                     LampshadeId = lampshade.Id,
                     LampshadeNormId = lampshadeNorms.Id,
                     LampshadeDekor = position.Dekor,

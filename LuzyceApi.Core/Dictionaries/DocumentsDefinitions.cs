@@ -1,4 +1,4 @@
-﻿namespace LuzyceApi.Repositories.Dictionaries;
+﻿namespace LuzyceApi.Core.Dictionaries;
 
 public static class DocumentsDefinitions
 {

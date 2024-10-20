@@ -1,6 +1,7 @@
 
 using LuzyceApi.Domain.Models;
 using Luzyce.Core.Models.Document;
+using LuzyceApi.Core.Dictionaries;
 
 namespace LuzyceApi.Mappers;
 
@@ -23,7 +24,7 @@ public static class DocumentMappers
             QuantityLoss = dto.QuantityLoss,
             QuantityToImprove = dto.QuantityToImprove,
             QuantityGross = dto.QuantityGross,
-            StartTime = DateTime.Now,
+            StartTime = DateTime.Now.ConvertToEuropeWarsaw(),
             LampshadeId = dto.LampshadeId
         };
     }

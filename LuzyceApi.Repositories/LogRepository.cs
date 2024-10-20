@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Luzyce.Core.Models.Log;
 using Luzyce.Core.Models.User;
+using LuzyceApi.Core.Dictionaries;
 using LuzyceApi.Db.AppDb.Data;
 using LuzyceApi.Db.AppDb.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,7 @@ public class LogRepository(ApplicationDbContext applicationDbContext)
     {
         applicationDbContext.Logs.Add(new Log
         {
-            Timestamp = DateTime.Now,
+            Timestamp = DateTime.Now.ConvertToEuropeWarsaw(),
             ClientId = clientId,
             Operation = "Nieudane logowanie",
             Hash = hash,
@@ -28,7 +29,7 @@ public class LogRepository(ApplicationDbContext applicationDbContext)
     {
         applicationDbContext.Logs.Add(new Log
         {
-            Timestamp = DateTime.Now,
+            Timestamp = DateTime.Now.ConvertToEuropeWarsaw(),
             ClientId = clientId,
             UserId = userId,
             Operation = operation,
@@ -42,7 +43,7 @@ public class LogRepository(ApplicationDbContext applicationDbContext)
     {
         applicationDbContext.Logs.Add(new Log
         {
-            Timestamp = DateTime.Now,
+            Timestamp = DateTime.Now.ConvertToEuropeWarsaw(),
             ClientId = GetId(ClaimTypes.PrimarySid),
             Operation = operation,
             UserId = GetId(ClaimTypes.NameIdentifier),
